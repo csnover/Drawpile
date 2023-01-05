@@ -292,6 +292,26 @@ private:
 	// canvas view by checking for the synthetic flag.
 	bool m_enableViewportEntryHack;
 	qreal m_brushOutlineWidth;
+
+	enum class InputState {
+		// Process events normally.
+		Normal,
+		// Discard events until the activation timer times out.
+		Waiting,
+		// Discard events until a pen release event occurs.
+		Blocked
+	};
+
+	// Qt sends input events that were used to trigger window activation, which
+	// causes spurious draws to the canvas when a user is just trying to focus
+	// the window. There is no way to identify that an input event was
+	// responsible for window activation, nor is it possible to tell Qt to not
+	// send those events (QTBUG-83713 for macOS, though this problem occurs
+	// separately for tablet events on all OS). Due to slow, missing, duplicate,
+	// and out-of-order input events, it is necessary to maintain extra state to
+	// discard window activation input events.
+	InputState m_inputState = InputState::Normal;
+	QTimer *m_activationTimer = nullptr;
 };
 
 }

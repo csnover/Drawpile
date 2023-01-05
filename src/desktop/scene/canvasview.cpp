@@ -36,6 +36,7 @@
 #include <QSettings>
 #include <QWindow>
 #include <QScreen>
+#include <QTimer>
 #include <QtMath>
 
 namespace widgets {
@@ -68,6 +69,12 @@ CanvasView::CanvasView(QWidget *parent)
 
 	m_notificationBar = new NotificationBar(this);
 	connect(m_notificationBar, &NotificationBar::actionButtonClicked, this, &CanvasView::reconnectRequested);
+
+	m_activationTimer = new QTimer(this);
+	m_activationTimer->setSingleShot(true);
+	connect(m_activationTimer, &QTimer::timeout, this, [this] {
+		this->m_inputState = InputState::Normal;
+	});
 
 	m_colorpickcursor = QCursor(QPixmap(":/cursors/colorpicker.png"), 2, 29);
 	m_layerpickcursor = QCursor(QPixmap(":/cursors/layerpicker.png"), 2, 29);
@@ -510,6 +517,17 @@ void CanvasView::penPressEvent(const QPointF &pos, qreal pressure, Qt::MouseButt
 	if(m_pendown != NOTDOWN)
 		return;
 
+	switch(m_inputState) {
+	case InputState::Waiting:
+		m_activationTimer->stop();
+		m_inputState = InputState::Blocked;
+		// fall through
+	case InputState::Blocked:
+		return;
+	case InputState::Normal:
+		break;
+	}
+
 	if((button == Qt::MiddleButton && m_dragmode != ViewDragMode::Started) || m_dragmode == ViewDragMode::Prepared) {
 		m_dragLastPoint = pos.toPoint();
 		m_dragmode = ViewDragMode::Started;
@@ -586,7 +604,7 @@ void CanvasView::mouseMoveEvent(QMouseEvent *event)
 		return;
 	if(m_touching)
 		return;
-	if(m_pendown && event->buttons() == Qt::NoButton) {
+	if((m_inputState == InputState::Blocked || m_pendown) && event->buttons() == Qt::NoButton) {
 		// In case we missed a mouse release
 		mouseReleaseEvent(event);
 		return;
@@ -603,6 +621,10 @@ void CanvasView::mouseMoveEvent(QMouseEvent *event)
 
 void CanvasView::penReleaseEvent(const QPointF &pos, Qt::MouseButton button)
 {
+	if (m_inputState == InputState::Blocked) {
+		m_inputState = InputState::Normal;
+	}
+
 	m_prevpoint = mapToScene(pos, 0.0);
 	if(m_dragmode != ViewDragMode::None) {
 		if(m_spacebar)
@@ -836,7 +858,11 @@ void CanvasView::touchEvent(QTouchEvent *event)
  */
 bool CanvasView::viewportEvent(QEvent *event)
 {
-	if(event->type() == QEvent::Gesture) {
+	if(event->type() == QEvent::WindowActivate) {
+		m_inputState = InputState::Waiting;
+		m_activationTimer->start(20);
+	}
+	else if(event->type() == QEvent::Gesture) {
 		gestureEvent(static_cast<QGestureEvent*>(event));
 	}
 #ifndef Q_OS_MACOS // On Mac, the above gesture events work better
