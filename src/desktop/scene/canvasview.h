@@ -279,7 +279,6 @@ private:
 	bool m_pointertracking;
 	bool m_pixelgrid;
 
-	bool m_isFirstPoint;
 	bool m_enableTouchScroll, m_enableTouchPinch, m_enableTouchTwist;
 	bool m_touching, m_touchRotating;
 	qreal m_touchStartZoom, m_touchStartRotate;

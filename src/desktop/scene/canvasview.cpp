@@ -48,7 +48,6 @@ CanvasView::CanvasView(QWidget *parent)
 	m_zoomWheelDelta(0),
 	m_enableTablet(true),
 	m_locked(false), m_pointertracking(false), m_pixelgrid(true),
-	m_isFirstPoint(false),
 	m_enableTouchScroll(true), m_enableTouchPinch(true), m_enableTouchTwist(true),
 	m_touching(false), m_touchRotating(false),
 	m_dpi(96),
