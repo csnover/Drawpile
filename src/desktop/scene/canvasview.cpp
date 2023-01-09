@@ -426,6 +426,7 @@ void CanvasView::drawForeground(QPainter *painter, const QRectF& rect)
 }
 
 void CanvasView::enterEvent(QEvent *event)
+#endif
 {
 	QGraphicsView::enterEvent(event);
 	m_showoutline = true;

@@ -87,6 +87,12 @@ DrawpileApp::~DrawpileApp()
 	drawdance::DrawContextPool::deinit();
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#define POINTER_TYPE QPointingDevice::PointerType
+#else
+#define POINTER_TYPE QTabletEvent
+#endif
+
 /**
  * Handle tablet proximity events. When the eraser is brought near
  * the tablet surface, switch to eraser tool on all windows.
@@ -98,7 +104,7 @@ DrawpileApp::~DrawpileApp()
 bool DrawpileApp::event(QEvent *e) {
 	if(e->type() == QEvent::TabletEnterProximity || e->type() == QEvent::TabletLeaveProximity) {
 		QTabletEvent *te = static_cast<QTabletEvent*>(e);
-		if(te->pointerType()==QTabletEvent::Eraser)
+		if(te->pointerType()==POINTER_TYPE::Eraser)
 			emit eraserNear(e->type() == QEvent::TabletEnterProximity);
 		return true;
 
@@ -124,6 +130,8 @@ bool DrawpileApp::event(QEvent *e) {
 
 	return QApplication::event(e);
 }
+
+#undef POINTER_TYPE
 
 void DrawpileApp::notifySettingsChanged()
 {
@@ -316,6 +324,7 @@ static void copyNativeSettings(DrawpileApp &app, QSettings &settings)
 	}
 }
 
+
 // Initialize the application and return a list of files to be opened (if any)
 static QStringList initApp(DrawpileApp &app)
 {
@@ -412,8 +421,10 @@ static QStringList initApp(DrawpileApp &app)
 }
 
 int main(int argc, char *argv[]) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	// Set attributes that must be set before QApplication is constructed
 	QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
 
 #ifdef Q_OS_ANDROID
 	// Android has a weird title bar by default, we want a menu bar instead.
