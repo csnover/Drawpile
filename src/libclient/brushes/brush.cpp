@@ -549,7 +549,6 @@ QJsonObject ActiveBrush::toJson() const
 			{"mypaint", m_myPaint.toJson()},
 		}},
 	};
-	return m_activeType == CLASSIC ? m_classic.toJson() : m_myPaint.toJson();
 }
 
 ActiveBrush ActiveBrush::fromJson(const QJsonObject &json)

@@ -2059,13 +2059,13 @@ void MainWindow::copyText()
 
 void MainWindow::paste()
 {
-	const QMimeData *data = QApplication::clipboard()->mimeData();
-	if(data->hasImage()) {
+	const QMimeData *mimeData = QApplication::clipboard()->mimeData();
+	if(mimeData->hasImage()) {
 		QPoint pastepos;
 		bool pasteAtPos = false;
 
 		// Get source position
-		QByteArray srcpos = data->data("x-drawpile/pastesrc");
+		QByteArray srcpos = mimeData->data("x-drawpile/pastesrc");
 		if(!srcpos.isNull()) {
 			QList<QByteArray> pos = srcpos.split(',');
 			if(pos.size() == 4) {
@@ -2080,9 +2080,9 @@ void MainWindow::paste()
 
 		// Paste-in-place if we're the source (same process, same document)
 		if(pasteAtPos && m_view->isPointVisible(pastepos))
-			pasteImage(data->imageData().value<QImage>(), &pastepos, true);
+			pasteImage(mimeData->imageData().value<QImage>(), &pastepos, true);
 		else
-			pasteImage(data->imageData().value<QImage>());
+			pasteImage(mimeData->imageData().value<QImage>());
 	}
 }
 
