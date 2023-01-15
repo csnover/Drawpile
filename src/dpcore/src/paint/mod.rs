@@ -56,7 +56,7 @@ pub use self::image::{Image15, Image8};
 pub use aoe::AoE;
 pub use bitmaplayer::BitmapLayer;
 pub use blendmode::Blendmode;
-pub use brushmask::{BrushMask, ClassicBrushCache};
+pub use brushmask::{BrushMask, ClassicBrushCache, MyPaintBrushCache};
 pub use color::{
     channel15_to_8, channel8_to_15, pixel15_to_8, pixel8_to_15, pixels15_to_8, pixels8_to_15,
     Color, Pixel15, Pixel8, BIT15_F32, BIT15_U16,

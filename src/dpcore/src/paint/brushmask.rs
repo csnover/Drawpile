@@ -23,6 +23,7 @@
 use super::color::{BIT15_F32, BIT15_U16};
 use super::rect::Rectangle;
 use super::rectiter::RectIterator;
+use lru::LruCache;
 use std::iter::FromIterator;
 
 pub struct BrushMask {
@@ -36,6 +37,56 @@ pub struct BrushMask {
 impl BrushMask {
     pub fn rect_iter(&self, r: &Rectangle) -> RectIterator<u16> {
         RectIterator::from_rectangle(&self.mask, self.diameter as usize, r)
+    }
+}
+
+pub struct MyPaintBrushCache {
+    lru: LruCache<(u32, u32, u32, u32), BrushMask>,
+}
+
+impl MyPaintBrushCache {
+    pub fn new() -> Self {
+        Self {
+            lru: LruCache::new(std::num::NonZeroUsize::new(100).unwrap()),
+        }
+    }
+
+    pub(crate) fn get_or_insert(
+        &mut self,
+        x: f32,
+        y: f32,
+        diameter: f32,
+        hardness: f32,
+        aspect_ratio: f32,
+        angle: f32,
+    ) -> (i32, i32, &BrushMask) {
+        debug_assert!(!diameter.is_nan());
+        debug_assert!(!hardness.is_nan());
+        debug_assert!(!aspect_ratio.is_nan());
+        debug_assert!(!angle.is_nan());
+
+        let key = (
+            diameter.to_bits(),
+            hardness.to_bits(),
+            aspect_ratio.to_bits(),
+            angle.to_bits(),
+        );
+
+        let mask = self.lru.get_or_insert(key, || {
+            BrushMask::new_mypaint_brush_mask(diameter, hardness, aspect_ratio, angle)
+        });
+        let radius = diameter / 2.0f32;
+        (
+            (x - radius + 0.5f32) as i32,
+            (y - radius + 0.5f32) as i32,
+            mask,
+        )
+    }
+}
+
+impl Default for MyPaintBrushCache {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -343,13 +394,11 @@ impl BrushMask {
     }
 
     pub fn new_mypaint_brush_mask(
-        x: f32,
-        y: f32,
         diameter: f32,
         hardness: f32,
         aspect_ratio: f32,
         angle: f32,
-    ) -> (i32, i32, BrushMask) {
+    ) -> BrushMask {
         let idia = diameter.ceil().max(1.0) as usize + 2;
         let mask_length = idia * idia;
 
@@ -426,14 +475,10 @@ impl BrushMask {
             }
         }
 
-        (
-            (x - radius + 0.5f32) as i32,
-            (y - radius + 0.5f32) as i32,
-            BrushMask {
-                diameter: idia as u32,
-                mask,
-            },
-        )
+        BrushMask {
+            diameter: idia as u32,
+            mask,
+        }
     }
 
     #[cfg(debug_assertions)]

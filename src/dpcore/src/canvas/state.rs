@@ -27,7 +27,8 @@ use super::retcon::{LocalFork, RetconAction};
 use crate::paint::annotation::{AnnotationID, VAlign};
 use crate::paint::{
     editlayer, AoE, BitmapLayer, Blendmode, ClassicBrushCache, Color, Frame, GroupLayer, Layer,
-    LayerID, LayerInsertion, LayerStack, Rectangle, Size, UserID, PREVIEW_SUBLAYER_ID,
+    LayerID, LayerInsertion, LayerStack, MyPaintBrushCache, Rectangle, Size, UserID,
+    PREVIEW_SUBLAYER_ID,
 };
 use crate::protocol::message::*;
 
@@ -41,6 +42,7 @@ pub struct CanvasState {
     layerstack: Arc<LayerStack>,
     history: History,
     brushcache: ClassicBrushCache,
+    mypaintcache: MyPaintBrushCache,
     localfork: LocalFork,
 }
 
@@ -194,6 +196,7 @@ impl CanvasState {
             layerstack: Arc::new(LayerStack::new(0, 0)),
             history: History::new(),
             brushcache: ClassicBrushCache::new(),
+            mypaintcache: MyPaintBrushCache::new(),
             localfork: LocalFork::new().set_fallbehind(1000),
         }
     }
@@ -203,6 +206,7 @@ impl CanvasState {
             layerstack: Arc::new(layerstack),
             history: History::new(),
             brushcache: ClassicBrushCache::new(),
+            mypaintcache: MyPaintBrushCache::new(),
             localfork: LocalFork::new().set_fallbehind(1000),
         }
     }
@@ -337,7 +341,7 @@ impl CanvasState {
                         a
                     }
                     CommandMessage::DrawDabsMyPaint(_, m) => {
-                        let (a, _) = brushes::drawdabs_mypaint(layer, 0, m);
+                        let (a, _) = brushes::drawdabs_mypaint(layer, 0, m, &mut self.mypaintcache);
                         a
                     }
                     CommandMessage::PutImage(_, m) => {
@@ -1000,7 +1004,7 @@ impl CanvasState {
             .root_mut()
             .get_bitmaplayer_mut(msg.layer as LayerID)
         {
-            let (aoe, pos) = brushes::drawdabs_mypaint(layer, user, msg);
+            let (aoe, pos) = brushes::drawdabs_mypaint(layer, user, msg, &mut self.mypaintcache);
             CanvasStateChange::aoe(aoe, user, msg.layer, pos)
         } else {
             warn!("DrawDabsMyPaint: Layer {:04x} not found!", msg.layer);

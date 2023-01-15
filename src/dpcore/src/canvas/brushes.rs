@@ -22,7 +22,7 @@
 
 use crate::paint::{
     channel8_to_15, editlayer, AoE, BitmapLayer, Blendmode, BrushMask, ClassicBrushCache, Color,
-    UserID, BIT15_F32,
+    MyPaintBrushCache, UserID, BIT15_F32,
 };
 use crate::protocol::message::{
     DrawDabsClassicMessage, DrawDabsMyPaintMessage, DrawDabsPixelMessage,
@@ -204,8 +204,9 @@ pub fn drawdabs_mypaint(
     layer: &mut BitmapLayer,
     user: UserID,
     dabs: &DrawDabsMyPaintMessage,
+    cache: &mut MyPaintBrushCache,
 ) -> (AoE, (i32, i32)) {
-    let (result, may_have_decreased_opacity) = drawdabs_mypaint_draw(layer, user, dabs);
+    let (result, may_have_decreased_opacity) = drawdabs_mypaint_draw(layer, user, dabs, cache);
 
     if may_have_decreased_opacity {
         layer.optimize(&result.0);
@@ -218,6 +219,7 @@ fn drawdabs_mypaint_draw(
     layer: &mut BitmapLayer,
     user: UserID,
     dabs: &DrawDabsMyPaintMessage,
+    cache: &mut MyPaintBrushCache,
 ) -> ((AoE, (i32, i32)), bool) {
     let mut aoe = AoE::Nothing;
     let color = Color::from_argb32(dabs.color);
@@ -235,7 +237,7 @@ fn drawdabs_mypaint_draw(
         last_x = x;
         last_y = y;
 
-        let (mx, my, mask) = BrushMask::new_mypaint_brush_mask(
+        let (mx, my, mask) = cache.get_or_insert(
             x as f32 / 4.0f32,
             y as f32 / 4.0f32,
             dab.size as f32 / 256.0f32,
@@ -263,7 +265,7 @@ fn drawdabs_mypaint_draw(
                 user,
                 mx,
                 my,
-                &mask,
+                mask,
                 &color,
                 mode,
                 (normal * opacity * BIT15_F32) as u16,
@@ -276,7 +278,7 @@ fn drawdabs_mypaint_draw(
                 user,
                 mx,
                 my,
-                &mask,
+                mask,
                 &color,
                 Blendmode::Recolor,
                 (lock_alpha * opacity * BIT15_F32) as u16,

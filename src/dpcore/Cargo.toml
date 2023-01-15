@@ -9,6 +9,7 @@ license.workspace = true
 dpmypaint = { path = "../dpmypaint" }
 base64 = "0.13"
 bytemuck = "1.12"
+lru = "0.9"
 tracing = "0.1"
 num_enum = "0.5"
 bitvec = "1.0"

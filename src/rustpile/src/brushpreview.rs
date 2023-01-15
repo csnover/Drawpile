@@ -24,7 +24,7 @@ use dpcore::brush::{BrushEngine, BrushState, ClassicBrush, MyPaintBrush, MyPaint
 use dpcore::canvas::brushes;
 use dpcore::paint::{
     editlayer, floodfill, Blendmode, BrushMask, ClassicBrushCache, Color, LayerID, LayerInsertion,
-    LayerStack, Rectangle, Tile, BIT15_U16,
+    LayerStack, MyPaintBrushCache, Rectangle, Tile, BIT15_U16,
 };
 use dpcore::protocol::message::CommandMessage;
 
@@ -234,6 +234,7 @@ impl BrushPreview {
         painter.end_stroke();
 
         let mut brushcache = ClassicBrushCache::new();
+        let mut mypaintcache = MyPaintBrushCache::new();
 
         let dabs = painter.take_dabs(1);
         for dab in dabs {
@@ -245,7 +246,9 @@ impl BrushPreview {
                 CommandMessage::DrawDabsPixelSquare(_, m) => {
                     brushes::drawdabs_pixel(layer, 1, &m, true)
                 }
-                CommandMessage::DrawDabsMyPaint(_, m) => brushes::drawdabs_mypaint(layer, 1, &m),
+                CommandMessage::DrawDabsMyPaint(_, m) => {
+                    brushes::drawdabs_mypaint(layer, 1, &m, &mut mypaintcache)
+                }
                 _ => unimplemented!(),
             };
         }
