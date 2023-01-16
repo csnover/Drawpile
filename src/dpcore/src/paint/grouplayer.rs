@@ -56,6 +56,13 @@ pub enum LayerInsertion {
     Into(LayerID),
 }
 
+#[derive(Clone, Copy, Default)]
+pub struct LocalLayerMetadata {
+    pub visible: bool,
+}
+
+pub type LocalState = std::collections::HashMap<LayerID, LocalLayerMetadata>;
+
 /// A group layer has no pixel data of its own, but contains
 /// child layers, which may also be groups.
 #[derive(Clone)]
@@ -72,7 +79,7 @@ pub struct GroupLayer {
 /// This provides functions that must always be executed
 /// on the root for invariants to hold.
 #[derive(Clone)]
-pub struct RootGroup(GroupLayer);
+pub struct RootGroup(GroupLayer, LocalState);
 
 /// Routes to sublayers. Each group holds a list of layer IDs
 /// contained by its own sub-groups. This allows fast lookup of
@@ -748,7 +755,7 @@ impl GroupLayer {
 
 impl RootGroup {
     pub fn new(width: u32, height: u32) -> Self {
-        Self(GroupLayer::new(0, width, height))
+        Self(GroupLayer::new(0, width, height), <_>::default())
     }
 
     /// Unwrap the group
@@ -856,7 +863,7 @@ impl RootGroup {
         new_order: &[LayerID],
     ) -> Result<Self, &'static str> {
         if root_group == 0 {
-            return Ok(Self(self.0.reordered(new_order)?));
+            return Ok(Self(self.0.reordered(new_order)?, self.1.clone()));
         }
 
         let mut root = self.clone();
@@ -904,6 +911,7 @@ impl RootGroup {
     }
 
     pub fn remove_layer(&mut self, id: LayerID) {
+        self.1.remove(&id);
         // this can only be called safely via the root group
         self.0.remove_layer(id);
     }
@@ -930,7 +938,10 @@ impl RootGroup {
     }
 
     pub fn resized(&self, top: i32, right: i32, bottom: i32, left: i32) -> Option<Self> {
-        Some(Self(self.0.resized(top, right, bottom, left)?))
+        Some(Self(
+            self.0.resized(top, right, bottom, left)?,
+            self.1.clone(),
+        ))
     }
 
     pub fn layer_at(&self, index: usize) -> &Layer {
@@ -951,6 +962,16 @@ impl RootGroup {
         self.0.layer_count()
     }
 
+    /// Local-only layer state data.
+    pub fn local_state(&self) -> &LocalState {
+        &self.1
+    }
+
+    /// Mutable local-only layer state data.
+    pub fn local_state_mut(&mut self) -> &mut LocalState {
+        &mut self.1
+    }
+
     pub fn pick_layer(&self, x: i32, y: i32) -> LayerID {
         self.0.pick_layer(x, y)
     }
@@ -966,7 +987,7 @@ impl RootGroup {
 
 impl From<GroupLayer> for RootGroup {
     fn from(root: GroupLayer) -> Self {
-        Self(root)
+        Self(root, <_>::default())
     }
 }
 

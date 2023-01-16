@@ -643,6 +643,8 @@ impl CanvasState {
 
         let root = Arc::make_mut(&mut self.layerstack).root_mut();
 
+        let local_state = root.local_state().get(&msg.id).copied();
+
         let new_layer = if msg.source > 0 {
             root.add_layer_copy(msg.id, msg.source, pos)
         } else if msg.flags & LayerCreateMessage::FLAGS_GROUP != 0 {
@@ -653,6 +655,10 @@ impl CanvasState {
 
         if let Some(new_layer) = new_layer {
             new_layer.metadata_mut().title = msg.name.clone();
+
+            if let Some(local_state) = local_state {
+                new_layer.metadata_mut().hidden = !local_state.visible;
+            }
 
             CanvasStateChange::layers(if msg.source > 0 {
                 new_layer.nonblank_tilemap().into()
@@ -762,10 +768,13 @@ impl CanvasState {
         layer_id: LayerID,
         visible: bool,
     ) -> CanvasStateChange {
-        if let Some(layer) = Arc::make_mut(&mut self.layerstack)
-            .root_mut()
-            .get_layer_mut(layer_id)
-        {
+        let root = Arc::make_mut(&mut self.layerstack).root_mut();
+
+        if let Some(entry) = root.local_state_mut().get_mut(&layer_id) {
+            entry.visible = visible;
+        }
+
+        if let Some(layer) = root.get_layer_mut(layer_id) {
             layer.metadata_mut().hidden = !visible;
             CanvasStateChange::layers(layer.nonblank_tilemap().into())
         } else {

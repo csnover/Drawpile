@@ -139,7 +139,7 @@ enum PaintEngineCommand {
     RemoteMessage(CommandMessage),
     BrushPreview(LayerID, Vec<CommandMessage>),
     RemovePreview(LayerID),
-    ReplaceCanvas(Box<LayerStack>),
+    ReplaceCanvas(Box<LayerStack>, bool),
     PlaybackPaused(i64, u32), // triggers PlaybackCallback
     SetLocalVisibility(LayerID, bool),
     TruncateHistory,
@@ -231,7 +231,11 @@ fn run_paintengine(
                     preview = (0, Vec::new());
                     changes |= canvas.remove_preview(layer);
                 }
-                ReplaceCanvas(layerstack) => {
+                ReplaceCanvas(mut layerstack, keep_local_state) => {
+                    if keep_local_state {
+                        *layerstack.root_mut().local_state_mut() =
+                            canvas.layerstack().root().local_state().clone();
+                    }
                     canvas = CanvasState::new_with_layerstack(*layerstack);
                     changes = CanvasStateChange::everything();
                 }
@@ -584,12 +588,10 @@ pub extern "C" fn paintengine_cleanup(dp: &mut PaintEngine) -> bool {
 pub extern "C" fn paintengine_reset_canvas(dp: &mut PaintEngine) {
     dp.aclfilter = AclFilter::new();
 
-    if let Err(err) = dp
-        .engine_channel
-        .send(PaintEngineCommand::ReplaceCanvas(Box::new(
-            LayerStack::new(0, 0),
-        )))
-    {
+    if let Err(err) = dp.engine_channel.send(PaintEngineCommand::ReplaceCanvas(
+        Box::new(LayerStack::new(0, 0)),
+        true,
+    )) {
         warn!(
             "Couldn't send reset canvas command to paint engine thread {:?}",
             err
@@ -1345,7 +1347,7 @@ pub extern "C" fn paintengine_load_blank(
 
     if let Err(err) = dp
         .engine_channel
-        .send(PaintEngineCommand::ReplaceCanvas(ls))
+        .send(PaintEngineCommand::ReplaceCanvas(ls, false))
     {
         warn!(
             "Couldn't send replace command to paint engine thread {:?}",
@@ -1405,7 +1407,7 @@ pub extern "C" fn paintengine_load_file(
 
     if let Err(err) = dp
         .engine_channel
-        .send(PaintEngineCommand::ReplaceCanvas(ls))
+        .send(PaintEngineCommand::ReplaceCanvas(ls, false))
     {
         warn!(
             "Couldn't send replace command to paint engine thread {:?}",
@@ -1451,12 +1453,10 @@ pub extern "C" fn paintengine_load_recording(
         }
     };
 
-    if let Err(err) = dp
-        .engine_channel
-        .send(PaintEngineCommand::ReplaceCanvas(Box::new(
-            LayerStack::new(0, 0),
-        )))
-    {
+    if let Err(err) = dp.engine_channel.send(PaintEngineCommand::ReplaceCanvas(
+        Box::new(LayerStack::new(0, 0)),
+        false,
+    )) {
         warn!(
             "Couldn't send replace command to paint engine thread {:?}",
             err
@@ -1869,10 +1869,10 @@ pub extern "C" fn paintengine_playback_jump(dp: &mut PaintEngine, pos: u32, exac
             return;
         }
 
-        if let Err(err) = dp
-            .engine_channel
-            .send(PaintEngineCommand::ReplaceCanvas(Box::new(layerstack)))
-        {
+        if let Err(err) = dp.engine_channel.send(PaintEngineCommand::ReplaceCanvas(
+            Box::new(layerstack),
+            false,
+        )) {
             warn!(
                 "Couldn't send reset canvas command to paint engine thread {:?}",
                 err
