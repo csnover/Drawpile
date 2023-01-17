@@ -67,16 +67,6 @@ CanvasView::CanvasView(QWidget *parent)
 	m_zoomcursor = QCursor(QPixmap(":/cursors/zoom.png"), 8, 8);
 	m_rotatecursor = QCursor(QPixmap(":/cursors/rotate.png"), 16, 16);
 
-	// Generate the minimalistic dot cursor
-	{
-		QPixmap dot(8, 8);
-		dot.fill(Qt::transparent);
-		QPainter p(&dot);
-		p.setPen(Qt::white);
-		p.drawPoint(0, 0);
-		m_dotcursor = QCursor(dot, 0, 0);
-	}
-
 	auto &settings = dpApp().settings();
 
 	settings.bindTabletEvents(this, &widgets::CanvasView::setTabletEnabled);
@@ -101,6 +91,10 @@ CanvasView::CanvasView(QWidget *parent)
 		const auto policy = enabled ? Qt::ScrollBarAsNeeded : Qt::ScrollBarAlwaysOff;
 		setHorizontalScrollBarPolicy(policy);
 		setVerticalScrollBarPolicy(policy);
+	});
+
+	settings.bindCanvasShowReticle(this, [=](bool enabled) {
+		m_showReticle = enabled;
 	});
 }
 
@@ -318,7 +312,7 @@ void CanvasView::resetCursor()
 
 	if(m_toolcursor.shape() == Qt::CrossCursor) {
 		switch(m_brushCursorStyle) {
-		case BrushCursor::Dot: viewport()->setCursor(m_dotcursor); break;
+		case BrushCursor::Dot: viewport()->setCursor(Qt::BlankCursor); break;
 		case BrushCursor::Cross: viewport()->setCursor(Qt::CrossCursor); break;
 		case BrushCursor::Arrow: viewport()->setCursor(Qt::ArrowCursor); break;
 		case BrushCursor::TriangleRight: viewport()->setCursor(m_trianglerightcursor); break;
@@ -341,16 +335,16 @@ void CanvasView::setPixelGrid(bool enable)
 void CanvasView::setOutlineSize(int newSize)
 {
 	if(m_showoutline && (m_outlineSize>0 || newSize>0)) {
-		const qreal maxSize = qMax(m_outlineSize, newSize) + m_brushOutlineWidth;
+		const auto max = qMax(m_outlineSize + extraReticleSize(),
+							  newSize + extraReticleSizeFor(newSize));
+		const qreal maxSize = max + m_brushOutlineWidth;
 		const qreal maxRad = maxSize / 2.0;
-		QList<QRectF> rect;
-		rect.append(QRectF {
-					m_prevoutlinepoint.x() - maxRad,
-					m_prevoutlinepoint.y() - maxRad,
-					maxSize,
-					maxSize
-					});
-		updateScene(rect);
+		updateScene({ QRectF{
+			m_prevoutlinepoint.x() - maxRad,
+			m_prevoutlinepoint.y() - maxRad,
+			maxSize,
+			maxSize
+		}});
 	}
 	m_outlineSize = newSize;
 }
@@ -391,9 +385,21 @@ void CanvasView::drawForeground(QPainter *painter, const QRectF& rect)
 	if(shouldRenderOutline) {
 		QRectF outline(m_prevoutlinepoint-QPointF(m_outlineSize/2.0, m_outlineSize/2.0),
 					QSizeF(m_outlineSize, m_outlineSize));
+	}
 
-		if(!m_subpixeloutline && m_outlineSize%2==0)
-			outline.translate(-0.5, -0.5);
+	if(m_showoutline && m_outlineSize>0 && m_zoom != 0.0 && m_penmode == PenMode::Normal && m_dragmode == ViewDragMode::None && !m_locked) {
+		auto invZoom = 1.0 / (m_zoom / 100.0);
+		// No matter how small the zoom is, the outline should be at least 1
+		// device pixel
+		auto diameter = qMax(qFloor(invZoom), m_outlineSize);
+		auto radius = diameter / 2.0;
+
+		QRectF outline(m_prevoutlinepoint-QPointF(radius, radius),
+					QSizeF(diameter, diameter));
+
+		auto realSize = realOutlineSizeFor(m_outlineSize);
+		if(!m_subpixeloutline && realSize%2==0)
+			outline.translate(-0.5 * invZoom, -0.5 * invZoom);
 
 		if(rect.intersects(outline) && m_brushOutlineWidth > 0) {
 			painter->save();
@@ -402,10 +408,26 @@ void CanvasView::drawForeground(QPainter *painter, const QRectF& rect)
 			pen.setWidthF(m_brushOutlineWidth);
 			painter->setPen(pen);
 			painter->setCompositionMode(QPainter::RasterOp_SourceXorDestination);
-			if(m_squareoutline)
+
+			if(realSize <= 1)
+				painter->drawPoint(outline.center());
+			else if(m_squareoutline)
 				painter->drawRect(outline);
 			else
 				painter->drawEllipse(outline);
+
+			if(shouldDrawReticleFor(m_outlineSize)) {
+				auto p0 = radius + OUTLINE_RETICLE_GAP_SIZE * invZoom;
+				auto p1 = p0 + OUTLINE_RETICLE_LINE_SIZE * invZoom;
+				auto c = outline.center();
+
+				painter->translate(c);
+				painter->rotate(-m_rotate);
+				painter->drawLine(QPointF(-p1, .0), QPointF(-p0, .0));
+				painter->drawLine(QPointF(p0, .0), QPointF(p1, .0));
+				painter->drawLine(QPointF(.0, -p1), QPointF(.0, -p0));
+				painter->drawLine(QPointF(.0, p0), QPointF(.0, p1));
+			}
 			painter->restore();
 		}
 	}
@@ -1278,7 +1300,7 @@ void CanvasView::updateOutline(canvas::Point point) {
 	}
 	if(m_showoutline && !m_locked && (!m_prevoutline || !point.roughlySame(m_prevoutlinepoint))) {
 		QList<QRectF> rect;
-		const qreal owidth = m_outlineSize + m_brushOutlineWidth;
+		const qreal owidth = m_outlineSize + m_brushOutlineWidth + extraReticleSize();
 		const qreal orad = owidth / 2.0;
 		rect.append(QRectF(
 					m_prevoutlinepoint.x() - orad,
@@ -1300,7 +1322,7 @@ void CanvasView::updateOutline(canvas::Point point) {
 void CanvasView::updateOutline()
 {
 	QList<QRectF> rect;
-	const qreal owidth = m_outlineSize + m_brushOutlineWidth;
+	const qreal owidth = m_outlineSize + m_brushOutlineWidth + extraReticleSize();
 	const qreal orad = owidth / 2.0;
 
 	rect.append(QRectF(

@@ -11,6 +11,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDoubleSpinBox>
+#include <QStandardItemModel>
 #include <QVariant>
 #include <QWidget>
 #include <QtColorWidgets/ColorWheel>
@@ -56,20 +57,20 @@ void Tools::initGeneralTools(desktop::settings::Settings &settings, utils::Saner
 	outlineSize->setSuffix(tr("px"));
 	auto *outlineSizeLayout = utils::encapsulate(tr("Show a %1 outline around the brush"), outlineSize);
 	auto *showOutline = utils::checkable(tr("Enable brush outline"), outlineSizeLayout, outlineSize);
-	connect(showOutline, &QCheckBox::toggled, outlineSize, [=, &settings](bool enable) {
-		if (enable && outlineSize->value() < std::numeric_limits<double>::epsilon()) {
-			outlineSize->setValue(1.0);
-		} else if (!enable) {
-			settings.setBrushOutlineWidth(0.0);
-		}
-	});
+
+	auto *reticle = new QCheckBox(tr("Add a reticle to improve visibility of small brushes"));
+	settings.bindCanvasShowReticle(reticle);
+
 	settings.bindBrushOutlineWidth(showOutline, [=](double value) {
 		const auto enabled = (value >= std::numeric_limits<double>::epsilon());
 		showOutline->setChecked(enabled);
 		outlineSize->setEnabled(enabled);
+		reticle->setEnabled(enabled);
 	});
 
 	form->addRow(nullptr, outlineSizeLayout, 1, 2);
+
+	form->addRow(nullptr, utils::indent(reticle), 1, 2);
 
 	auto *brushCursor = new QComboBox;
 	// Always adjust in case of locale changes
@@ -77,19 +78,34 @@ void Tools::initGeneralTools(desktop::settings::Settings &settings, utils::Saner
 
 	using BrushCursor = widgets::CanvasView::BrushCursor;
 	for (const auto &[name, value] : {
-		std::pair { tr("Dot"), BrushCursor::Dot },
-		std::pair { tr("Crosshair"), BrushCursor::Cross },
-		std::pair { tr("Arrow"), BrushCursor::Arrow },
-		std::pair { tr("Right-handed triangle"), BrushCursor::TriangleRight },
-		std::pair { tr("Left-handed triangle"), BrushCursor::TriangleLeft }
+		std::pair { tr("just an outline"), BrushCursor::Dot },
+		std::pair { tr("a crosshair"), BrushCursor::Cross },
+		std::pair { tr("an arrow"), BrushCursor::Arrow },
+		std::pair { tr("a right-handed triangle"), BrushCursor::TriangleRight },
+		std::pair { tr("a left-handed triangle"), BrushCursor::TriangleLeft }
 	}) {
 		brushCursor->addItem(name, QVariant::fromValue(value));
 	}
 	settings.bindBrushCursor(brushCursor, Qt::UserRole);
 
-	auto *brushCursorLayout = utils::encapsulate(tr("Draw the brush as a %1"), brushCursor);
+	auto *brushCursorLayout = utils::encapsulate(tr("Draw the brush as %1"), brushCursor);
 	utils::setSpacingControlType(brushCursorLayout, QSizePolicy::ComboBox);
 	form->addRow(nullptr, brushCursorLayout, 1, 2);
+
+	connect(showOutline, &QCheckBox::toggled, outlineSize, [=, &settings](bool enable) {
+		if (enable && outlineSize->value() < std::numeric_limits<double>::epsilon()) {
+			outlineSize->setValue(1.0);
+		} else if (!enable) {
+			settings.setBrushOutlineWidth(0.0);
+			if (settings.brushCursor() == BrushCursor::Dot) {
+				settings.setBrushCursor(BrushCursor::Cross);
+			}
+		}
+
+		if (auto *model = qobject_cast<QStandardItemModel *>(brushCursor->model())) {
+			model->item(0)->setEnabled(enable);
+		}
+	});
 }
 
 void Tools::initColorWheel(desktop::settings::Settings &settings, utils::SanerFormLayout *form)
