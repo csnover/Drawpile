@@ -111,13 +111,11 @@ void CanvasView::setCanvas(drawingboard::CanvasScene *scene)
 	setScene(scene);
 
 	connect(m_scene, &drawingboard::CanvasScene::canvasResized, this, [this](int xoff, int yoff, const QSize &oldsize) {
-		if(oldsize.isEmpty()) {
-			centerOn(m_scene->sceneRect().center());
-		} else {
+		if(!oldsize.isEmpty()) {
 			const qreal z = m_zoom / 100.0;
 			scrollBy(xoff * z, yoff * z);
+			viewRectChanged();
 		}
-		viewRectChanged();
 	});
 
 	connect(m_scene, &drawingboard::CanvasScene::paintEngineCrashed, this, [this]() {

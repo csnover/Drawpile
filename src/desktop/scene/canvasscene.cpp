@@ -148,6 +148,12 @@ void CanvasScene::handleCanvasResize(int xoffset, int yoffset, const QSize &olds
 		return;
 	QRectF bounds = m_canvasItem->boundingRect();
 
+	// Empty bounds will be sent at the beginning of an autoreset. If they are
+	// not ignored, it will cause the viewport position to move, which is not
+	// desirable
+	if(bounds.isEmpty())
+		return;
+
 	setSceneRect(bounds.adjusted(-MARGIN, -MARGIN, MARGIN, MARGIN));
 	emit canvasResized(xoffset, yoffset, oldsize);
 }
