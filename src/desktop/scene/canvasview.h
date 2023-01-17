@@ -202,6 +202,16 @@ private:
 	void penReleaseEvent(const QPointF &pos, Qt::MouseButton button);
 
 private:
+	//! The maximum outline size, in display pixels, that should receive a
+	//! reticle for visibility.
+	const int OUTLINE_RETICLE_MAX = 3;
+	//! The distance, in display pixels, between the reticle and the outline.
+	const int OUTLINE_RETICLE_GAP_SIZE = 3;
+	//! The length, in display pixels, of the reticle crosshairs.
+	const int OUTLINE_RETICLE_LINE_SIZE = 3;
+	//! The extra diameter, in display pixels, of the reticle.
+	const int OUTLINE_RETICLE_DIAMETER = (OUTLINE_RETICLE_GAP_SIZE + OUTLINE_RETICLE_LINE_SIZE) * 2;
+
 	qreal mapPressure(qreal pressure, bool stylus);
 
 	enum class ViewDragMode {None, Prepared, Started};
@@ -221,6 +231,22 @@ private:
 	void touchEvent(QTouchEvent *event);
 
 	void resetCursor();
+
+	inline int realOutlineSizeFor(int size) {
+		return size * int(m_zoom) / 100;
+	}
+
+	inline qreal extraReticleSize() {
+		return extraReticleSizeFor(m_outlineSize);
+	}
+
+	inline qreal extraReticleSizeFor(int size) {
+		return shouldDrawReticleFor(size) ? (OUTLINE_RETICLE_DIAMETER / (m_zoom / 100.0)) : 0.0;
+	}
+
+	inline bool shouldDrawReticleFor(int size) {
+		return realOutlineSizeFor(size) <= OUTLINE_RETICLE_MAX;
+	}
 
 	inline void viewRectChanged() { emit viewRectChange(mapToScene(rect())); }
 
@@ -259,7 +285,7 @@ private:
 
 	int m_outlineSize;
 	bool m_showoutline, m_subpixeloutline, m_squareoutline;
-	QCursor m_dotcursor, m_colorpickcursor, m_layerpickcursor, m_zoomcursor, m_rotatecursor;
+	QCursor m_colorpickcursor, m_layerpickcursor, m_zoomcursor, m_rotatecursor;
 	QCursor m_toolcursor;
 
 	qreal m_zoom; // View zoom in percents
