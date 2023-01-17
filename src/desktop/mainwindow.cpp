@@ -280,6 +280,15 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 		msgbox->show();
 	});
 
+	connect(m_doc->client(), &net::Client::sessionResetted, [this] {
+		m_view->setUpdatesEnabled(false);
+	});
+	connect(m_doc->client(), &net::Client::catchupProgress, [this](int progress) {
+		if(progress == 100) {
+			m_view->setUpdatesEnabled(true);
+		}
+	});
+
 	// Tool dock connections
 	m_tempToolSwitchShortcut = new ShortcutDetector(this);
 
