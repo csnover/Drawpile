@@ -80,11 +80,6 @@ void TitleWidget::Button::leaveEvent(QEvent *event)
 
 void TitleWidget::Button::paintEvent(QPaintEvent *)
 {
-	// Make the button invisible when it's not enabled.
-	// This way we can hide the button without affecting the layout.
-	if(!isEnabled())
-		return;
-
 	QPainter p(this);
 
 	icon().paint(
@@ -136,17 +131,10 @@ void TitleWidget::addStretch(int stretch)
 	m_layout->insertStretch(m_layout->count()-2, stretch);
 }
 
-void TitleWidget::addCenteringSpacer()
-{
-	m_layout->insertStretch(0);
-	m_layout->insertSpacing(0, m_closeButton->width() + m_dockButton->width());
-	m_layout->insertStretch(m_layout->count()-2);
-}
-
 void TitleWidget::onFeaturesChanged(QDockWidget::DockWidgetFeatures features)
 {
-	m_dockButton->setEnabled(features.testFlag(QDockWidget::DockWidgetMovable));
-	m_closeButton->setEnabled(features.testFlag(QDockWidget::DockWidgetClosable));
+	m_dockButton->setVisible(features.testFlag(QDockWidget::DockWidgetMovable));
+	m_closeButton->setVisible(features.testFlag(QDockWidget::DockWidgetClosable));
 }
 
 }

@@ -161,13 +161,6 @@ QWidget *BrushSettings::createUiWidget(QWidget *parent)
 
 	d->brushSlotWidget->setLayout(brushSlotWidgetLayout);
 
-	// A spacer for centering the tool slots in the title bar
-	{
-		const int iconSize = parent->style()->pixelMetric(QStyle::PM_SmallIconSize, nullptr, parent);
-		int marginSize = parent->style()->pixelMetric(QStyle::PM_DockWidgetTitleBarButtonMargin, nullptr, parent);
-		brushSlotWidgetLayout->addSpacing(marginSize+iconSize);
-	}
-
 	brushSlotWidgetLayout->addStretch();
 
 	for(int i=0;i<BRUSH_COUNT;++i) {

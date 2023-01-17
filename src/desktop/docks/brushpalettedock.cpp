@@ -81,7 +81,6 @@ BrushPalette::BrushPalette(QWidget *parent)
 
 	TitleWidget *titleWidget = new TitleWidget(this);
 	setTitleBarWidget(titleWidget);
-	titleWidget->addSpace(4);
 
 	d->tagComboBox = new QComboBox(this);
 	d->tagComboBox->setInsertPolicy(QComboBox::NoInsert);

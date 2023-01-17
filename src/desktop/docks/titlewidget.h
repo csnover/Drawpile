@@ -35,9 +35,6 @@ public:
 	void addSpace(int space);
 	void addStretch(int stretch=0);
 
-	/// Add a spacer to the left side to center the custom widgets
-	void addCenteringSpacer();
-
 private slots:
 	void onFeaturesChanged(QDockWidget::DockWidgetFeatures features);
 
