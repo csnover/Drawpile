@@ -39,8 +39,7 @@
         </property>
         <property name="icon">
          <iconset theme="object-flip-vertical">
-          <normaloff/>
-         </iconset>
+          <normaloff>theme:object-flip-vertical.svg</normaloff>theme:object-flip-vertical.svg</iconset>
         </property>
        </widget>
       </item>
@@ -51,8 +50,7 @@
         </property>
         <property name="icon">
          <iconset theme="object-flip-horizontal">
-          <normaloff/>
-         </iconset>
+          <normaloff>theme:object-flip-horizontal.svg</normaloff>theme:object-flip-horizontal.svg</iconset>
         </property>
        </widget>
       </item>
