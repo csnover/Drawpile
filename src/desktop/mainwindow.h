@@ -229,6 +229,9 @@ private:
 	void createDocks();
 	void setupActions();
 
+	void updateSessionSettings();
+	void showSessionSettings();
+
 	QTimer m_saveWindowDebounce;
 	QTimer m_saveSplitterDebounce;
 	QMap<QString, bool> m_actionsConfig;
