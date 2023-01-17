@@ -791,7 +791,11 @@ void BrushSettings::quickAdjustOn(QSpinBox *box, qreal adjustment)
 
 int BrushSettings::getSize() const
 {
-	return d->ui.brushsizeBox->value();
+	if(d->ui.brushsizeBox->isVisible()) {
+		return d->ui.brushsizeBox->value();
+	} else {
+		return std::exp(d->ui.radiusLogarithmicBox->value() / 100.0 - 2.0);
+	}
 }
 
 bool BrushSettings::getSubpixelMode() const
