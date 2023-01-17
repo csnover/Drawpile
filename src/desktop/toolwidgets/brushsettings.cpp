@@ -142,6 +142,11 @@ const int BrushSettings::MAX_BRUSH_SPACING = 999;
 const int BrushSettings::DEFAULT_BRUSH_SIZE = 128;
 const int BrushSettings::DEFAULT_BRUSH_SPACING = 50;
 
+static inline int logSize(int radiusLogarithmic)
+{
+	return std::max(1.0, std::ceil(std::exp(radiusLogarithmic / 100.0)));
+}
+
 BrushSettings::BrushSettings(ToolController *ctrl, QObject *parent)
 	: ToolSettings(ctrl, parent), d(new Private(this))
 {
@@ -385,7 +390,7 @@ void BrushSettings::changeSizeSetting(int size)
 void BrushSettings::changeRadiusLogarithmicSetting(int radiusLogarithmic)
 {
 	if(d->ui.radiusLogarithmicBox->isVisible()) {
-		emit pixelSizeChanged(std::exp(radiusLogarithmic / 100.0 - 2.0));
+		emit pixelSizeChanged(logSize(radiusLogarithmic));
 	}
 }
 
@@ -466,7 +471,7 @@ void BrushSettings::updateUi()
 
 	const rustpile::MyPaintSettings &myPaintSettings = myPaint.constSettings();
 	d->ui.radiusLogarithmicBox->setValue(
-		(myPaintSettings.mappings[MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC].base_value + 2.0) * 100.0);
+		(myPaintSettings.mappings[MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC].base_value) * 100.0);
 	d->ui.gainBox->setValue(qRound(
 		myPaintSettings.mappings[MYPAINT_BRUSH_SETTING_PRESSURE_GAIN_LOG].base_value * 100.0));
 	d->ui.paintModeBox->setValue(qRound(
@@ -537,7 +542,7 @@ void BrushSettings::updateFromUi()
 
 	rustpile::MyPaintSettings &myPaintSettings = myPaint.settings();
 	myPaintSettings.mappings[MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC].base_value =
-		d->ui.radiusLogarithmicBox->value() / 100.0 - 2.0;
+		d->ui.radiusLogarithmicBox->value() / 100.0;
 	myPaintSettings.mappings[MYPAINT_BRUSH_SETTING_OPAQUE].base_value =
 		d->ui.brushopacity->value() / 100.0;
 	myPaintSettings.mappings[MYPAINT_BRUSH_SETTING_HARDNESS].base_value =
@@ -794,7 +799,7 @@ int BrushSettings::getSize() const
 	if(d->ui.brushsizeBox->isVisible()) {
 		return d->ui.brushsizeBox->value();
 	} else {
-		return std::exp(d->ui.radiusLogarithmicBox->value() / 100.0 - 2.0);
+		return logSize(d->ui.radiusLogarithmicBox->value());
 	}
 }
 
