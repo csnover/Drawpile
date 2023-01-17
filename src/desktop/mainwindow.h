@@ -175,8 +175,9 @@ private slots:
 	void onCanvasSaved(const QString &errorMessage);
 
 protected:
-	void closeEvent(QCloseEvent *event);
-	bool event(QEvent *event);
+	void changeEvent(QEvent *event) override;
+	void closeEvent(QCloseEvent *event) override;
+	bool event(QEvent *event) override;
 
 private:
 	MainWindow *replaceableWindow();
@@ -204,6 +205,8 @@ private:
 
 	void createDocks();
 	void setupActions();
+
+	void updatePalette();
 
 	QSplitter *m_splitter;
 

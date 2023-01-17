@@ -44,6 +44,9 @@
 #include <QTimer>
 #include <QTextEdit>
 #include <QThreadPool>
+#ifdef Q_OS_MACOS
+#include <QStyle>
+#endif
 
 #include <QtColorWidgets/ColorDialog>
 
@@ -194,13 +197,8 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	m_viewStatusBar->setSizeGripEnabled(false);
 	mainwinlayout->addWidget(m_viewStatusBar);
 
-#ifdef Q_OS_MAC
-	// The "native" style status bar appears slightly glitchy.
-	// This makes it look better.
-	if(icon::isDark(palette().color(QPalette::Window)))
-		m_viewStatusBar->setStyleSheet("QStatusBar { background: #323232 }");
-	else
-		m_viewStatusBar->setStyleSheet("QStatusBar { background: #ececec }");
+#ifdef Q_OS_MACOS
+	updatePalette();
 #endif
 
 	// Create status indicator widgets
@@ -590,8 +588,27 @@ void MainWindow::updateTitle()
 	else
 		setWindowTitle(QStringLiteral("%1[*] - %2").arg(name, m_doc->sessionTitle()));
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
 	MacMenu::instance()->updateWindow(this);
+#endif
+}
+
+void MainWindow::changeEvent(QEvent *event)
+{
+	QMainWindow::changeEvent(event);
+	if(event->type() == QEvent::PaletteChange)
+		updatePalette();
+}
+
+void MainWindow::updatePalette()
+{
+#ifdef Q_OS_MACOS
+	// The "native" style status bar is wrong because Qt uses the same gradient
+	// as the title bar for the status bar. This makes it look better.
+	if(icon::isDark(palette().color(QPalette::Window)))
+		m_viewStatusBar->setStyleSheet("QStatusBar { background: #323232 }");
+	else
+		m_viewStatusBar->setStyleSheet("QStatusBar { background: #ececec }");
 #endif
 }
 
