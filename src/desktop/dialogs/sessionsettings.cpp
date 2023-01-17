@@ -39,7 +39,10 @@
 namespace dialogs {
 
 SessionSettingsDialog::SessionSettingsDialog(Document *doc, QWidget *parent)
-	: QDialog(parent), m_ui(new Ui_SessionSettingsDialog), m_doc(doc)
+	: QDialog(parent),
+	m_ui(new Ui_SessionSettingsDialog),
+	m_doc(doc),
+	m_op(m_doc->canvas()->aclState()->amOperator())
 {
 	Q_ASSERT(doc);
 	m_ui->setupUi(this);
@@ -66,6 +69,21 @@ SessionSettingsDialog::SessionSettingsDialog(Document *doc, QWidget *parent)
 
 	connect(m_ui->sessionPassword, &QLabel::linkActivated, this, &SessionSettingsDialog::changePassword);
 	connect(m_ui->opword, &QLabel::linkActivated, this, &SessionSettingsDialog::changeOpword);
+
+	m_ui->title->setText(m_doc->sessionTitle());
+	m_ui->preserveChat->setChecked(m_doc->isSessionPreserveChat());
+	m_ui->persistent->setChecked(m_doc->isSessionPersistent());
+	m_ui->denyJoins->setChecked(m_doc->isSessionClosed());
+	m_ui->authOnly->setEnabled(m_op && (m_doc->isSessionAuthOnly() || m_isAuth));
+	m_ui->sessionPassword->setProperty("haspass", m_doc->isSessionPasswordProtected());
+	updatePasswordLabel(m_ui->sessionPassword);
+	m_ui->opword->setProperty("haspass", m_doc->isSessionOpword());
+	updatePasswordLabel(m_ui->opword);
+	m_ui->nsfm->setChecked(m_doc->isSessionNsfm());
+	m_ui->deputies->setCurrentIndex(m_doc->isSessionDeputies() ? 1 : 0);
+	m_ui->maxUsers->setValue(m_doc->sessionMaxUserCount());
+	m_ui->autoresetThreshold->setValue(m_doc->sessionResetThreshold());
+	m_ui->baseResetThreshold->setText(QStringLiteral("+ %1 MB").arg(m_doc->baseResetThreshold()/(1024.0*1024.0), 0, 'f', 1));
 
 	connect(m_doc, &Document::sessionTitleChanged, m_ui->title, &QLineEdit::setText);
 	connect(m_doc, &Document::sessionPreserveChatChanged, m_ui->preserveChat, &QCheckBox::setChecked);

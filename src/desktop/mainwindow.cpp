@@ -255,7 +255,6 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	createDocks();
 
 	// Crete persistent dialogs
-	m_sessionSettings = new dialogs::SessionSettingsDialog(m_doc, this);
 	m_serverLogDialog = new dialogs::ServerLogDialog(this);
 	m_serverLogDialog->setModel(m_doc->serverLog());
 
@@ -1617,7 +1616,9 @@ void MainWindow::onServerDisconnected(const QString &message, const QString &err
 	getAction("reportabuse")->setEnabled(false);
 	m_admintools->setEnabled(false);
 	m_modtools->setEnabled(false);
-	m_sessionSettings->close();
+	if(m_sessionSettings) {
+		m_sessionSettings->close();
+	}
 
 	// Re-enable UI
 	m_view->setEnabled(true);
@@ -1674,12 +1675,30 @@ void MainWindow::onServerLogin()
 	m_netstatus->loggedIn(m_doc->client()->sessionUrl());
 	m_netstatus->setSecurityLevel(m_doc->client()->securityLevel(), m_doc->client()->hostCertificate());
 	m_view->setEnabled(true);
-	m_sessionSettings->setPersistenceEnabled(m_doc->client()->serverSuppotsPersistence());
-	m_sessionSettings->setAutoResetEnabled(m_doc->client()->sessionSupportsAutoReset());
-	m_sessionSettings->setAuthenticated(m_doc->client()->isAuthenticated());
+	updateSessionSettings();
 	setDrawingToolsEnabled(true);
 	m_modtools->setEnabled(m_doc->client()->isModerator());
 	getAction("reportabuse")->setEnabled(m_doc->client()->serverSupportsReports());
+}
+
+void MainWindow::updateSessionSettings()
+{
+	if(!m_sessionSettings || !m_doc || !m_doc->client())
+		return;
+
+	m_sessionSettings->setPersistenceEnabled(m_doc->client()->serverSuppotsPersistence());
+	m_sessionSettings->setAutoResetEnabled(m_doc->client()->sessionSupportsAutoReset());
+	m_sessionSettings->setAuthenticated(m_doc->client()->isAuthenticated());
+}
+
+void MainWindow::showSessionSettings()
+{
+	if(!m_sessionSettings) {
+		m_sessionSettings = new dialogs::SessionSettingsDialog(m_doc, this);
+		updateSessionSettings();
+	}
+
+	m_sessionSettings->show();
 }
 
 void MainWindow::updateLockWidget()
@@ -2720,7 +2739,7 @@ void MainWindow::setupActions()
 	connect(host, &QAction::triggered, this, &MainWindow::host);
 	connect(join, SIGNAL(triggered()), this, SLOT(join()));
 	connect(logout, &QAction::triggered, this, &MainWindow::leave);
-	connect(sessionSettings, &QAction::triggered, m_sessionSettings, &dialogs::SessionSettingsDialog::show);
+	connect(sessionSettings, &QAction::triggered, this, &MainWindow::showSessionSettings);
 	connect(serverlog, &QAction::triggered, m_serverLogDialog, &dialogs::ServerLogDialog::show);
 	connect(reportabuse, &QAction::triggered, this, &MainWindow::reportAbuse);
 	connect(gainop, &QAction::triggered, this, &MainWindow::tryToGainOp);

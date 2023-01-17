@@ -206,6 +206,9 @@ private:
 	void createDocks();
 	void setupActions();
 
+	void updateSessionSettings();
+	void showSessionSettings();
+
 	void updatePalette();
 
 	QSplitter *m_splitter;
