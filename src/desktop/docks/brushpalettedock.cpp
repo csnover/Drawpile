@@ -42,7 +42,6 @@ namespace docks {
 struct BrushPalette::Private {
 	brushes::BrushPresetTagModel *tagModel;
 	brushes::BrushPresetModel *presetModel;
-	QSortFilterProxyModel *tagProxyModel;
 	QSortFilterProxyModel *presetProxyModel;
 	tools::BrushSettings *brushSettings;
 	brushes::Tag currentTag;
@@ -73,19 +72,10 @@ BrushPalette::BrushPalette(QWidget *parent)
 	d->tagModel = new brushes::BrushPresetTagModel(this);
 	d->presetModel = d->tagModel->presetModel();
 
-	d->tagProxyModel = new QSortFilterProxyModel(this);
-	d->tagProxyModel->setSourceModel(d->tagModel);
-	d->tagProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-	d->tagProxyModel->setSortRole(brushes::BrushPresetTagModel::SortRole);
-	d->tagProxyModel->sort(0);
-
 	d->presetProxyModel = new QSortFilterProxyModel(this);
 	d->presetProxyModel->setSourceModel(d->presetModel);
-	d->presetProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 	d->presetProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-	d->presetProxyModel->setSortRole(brushes::BrushPresetModel::SortRole);
 	d->presetProxyModel->setFilterRole(brushes::BrushPresetModel::FilterRole);
-	d->presetProxyModel->sort(0);
 
 	setWindowTitle(tr("Brushes"));
 
@@ -143,7 +133,7 @@ BrushPalette::BrushPalette(QWidget *parent)
 	d->presetListView->setContextMenuPolicy(Qt::CustomContextMenu);
 	setWidget(d->presetListView);
 
-	d->tagComboBox->setModel(d->tagProxyModel);
+	d->tagComboBox->setModel(d->tagModel);
 	d->presetListView->setModel(d->presetProxyModel);
 
 	connect(d->presetModel, &QAbstractItemModel::modelReset, this, &BrushPalette::presetsReset);
@@ -169,7 +159,7 @@ BrushPalette::BrushPalette(QWidget *parent)
 	bool selectedTagIdOk;
 	int selectedTagId = d->tagModel->getState(SELECTED_TAG_ID_KEY).toInt(&selectedTagIdOk);
 	int selectedTagRow = selectedTagIdOk ? d->tagModel->getTagRowById(selectedTagId) : -1;
-	int initialTagRow = selectedTagRow >= 0 ? tagRowToProxy(selectedTagRow) : 0;
+	int initialTagRow = selectedTagRow > 0 ? selectedTagRow : 0;
 	d->tagComboBox->setCurrentIndex(initialTagRow);
 	tagIndexChanged(d->tagComboBox->currentIndex());
 	presetsReset();
@@ -185,9 +175,9 @@ void BrushPalette::connectBrushSettings(tools::ToolSettings *toolSettings)
 	d->brushSettings = qobject_cast<tools::BrushSettings*>(toolSettings);
 }
 
-void BrushPalette::tagIndexChanged(int proxyRow)
+void BrushPalette::tagIndexChanged(int row)
 {
-	d->currentTag = d->tagModel->getTagAt(tagRowToSource(proxyRow));
+	d->currentTag = d->tagModel->getTagAt(row);
 	d->editTagAction->setEnabled(d->currentTag.editable);
 	d->deleteTagAction->setEnabled(d->currentTag.editable);
 	d->presetModel->setTagIdToFilter(d->currentTag.id);
@@ -256,7 +246,7 @@ void BrushPalette::editCurrentTag()
 		if(ok && !(name = name.trimmed()).isEmpty()) {
 			int sourceRow = d->tagModel->editTag(d->currentTag.id, name);
 			if(sourceRow >= 0) {
-				d->tagComboBox->setCurrentIndex(tagRowToProxy(sourceRow));
+				d->tagComboBox->setCurrentIndex(sourceRow);
 			}
 		}
 	}
@@ -413,29 +403,9 @@ void BrushPalette::changeTagAssignment(int tagId, bool assigned)
 	}
 }
 
-int BrushPalette::tagRowToSource(int proxyRow)
-{
-	return tagIndexToSource(d->tagProxyModel->index(proxyRow, 0)).row();
-}
-
-int BrushPalette::tagRowToProxy(int sourceRow)
-{
-	return tagIndexToProxy(d->tagModel->index(sourceRow)).row();
-}
-
-QModelIndex BrushPalette::tagIndexToSource(const QModelIndex &proxyIndex)
-{
-	return d->tagProxyModel->mapToSource(proxyIndex);
-}
-
-QModelIndex BrushPalette::tagIndexToProxy(const QModelIndex &sourceIndex)
-{
-	return d->tagProxyModel->mapFromSource(sourceIndex);
-}
-
 int BrushPalette::tagIdToProxyRow(int tagId)
 {
-	return tagRowToProxy(d->tagModel->getTagRowById(tagId));
+	return d->tagModel->getTagRowById(tagId);
 }
 
 int BrushPalette::presetRowToSource(int proxyRow)
