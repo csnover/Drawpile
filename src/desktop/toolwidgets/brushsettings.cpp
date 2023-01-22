@@ -142,9 +142,13 @@ const int BrushSettings::MAX_BRUSH_SPACING = 999;
 const int BrushSettings::DEFAULT_BRUSH_SIZE = 128;
 const int BrushSettings::DEFAULT_BRUSH_SPACING = 50;
 
-static inline int logSize(int radiusLogarithmic)
+static inline int logSize(int radiusLogarithmic, const rustpile::MyPaintSettings &settings)
 {
-	return std::max(1.0, std::ceil(std::exp(radiusLogarithmic / 100.0)));
+	auto randomness = settings.mappings[MYPAINT_BRUSH_SETTING_OFFSET_BY_RANDOM].base_value;
+	if(randomness == 0.0f)
+		randomness = 1.0f;
+
+	return std::max(1.0, std::ceil(std::exp(radiusLogarithmic * randomness / 100.0)));
 }
 
 BrushSettings::BrushSettings(ToolController *ctrl, QObject *parent)
@@ -390,7 +394,7 @@ void BrushSettings::changeSizeSetting(int size)
 void BrushSettings::changeRadiusLogarithmicSetting(int radiusLogarithmic)
 {
 	if(d->ui.radiusLogarithmicBox->isVisible()) {
-		emit pixelSizeChanged(logSize(radiusLogarithmic));
+		emit pixelSizeChanged(logSize(radiusLogarithmic, d->currentBrush().myPaint().constSettings()));
 	}
 }
 
@@ -799,7 +803,7 @@ int BrushSettings::getSize() const
 	if(d->ui.brushsizeBox->isVisible()) {
 		return d->ui.brushsizeBox->value();
 	} else {
-		return logSize(d->ui.radiusLogarithmicBox->value());
+		return logSize(d->ui.radiusLogarithmicBox->value(), d->currentBrush().myPaint().constSettings());
 	}
 }
 
