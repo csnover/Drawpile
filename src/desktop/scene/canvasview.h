@@ -23,6 +23,7 @@
 #include "libclient/canvas/pressure.h"
 #include "libclient/canvas/point.h"
 #include "libclient/tools/tool.h"
+#include "desktop/utils/qtguicompat.h"
 
 #include <QGraphicsView>
 
@@ -176,11 +177,7 @@ public slots:
 	void updateSettings();
 
 protected:
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-	void enterEvent(QEnterEvent *event) override;
-#else
-	void enterEvent(QEvent *event) override;
-#endif
+	void enterEvent(compat::EnterEvent *event) override;
 	void leaveEvent(QEvent *event) override;
 	void focusInEvent(QFocusEvent *event) override;
 	void mouseMoveEvent(QMouseEvent *event) override;

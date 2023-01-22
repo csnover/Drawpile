@@ -20,6 +20,7 @@
 #include "desktop/docks/titlewidget.h"
 #include "libclient/utils/icon.h"
 #include "desktop/widgets/groupedtoolbutton.h"
+#include "desktop/utils/qtguicompat.h"
 
 #include <QHBoxLayout>
 #include <QLabel>

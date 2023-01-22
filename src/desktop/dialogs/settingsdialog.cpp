@@ -39,6 +39,7 @@
 #include "libshared/util/paths.h"
 #include "libclient/canvas/paintengine.h"
 #include "desktop/notifications.h"
+#include "libshared/util/qtcompat.h"
 
 #include "ui_settings.h"
 
@@ -163,7 +164,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
 	// QKeySequence editor delegate
 	QStyledItemDelegate *keyseqdel = new QStyledItemDelegate(this);
-	m_itemEditorFactory->registerEditor(QVariant::nameToType("QKeySequence"), new KeySequenceEditFactory);
+	m_itemEditorFactory->registerEditor(compat::metaTypeFromName("QKeySequence"), new KeySequenceEditFactory);
 	keyseqdel->setItemEditorFactory(m_itemEditorFactory.get());
 	m_ui->shortcuts->setItemDelegateForColumn(1, keyseqdel);
 	m_ui->shortcuts->setItemDelegateForColumn(2, keyseqdel);
