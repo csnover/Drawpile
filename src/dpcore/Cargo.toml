@@ -18,9 +18,9 @@ deflate = "1.0"
 lazy_static = "1.4"
 
 [dev-dependencies]
+brunch = "0.3"
 itertools = "0.10"
 image = { version = "0.24", default-features = false, features = ["png"] }
-criterion = "0.3"
 
 [[bench]]
 name = "rasterops"

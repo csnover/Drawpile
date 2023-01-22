@@ -20,39 +20,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Drawpile.  If not, see <https://www.gnu.org/licenses/>.
 
-use criterion::{criterion_group, criterion_main, Criterion};
+use brunch::{benches, Bench};
 use dpcore::paint::{BrushMask, ClassicBrushCache};
 
-fn gimp_style_dab_benchmark(c: &mut Criterion) {
-    c.bench_function("tiny v2 GIMP style dab", |b| {
-        let mut cache = ClassicBrushCache::new(); // note: this produces a single outlier when the LUT is generated
-        b.iter(|| {
-            BrushMask::new_gimp_style_v2(0.0, 0.0, 1.0, 0.5, &mut cache);
-        })
-    });
+fn main() {
+    const HARDNESS: f32 = 0.5;
 
-    c.bench_function("small v2 GIMP style dab", |b| {
-        let mut cache = ClassicBrushCache::new(); // note: this produces a single outlier when the LUT is generated
-        b.iter(|| {
-            BrushMask::new_gimp_style_v2(0.0, 0.0, 15.0, 0.5, &mut cache);
-        })
-    });
+    let mut cache = ClassicBrushCache::new();
+    // Pre-fill LUT to avoid benchmarking the cache
+    BrushMask::new_gimp_style_v2(0.0, 0.0, 1.0, HARDNESS, &mut cache);
 
-    c.bench_function("big v2 GIMP style dab", |b| {
-        let mut cache = ClassicBrushCache::new(); // note: this produces a single outlier when the LUT is generated
-        b.iter(|| {
-            BrushMask::new_gimp_style_v2(0.0, 0.0, 30.0, 0.5, &mut cache);
-        })
-    });
+    benches!(inline:
+        Bench::new("tiny v2 GIMP style dab")
+            .run(|| BrushMask::new_gimp_style_v2(0.0, 0.0, 1.0, HARDNESS, &mut cache)),
+        Bench::new("small v2 GIMP style dab")
+            .run(|| BrushMask::new_gimp_style_v2(0.0, 0.0, 15.0, HARDNESS, &mut cache)),
+        Bench::new("big v2 GIMP style dab")
+            .run(|| BrushMask::new_gimp_style_v2(0.0, 0.0, 30.0, HARDNESS, &mut cache)),
+        Bench::spacer(),
+        Bench::new("round pixel dab")
+            .run(|| BrushMask::new_round_pixel(15)),
+    );
 }
-
-fn round_pixel_dab_benchmark(c: &mut Criterion) {
-    c.bench_function("round pixel dab", |b| {
-        b.iter(|| {
-            BrushMask::new_round_pixel(15);
-        })
-    });
-}
-
-criterion_group!(benches, gimp_style_dab_benchmark, round_pixel_dab_benchmark);
-criterion_main!(benches);

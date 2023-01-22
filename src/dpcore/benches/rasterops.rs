@@ -20,7 +20,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Drawpile.  If not, see <https://www.gnu.org/licenses/>.
 
-use criterion::{criterion_group, criterion_main, Criterion};
+use brunch::{benches, Bench};
 use dpcore::paint::{rasterop, Blendmode, BrushMask, Pixel15};
 
 fn mask_blend(mask: &[u16], mode: Blendmode) {
@@ -33,45 +33,25 @@ fn pixel_blend(over: &[Pixel15], mode: Blendmode) {
     rasterop::pixel_blend(&mut base, over, 128, mode);
 }
 
-fn mask_blend_benchmark(c: &mut Criterion) {
+fn main() {
     let mask = BrushMask::new_round_pixel(64);
-
-    c.bench_function("mask normal", |b| {
-        b.iter(|| mask_blend(&mask.mask, Blendmode::Normal))
-    });
-    c.bench_function("mask erase", |b| {
-        b.iter(|| mask_blend(&mask.mask, Blendmode::Erase))
-    });
-    c.bench_function("mask multiply", |b| {
-        b.iter(|| mask_blend(&mask.mask, Blendmode::Multiply))
-    });
-    c.bench_function("mask behind", |b| {
-        b.iter(|| mask_blend(&mask.mask, Blendmode::Behind))
-    });
-    c.bench_function("mask colorerase", |b| {
-        b.iter(|| mask_blend(&mask.mask, Blendmode::ColorErase))
-    });
-}
-
-fn pixel_blend_benchmark(c: &mut Criterion) {
     let over = vec![[255, 255, 255, 255]; 64 * 64];
 
-    c.bench_function("pixel normal", |b| {
-        b.iter(|| pixel_blend(&over, Blendmode::Normal))
-    });
-    c.bench_function("pixel erase", |b| {
-        b.iter(|| pixel_blend(&over, Blendmode::Erase))
-    });
-    c.bench_function("pixel multiply", |b| {
-        b.iter(|| pixel_blend(&over, Blendmode::Multiply))
-    });
-    c.bench_function("pixel behind", |b| {
-        b.iter(|| pixel_blend(&over, Blendmode::Behind))
-    });
-    c.bench_function("pixel colorerase", |b| {
-        b.iter(|| pixel_blend(&over, Blendmode::ColorErase))
-    });
-}
+    benches!(
+        inline:
 
-criterion_group!(benches, mask_blend_benchmark, pixel_blend_benchmark);
-criterion_main!(benches);
+        Bench::new("mask normal").run(|| mask_blend(&mask.mask, Blendmode::Normal)),
+        Bench::new("mask erase").run(|| mask_blend(&mask.mask, Blendmode::Erase)),
+        Bench::new("mask multiply").run(|| mask_blend(&mask.mask, Blendmode::Multiply)),
+        Bench::new("mask behind").run(|| mask_blend(&mask.mask, Blendmode::Behind)),
+        Bench::new("mask colorerase").run(|| mask_blend(&mask.mask, Blendmode::ColorErase)),
+
+        Bench::spacer(),
+
+        Bench::new("pixel normal").run(|| pixel_blend(&over, Blendmode::Normal)),
+        Bench::new("pixel erase").run(|| pixel_blend(&over, Blendmode::Erase)),
+        Bench::new("pixel multiply").run(|| pixel_blend(&over, Blendmode::Multiply)),
+        Bench::new("pixel behind").run(|| pixel_blend(&over, Blendmode::Behind)),
+        Bench::new("pixel colorerase").run(|| pixel_blend(&over, Blendmode::ColorErase)),
+    );
+}
