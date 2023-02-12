@@ -1,5 +1,33 @@
 Unreleased Version 2.2.0-pre
- * Releases are now generated automatically
+ * Continuous builds are now available from GitHub
+ * Added support for Qt6
+ * Added option to enable/disable automatic updates in Network preferences
+ * Added option to opt in to receiving notifications about beta releases
+ * Added check on first install for automatic updates instead of defaulting to enabled
+ * Added dedicated server and command-line tools to all release builds
+ * Added support for loading WebP images
+ * Changed automatic update system to ask for permission on first load
+ * Improved startup performance
+ * Improved MyPaint brush performance
+ * Improved session catch-up user experience
+ * Improved visibility of small brushes
+ * Improved MyPaint brush cursor size accuracy
+ * Fixed missing file associations
+ * Fixed missing theme icons
+ * Fixed memory errors and leaks
+ * Fixed crash drawing off the edge of the canvas
+ * Fixed project generation for Visual Studio and Xcode
+ * Fixed disappearing menus after the last window is closed on macOS
+ * Fixed wrong status bar colour when switching to dark mode on macOS
+ * Fixed wrong dock icon sizes on Windows
+ * Fixed auto-reset losing layer visibility and canvas position settings
+ * Fixed resizing selections with a fixed aspect ratio
+ * Fixed dedicated server no longer compiling on Debian LTS
+ * Pen inputs on the canvas are now ignored when the Drawpile window is being focused
+ * Dock buttons are now collapsed completely when docks are locked
+ * Localised auto update messages
+ * Removed no longer needed Krita tablet code for Linux
+ * Windows installer is now available as a standard MSI
 
 2022-08-20 Version 2.2.0-beta.3
  * Added support for MyPaint brushes
