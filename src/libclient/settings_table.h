@@ -18,7 +18,7 @@ SETTING(smoothing                 , Smoothing                 , "settings/input/
 SETTING(versionCheckBeta          , VersionCheckBeta          , "versioncheck/beta"                     , false)
 SETTING(versionCheckEnabled       , VersionCheckEnabled       , "versioncheck/enabled"                  , false)
 SETTING(versionCheckLastCheck     , VersionCheckLastCheck     , "versioncheck/lastcheck"                , QString())
-SETTING(versionCheckLastSuccess   , VersionCheckLastSuccess   , "versioncheck/lastsuccess"              , false)
+SETTING(versionCheckLastSuccess   , VersionCheckLastSuccess   , "versioncheck/lastsuccess"              , QString())
 SETTING(versionCheckLatest        , VersionCheckLatest        , "versioncheck/latest"                   , QString())
 
 #include "libclient/settings_table_macros.h"

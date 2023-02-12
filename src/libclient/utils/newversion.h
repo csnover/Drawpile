@@ -4,6 +4,7 @@
 #define DP_CLIENT_NEWVERSION_CHECK_H
 
 #include <QObject>
+#include <QString>
 #include <QUrl>
 #include <QVector>
 
@@ -49,7 +50,7 @@ public:
 	explicit NewVersionCheck(QObject *parent=nullptr);
 
 	//! Construct a version checker with the given version
-	NewVersionCheck(int server, int major, int minor, QObject *parent=nullptr);
+	NewVersionCheck(int server, int major, int minor, QString tag=QString(), QObject *parent=nullptr);
 
 	/**
 	 * Is a new version check needed?
@@ -60,7 +61,7 @@ public:
 	 *  - it has been at least one day since the previous check
 	 *  - if the last version checked failed, it has been at least one week
 	 */
-	static bool needCheck(const libclient::settings::Settings &settings);
+	static bool needCheck(libclient::settings::Settings &settings);
 
 	/**
 	 * @brief Is a new series (e.g. 2.0 --> 2.1) out? (cached)
@@ -84,9 +85,10 @@ public:
 	 * This is used to select which artifact to include in the Version structure.
 	 * If not set explicitly, the platform is selected by the build type:
 	 *
-	 *  - win64 if built for 64 bit windows
-	 *  - win32 if built for 32 bit windows
-	 *  - macos if built of macOS
+	 *  - x86_64-windows if built for 64 bit windows
+	 *  - i386-windows if built for 32 bit windows
+	 *  - darwin if built for macOS
+	 *  - linux if built for Linux
 	 *  - blank for everything else
 	 *
 	 * If a blank platform is set, the download fields will not be populated.
@@ -141,6 +143,7 @@ private:
 	void querySuccess(libclient::settings::Settings &settings);
 
 	int m_server, m_major, m_minor;
+	QString m_tag;
 	QVector<Version> m_newer;
 	bool m_showBetas;
 	QString m_platform;
