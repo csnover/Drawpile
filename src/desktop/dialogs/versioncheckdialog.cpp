@@ -116,13 +116,16 @@ void VersionCheckDialog::versionChecked(bool isNew, const QString &errorMessage)
 void VersionCheckDialog::setNewVersions(const QVector<NewVersionCheck::Version> &versions)
 {
 	if(versions.isEmpty()) {
-		m_ui->textBrowser->setHtml("<h1>You're up to date!</h1><p>No new versions found.</p>");
-
+		m_ui->textBrowser->setHtml(QStringLiteral("<h1>%1</h1><p>%2</p>")
+			.arg(tr("You're up to date!"), tr("No new versions found."))
+		);
 	} else {
-		QString content = "<h1>A new version of Drawpile is available!</h1>";
+		QString content = QStringLiteral("<h1>%1</h1>")
+			.arg(tr("A new version of Drawpile is available!"));
 
 		for(const auto &version : versions) {
-			content += QStringLiteral("<h2><a href=\"%1\">Version %2</a></h2>").arg(version.announcementUrl, version.version);
+			content += QStringLiteral("<h2><a href=\"%1\">%2</a></h2>")
+				.arg(version.announcementUrl, tr("Version %1").arg(version.version));
 			content += version.description;
 		}
 
