@@ -35,6 +35,7 @@ using StringView = QString;
 #endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+using NativeEventResult = qintptr *;
 using RetrieveDataMetaType = QMetaType;
 
 inline auto castSize(size_t size) {
@@ -64,6 +65,7 @@ inline auto stringSlice(const QString &str, qsizetype position) {
 #else
 #define Q_MOC_INCLUDE(moc)
 
+using NativeEventResult = long *;
 using RetrieveDataMetaType = QVariant::Type;
 
 inline auto castSize(size_t size) {

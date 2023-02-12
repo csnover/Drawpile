@@ -58,6 +58,45 @@ inline auto tabDevice(const QTabletEvent &event) {
 using DeviceType = QInputDevice::DeviceType;
 using EnterEvent = QEnterEvent;
 using PointerType = QPointingDevice::PointerType;
+const auto UnknownPointer = PointerType::Unknown;
+const auto NoDevice = DeviceType::Unknown;
+const auto FourDMouseDevice = DeviceType::Mouse;
+const auto RotationStylusDevice = DeviceType::Stylus;
+
+inline auto makeTabletEvent(
+	QEvent::Type type,
+	const QPointF &pos,
+	const QPointF &globalPos,
+	compat::DeviceType device,
+	compat::PointerType pointerType,
+	qreal pressure,
+	int xTilt,
+	int yTilt,
+	qreal tangentialPressure,
+	qreal rotation,
+	int z,
+	Qt::KeyboardModifiers keyState,
+	qint64 uniqueID,
+	Qt::MouseButton button,
+	Qt::MouseButtons buttons
+) {
+	const QPointingDevice *sysDevice = nullptr;
+	for(const auto *candidate : QInputDevice::devices()) {
+		if(candidate && candidate->type() == device && candidate->systemId() == uniqueID) {
+			const auto *pd = static_cast<const QPointingDevice *>(candidate);
+			if(pd->pointerType() == pointerType) {
+				sysDevice = pd;
+				break;
+			}
+		}
+	}
+
+	if(!sysDevice) {
+		qWarning("Could not find device matching event ID %lld", uniqueID);
+	}
+
+	return ::QTabletEvent(type, sysDevice, pos, globalPos, pressure, xTilt, yTilt, tangentialPressure, rotation, z, keyState, button, buttons);
+}
 
 inline auto keyPressed(const QKeyEvent &event) {
 	return event.keyCombination();
@@ -91,9 +130,33 @@ inline auto touchPos(const QEventPoint &event) {
 	return event.position();
 }
 #else
-using DeviceType = QTabletEvent;
+using DeviceType = QTabletEvent::TabletDevice;
 using EnterEvent = QEvent;
-using PointerType = QTabletEvent;
+using PointerType = QTabletEvent::PointerType;
+const auto UnknownPointer = PointerType::UnknownPointer;
+const auto NoDevice = DeviceType::NoDevice;
+const auto FourDMouseDevice = DeviceType::FourDMouse;
+const auto RotationStylusDevice = DeviceType::RotationStylus;
+
+inline auto makeTabletEvent(
+	QEvent::Type type,
+	const QPointF &pos,
+	const QPointF &globalPos,
+	compat::DeviceType device,
+	compat::PointerType pointerType,
+	qreal pressure,
+	int xTilt,
+	int yTilt,
+	qreal tangentialPressure,
+	qreal rotation,
+	int z,
+	Qt::KeyboardModifiers keyState,
+	qint64 uniqueID,
+	Qt::MouseButton button,
+	Qt::MouseButtons buttons
+) {
+	return ::QTabletEvent(type, pos, globalPos, device, pointerType, pressure, xTilt, yTilt, tangentialPressure, rotation, z, keyState, uniqueID, button, buttons);
+}
 
 inline auto keyPressed(const QKeyEvent &event) {
 	return event.key();
