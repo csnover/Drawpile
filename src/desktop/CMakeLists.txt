@@ -177,6 +177,7 @@ add_executable(drawpile MACOSX_BUNDLE
 	utils/listserverdelegate.h
 	utils/mandatoryfields.cpp
 	utils/mandatoryfields.h
+	utils/qtguicompat.h
 	utils/recentfiles.cpp
 	utils/recentfiles.h
 	widgets/brushpreview.cpp
