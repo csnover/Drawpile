@@ -1,4 +1,4 @@
-Drawpile - a collaborative drawing program  (dev branch)
+Drawpile - a collaborative drawing program [![CI status badge](../../actions/workflows/main.yml/badge.svg)](../../actions/workflows/main.yml)
 ------------------------------------------
 
 Drawpile is a drawing program that lets you share the canvas
