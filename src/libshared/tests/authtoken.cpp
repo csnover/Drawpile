@@ -50,7 +50,5 @@ private slots:
 	}
 };
 
-
 QTEST_MAIN(TestAuthToken)
 #include "authtoken.moc"
-

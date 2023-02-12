@@ -175,4 +175,3 @@ int skipRecordingMessage(QIODevice *file, uint8_t *msgType, uint8_t *ctxId)
 }
 
 }
-

@@ -186,7 +186,6 @@ QPixmap ClassicBrush::presetThumbnail() const
 	return pixmap;
 }
 
-
 MyPaintBrush::MyPaintBrush()
 	: m_brush{rustpile::Color_BLACK, false, false}
 	, m_settings(nullptr)
@@ -360,23 +359,23 @@ const rustpile::MyPaintSettings &MyPaintBrush::getDefaultSettings()
 	if(!settingsInitialized) {
 		settingsInitialized = true;
 		// Same procedure as mypaint_brush_from_defaults.
-        for (int i = 0; i < MYPAINT_BRUSH_SETTINGS_COUNT; ++i) {
-            rustpile::MyPaintMapping &mapping = settings.mappings[i];
-            mapping.base_value = mypaint_brush_setting_info(
+		for (int i = 0; i < MYPAINT_BRUSH_SETTINGS_COUNT; ++i) {
+			rustpile::MyPaintMapping &mapping = settings.mappings[i];
+			mapping.base_value = mypaint_brush_setting_info(
 				static_cast<MyPaintBrushSetting>(i))->def;
-            for (int j = 0; j < MYPAINT_BRUSH_INPUTS_COUNT; ++j) {
-                mapping.inputs[j].n = 0;
-            }
-        }
-        rustpile::MyPaintMapping &opaqueMultiplyMapping =
+			for (int j = 0; j < MYPAINT_BRUSH_INPUTS_COUNT; ++j) {
+				mapping.inputs[j].n = 0;
+			}
+		}
+		rustpile::MyPaintMapping &opaqueMultiplyMapping =
 			settings.mappings[MYPAINT_BRUSH_SETTING_OPAQUE_MULTIPLY];
-        rustpile::ControlPoints &brushInputPressure =
+		rustpile::ControlPoints &brushInputPressure =
 			opaqueMultiplyMapping.inputs[MYPAINT_BRUSH_INPUT_PRESSURE];
-        brushInputPressure.n = 2;
-        brushInputPressure.xvalues[0] = 0.0;
-        brushInputPressure.yvalues[0] = 0.0;
-        brushInputPressure.xvalues[1] = 1.0;
-        brushInputPressure.yvalues[1] = 1.0;
+		brushInputPressure.n = 2;
+		brushInputPressure.xvalues[0] = 0.0;
+		brushInputPressure.yvalues[0] = 0.0;
+		brushInputPressure.xvalues[1] = 1.0;
+		brushInputPressure.yvalues[1] = 1.0;
 	}
 	return settings;
 }
@@ -448,7 +447,6 @@ bool MyPaintBrush::loadJsonInputs(const QString &mappingKey,
 	return foundSetting;
 }
 
-
 ActiveBrush::ActiveBrush(ActiveType activeType)
 	: m_activeType(activeType)
 	, m_classic()
@@ -476,7 +474,6 @@ void ActiveBrush::setQColor(const QColor &c)
 	m_classic.setQColor(c);
 	m_myPaint.setQColor(c);
 }
-
 
 QJsonObject ActiveBrush::toJson() const
 {
@@ -549,4 +546,3 @@ void ActiveBrush::renderPreview(rustpile::BrushPreview *bp, rustpile::BrushPrevi
 }
 
 }
-

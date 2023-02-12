@@ -43,13 +43,11 @@
 #include <QDebug>
 #include <QtMath>
 
-
 // NOTE: we stub out qwindowcontext.cpp::347 to disable Qt's own tablet support.
 
 // Note: The definition of the PACKET structure in pktdef.h depends on this define.
 #define PACKETDATA (PK_X | PK_Y | PK_BUTTONS | PK_TIME | PK_NORMAL_PRESSURE | PK_TANGENT_PRESSURE | PK_ORIENTATION | PK_CURSOR | PK_Z)
 #include "desktop/bundled/kis_tablet/pktdef.h"
-
 
 QT_BEGIN_NAMESPACE
 
@@ -101,7 +99,6 @@ HWND createDummyWindow(const QString &className, const wchar_t *windowName, WNDP
                           HWND_MESSAGE, NULL, (HINSTANCE)GetModuleHandle(0), NULL);
 }
 
-
 void printContext(const LOGCONTEXT &lc)
 {
     dbgTablet << "# Getting current context data:";
@@ -122,7 +119,6 @@ void printContext(const LOGCONTEXT &lc)
 
     dbgTablet << "Qt Desktop Geometry" << QGuiApplication::primaryScreen()->virtualGeometry();
 }
-
 
 static inline QEvent::Type mouseEventType(QEvent::Type t)
 {
@@ -164,7 +160,6 @@ void KisTabletSupportWin::enableRelativePenModeHack(bool enable)
 		QTAB->setAbsoluteRange(enable ? 20 : 0);
 }
 
-
 // Derived from qwidgetwindow.
 //
 // The work done by processTabletEvent from qguiapplicationprivate is divided
@@ -187,7 +182,6 @@ static void handleTabletEvent(QWidget *windowWidget, const QPointF &local, const
     if (!windowWidget) // Should never happen
         return;
 
-
     // We do this instead of constructing the event e beforehand
     const QPoint localPos = local.toPoint();
     const QPoint globalPos = global.toPoint();
@@ -204,7 +198,6 @@ static void handleTabletEvent(QWidget *windowWidget, const QPointF &local, const
         finalDestination = windowWidget->childAt(localPos);
     }
 
-
     if ((type == QEvent::TabletRelease || buttons == Qt::NoButton) && (qt_tablet_target != 0)) {
         dbgInput << "releasing tablet target" << qt_tablet_target;
         qt_tablet_target = 0;
@@ -218,7 +211,6 @@ static void handleTabletEvent(QWidget *windowWidget, const QPointF &local, const
                         tangentialPressure, rotation, z, modifiers, uniqueId, button, buttons);
         ev.setTimestamp(time);
         QGuiApplication::sendEvent(finalDestination, &ev);
-
 
         if (ev.isAccepted()) {
             // dbgTablet << "Tablet event" << type << "accepted" << "by target widget" << finalDestination;
@@ -334,7 +326,6 @@ private:
     }
 };
 
-
 static DefaultButtonsConverter *globalButtonsConverter =
     new DefaultButtonsConverter();
 
@@ -361,7 +352,6 @@ extern "C" LRESULT QT_WIN_CALLBACK qWindowsTabletSupportWndProc(HWND hwnd, UINT 
     return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-
 // Scale tablet coordinates to screen coordinates.
 
 static inline int sign(int x)
@@ -386,7 +376,6 @@ inline QPointF QWindowsTabletDeviceData::scaleCoordinates(int coordX, int coordY
 
     return QPointF(x, y);
 }
-
 
 /*!
   \class QWindowsWinTab32DLL QWindowsTabletSupport
@@ -428,8 +417,6 @@ bool QWindowsWinTab32DLL::init()
                << "\t wTQueueSizeSet" << wTQueueSizeSet << "\n";
     return false;
 }
-
-
 
 /*!
   \class QWindowsTabletSupport
@@ -508,14 +495,12 @@ QWindowsTabletSupport *QWindowsTabletSupport::create()
     return new QWindowsTabletSupport(window, context);
 }
 
-
 unsigned QWindowsTabletSupport::options() const
 {
     UINT result = 0;
     m_winTab32DLL.wTInfo(WTI_INTERFACE, IFC_CTXOPTIONS, &result);
     return result;
 }
-
 
 QString QWindowsTabletSupport::description() const
 {
@@ -647,9 +632,6 @@ QWindowsTabletDeviceData QWindowsTabletSupport::tabletInit(const quint64 uniqueI
     return result;
 }
 
-
-
-
 bool QWindowsTabletSupport::translateTabletProximityEvent(WPARAM /* wParam */, LPARAM lParam)
 {
     if (dialogOpen) {
@@ -688,8 +670,6 @@ bool QWindowsTabletSupport::translateTabletProximityEvent(WPARAM /* wParam */, L
     return true;
 }
 
-
-
 bool QWindowsTabletSupport::translateTabletPacketEvent()
 {
     static PACKET localPacketBuf[TabletPacketQSize];  // our own tablet packet queue.
@@ -724,8 +704,6 @@ bool QWindowsTabletSupport::translateTabletPacketEvent()
     if (activeWindow) {
         dpr = activeWindow->devicePixelRatio();
     }
-
-
 
     const Qt::KeyboardModifiers keyboardModifiers = QApplication::queryKeyboardModifiers();
 
@@ -779,7 +757,6 @@ bool QWindowsTabletSupport::translateTabletPacketEvent()
             globalPos = mouseLocation;
             globalPosF = globalPos;
         }
-
 
         const QPoint localPos = w->mapFromGlobal(globalPos);
         const QPointF delta = globalPosF - globalPos;
@@ -860,10 +837,6 @@ bool QWindowsTabletSupport::translateTabletPacketEvent()
     } // Loop over packets
     return true;
 }
-
-
-
-
 
 void QWindowsTabletSupport::tabletUpdateCursor(const int pkCursor)
 {
@@ -946,6 +919,5 @@ void QWindowsTabletSupport::tabletUpdateCursor(const int pkCursor)
     }
 #endif
 }
-
 
 QT_END_NAMESPACE

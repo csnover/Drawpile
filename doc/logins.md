@@ -27,8 +27,8 @@ A successful login response from the identity manager contains two extra fields:
 
 Supported user flags are:
 
- * mod: this user is a moderator. A moderator may log in to any (even closed and password protected) session and has a permanent OP status.
- * host: this user may host sessions without providing a hosting password.
+* mod: this user is a moderator. A moderator may log in to any (even closed and password protected) session and has a permanent OP status.
+* host: this user may host sessions without providing a hosting password.
 
 ## User file
 
@@ -43,4 +43,3 @@ If the password hash token is prefixed with `*`, the username is considered bann
 To enable the userfile backend, pass drawpile-srv the parameter `--userfile <path>`. The server will monitor the file for changes and reload it when necessary.
 
 A python script for editing user files is provided in `server/usertool.py`. 
-

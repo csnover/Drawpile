@@ -103,7 +103,6 @@ def add_release(appdata, changes):
     releases.insert(0, release)
     return True
 
-
 def find_artifact(filename):
     path = 'artifacts/' + filename
     try:

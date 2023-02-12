@@ -750,7 +750,6 @@ void Session::handleInitComplete(int ctxId)
 	switchState(State::Running);
 }
 
-
 void Session::handleInitCancel(int ctxId)
 {
 	Client *c = getClientById(ctxId);
@@ -975,7 +974,6 @@ sessionlisting::Session Session::getSessionAnnouncement() const
 	};
 }
 
-
 void Session::onAnnouncementsChanged(const sessionlisting::Announcable *session)
 {
 	if(session == this)
@@ -1172,4 +1170,3 @@ void Session::log(const Log &log)
 }
 
 }
-

@@ -62,7 +62,6 @@ public:
 	AccountListPage *makePage(Server *server) const override { return new AccountListPage(server); }
 };
 
-
 }
 }
 

@@ -76,8 +76,6 @@ void AddServerDialog::showSuccess()
 		const auto icon = QIcon(":/icons/drawpile.png").pixmap(128, 128);
 		m_favicon = icon.toImage();
 		setIconPixmap(icon);
-
-
 	} else {
 		const QUrl faviconUrl(m_serverInfo.faviconUrl);
 		if(faviconUrl.isValid()) {

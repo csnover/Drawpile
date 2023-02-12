@@ -58,7 +58,6 @@ public:
 	ServerLogPage *makePage(Server *server) const override { return new ServerLogPage(server); }
 };
 
-
 }
 }
 

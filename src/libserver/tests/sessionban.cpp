@@ -81,7 +81,5 @@ private slots:
 
 };
 
-
 QTEST_MAIN(TestSessionBan)
 #include "sessionban.moc"
-

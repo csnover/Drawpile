@@ -119,4 +119,3 @@ bool OpaqueMessage::payloadEquals(const Message &m) const
 }
 
 }
-

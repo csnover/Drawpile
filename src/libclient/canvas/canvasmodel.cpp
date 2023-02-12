@@ -55,7 +55,7 @@ CanvasModel::CanvasModel(uint8_t localUserId, QObject *parent)
 	m_timeline = new TimelineModel(this);
 	m_metadata = new DocumentMetadata(m_paintengine, this);
 
-	connect(m_aclstate, &AclState::userBitsChanged, m_userlist, &UserListModel::updateAclState);	
+	connect(m_aclstate, &AclState::userBitsChanged, m_userlist, &UserListModel::updateAclState);
 
 	rustpile::paintengine_register_meta_callbacks(
 		m_paintengine->engine(),

@@ -38,47 +38,47 @@ void BrushPreviewPlugin::initialize(QDesignerFormEditorInterface * /* core */)
 
 bool BrushPreviewPlugin::isInitialized() const
 {
-    return initialized;
+	return initialized;
 }
 
 QWidget *BrushPreviewPlugin::createWidget(QWidget *parent)
 {
-    return new widgets::BrushPreview(parent);
+	return new widgets::BrushPreview(parent);
 }
 
 QString BrushPreviewPlugin::name() const
 {
-    return "widgets::BrushPreview";
+	return "widgets::BrushPreview";
 }
 
 QString BrushPreviewPlugin::group() const
 {
-    return "Drawpile Widgets";
+	return "Drawpile Widgets";
 }
 
 QIcon BrushPreviewPlugin::icon() const
 {
-    return QIcon();
+	return QIcon();
 }
 
 QString BrushPreviewPlugin::toolTip() const
 {
-    return "A widget for previewing brushes";
+	return "A widget for previewing brushes";
 }
 
 QString BrushPreviewPlugin::whatsThis() const
 {
-    return "";
+	return "";
 }
 
 bool BrushPreviewPlugin::isContainer() const
 {
-    return false;
+	return false;
 }
 
 QString BrushPreviewPlugin::domXml() const
 {
-    return 
+	return
 		"<ui language=\"c++\" displayname=\"BrushPreview\">\n"
 		"<widget class=\"widgets::BrushPreview\" name=\"brushPreview\">\n"
 		" <property name=\"geometry\">\n"
@@ -95,6 +95,5 @@ QString BrushPreviewPlugin::domXml() const
 
 QString BrushPreviewPlugin::includeFile() const
 {
-    return "widgets/brushpreview.h";
+	return "widgets/brushpreview.h";
 }
-

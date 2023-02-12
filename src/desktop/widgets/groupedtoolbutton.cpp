@@ -153,4 +153,3 @@ void GroupedToolButton::paintEvent(QPaintEvent* event)
 }
 
 }
-

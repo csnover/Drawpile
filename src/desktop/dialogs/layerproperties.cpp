@@ -25,23 +25,22 @@
 
 #include "ui_layerproperties.h"
 
-
 namespace dialogs {
 
 LayerProperties::LayerProperties(uint8_t localUser, QWidget *parent)
 	: QDialog(parent), m_user(localUser)
 {
-    m_ui = new Ui_LayerProperties;
-    m_ui->setupUi(this);
+	m_ui = new Ui_LayerProperties;
+	m_ui->setupUi(this);
 
 	const auto modes = canvas::blendmode::layerModeNames();
 	for(const auto &bm : modes) {
 		m_ui->blendMode->addItem(bm.second, int(bm.first));
-    }
+	}
 
-    connect(m_ui->title, &QLineEdit::returnPressed, this, &QDialog::accept);
-    connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
-    connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+	connect(m_ui->title, &QLineEdit::returnPressed, this, &QDialog::accept);
+	connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+	connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 	connect(m_ui->buttonBox, &QDialogButtonBox::clicked, this, [this](QAbstractButton *b) {
 		if(m_ui->buttonBox->buttonRole(b) == QDialogButtonBox::ApplyRole)
 			emitChanges();
@@ -102,9 +101,9 @@ void LayerProperties::setOpControlsEnabled(bool enabled)
 
 void LayerProperties::showEvent(QShowEvent *event)
 {
-    QDialog::showEvent(event);
-    m_ui->title->setFocus(Qt::PopupFocusReason);
-    m_ui->title->selectAll();
+	QDialog::showEvent(event);
+	m_ui->title->setFocus(Qt::PopupFocusReason);
+	m_ui->title->selectAll();
 }
 
 void LayerProperties::emitChanges()
@@ -130,7 +129,7 @@ void LayerProperties::emitChanges()
 		m_ui->opacitySpinner->value() != oldOpacity ||
 		newBlendmode != m_item.blend ||
 		censored != m_item.censored ||
-	    isolated != m_item.isolated
+		isolated != m_item.isolated
 	) {
 		rustpile::write_layerattr(
 			eb,
@@ -138,19 +137,19 @@ void LayerProperties::emitChanges()
 			m_item.id,
 			0,
 			(censored ? rustpile::LayerAttributesMessage_FLAGS_CENSOR : 0) |
-		    (isolated ? rustpile::LayerAttributesMessage_FLAGS_ISOLATED : 0),
+			(isolated ? rustpile::LayerAttributesMessage_FLAGS_ISOLATED : 0),
 			qRound(m_ui->opacitySpinner->value() / 100.0 * 255),
 			newBlendmode
 		);
-    }
+	}
 
 	if(m_ui->visible->isChecked() != (!m_item.hidden)) {
 		emit visibilityChanged(m_item.id, m_ui->visible->isChecked());
-    }
+	}
 
-    if(m_ui->defaultLayer->isEnabled() && m_ui->defaultLayer->isChecked()) {
+	if(m_ui->defaultLayer->isEnabled() && m_ui->defaultLayer->isChecked()) {
 		rustpile::write_defaultlayer(eb, m_user, m_item.id);
-    }
+	}
 
 	emit layerCommand(eb.toEnvelope());
 }
@@ -158,12 +157,12 @@ void LayerProperties::emitChanges()
 int LayerProperties::searchBlendModeIndex(rustpile::Blendmode mode)
 {
 	const int blendModeCount = m_ui->blendMode->count();
-    for(int i = 0; i < blendModeCount; ++i) {
+	for(int i = 0; i < blendModeCount; ++i) {
 		if(m_ui->blendMode->itemData(i).toInt() == static_cast<int>(mode)) {
-            return i;
-        }
-    }
-    return -1;
+			return i;
+		}
+	}
+	return -1;
 }
 
 }

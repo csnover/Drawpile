@@ -35,4 +35,3 @@ static const int TierCount = 4;
 }
 
 #endif
-

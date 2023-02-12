@@ -31,7 +31,7 @@
 DrawpileWidgetCollection::DrawpileWidgetCollection(QObject *parent) :
 	QObject(parent)
 {
-    widgets
+	widgets
 		<< new ColorButtonPlugin(this)
 		<< new BrushPreviewPlugin(this)
 		<< new GroupedToolButtonPlugin(this)
@@ -46,5 +46,5 @@ DrawpileWidgetCollection::DrawpileWidgetCollection(QObject *parent) :
 
 QList<QDesignerCustomWidgetInterface *> DrawpileWidgetCollection::customWidgets() const
 {
-    return widgets;
+	return widgets;
 }

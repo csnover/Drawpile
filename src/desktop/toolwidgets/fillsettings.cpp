@@ -134,4 +134,3 @@ void FillSettings::quickAdjust1(qreal adjustment)
 }
 
 }
-

@@ -96,4 +96,3 @@ QString SpinnerPlugin::includeFile() const
 {
 	return "widgets/spinner.h";
 }
-

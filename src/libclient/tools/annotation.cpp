@@ -55,7 +55,6 @@ void Annotation::begin(const canvas::Point& point, bool right, float zoom)
 		m_selectedId = selection.id;
 		m_shape = QRect{selection.rect.x, selection.rect.y, selection.rect.w, selection.rect.h};
 
-
 		if(selection.protect && !owner.model()->aclState()->amOperator() && (selection.id >> 8) != owner.client()->myId()) {
 			m_handle = Handle::Outside;
 		} else {

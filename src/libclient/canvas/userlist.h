@@ -151,12 +151,12 @@ public:
 	 */
 	net::Envelope getTrustUserCommand(int localId, int userId, bool op) const;
 
-        /**
-         * @brief Check if the given user is an operator
-         * @param userId
-         * @return
-         */
-        bool isOperator(int userId) const;
+	/**
+	 * @brief Check if the given user is an operator
+	 * @param userId
+	 * @return
+	 */
+	bool isOperator(int userId) const;
 
 public slots:
 	void updateAclState(const AclState *state);
@@ -185,4 +185,3 @@ protected:
 Q_DECLARE_METATYPE(canvas::User)
 
 #endif
-

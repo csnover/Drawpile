@@ -535,4 +535,3 @@ void NewVersionCheck::querySuccess()
 		emit versionChecked(false, QString());
 	}
 }
-

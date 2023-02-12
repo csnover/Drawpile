@@ -51,11 +51,11 @@ public:
 	MyPaintBrush();
 	~MyPaintBrush();
 
-    MyPaintBrush(const MyPaintBrush &other);
+	MyPaintBrush(const MyPaintBrush &other);
 	MyPaintBrush(MyPaintBrush &&other);
 
-    MyPaintBrush &operator=(MyPaintBrush &&other);
-    MyPaintBrush &operator=(const MyPaintBrush &other);
+	MyPaintBrush &operator=(MyPaintBrush &&other);
+	MyPaintBrush &operator=(const MyPaintBrush &other);
 
 	rustpile::MyPaintBrush &brush() { return m_brush; }
 	const rustpile::MyPaintBrush &constBrush() const { return m_brush; }
@@ -137,5 +137,3 @@ Q_DECLARE_METATYPE(brushes::MyPaintBrush)
 Q_DECLARE_METATYPE(brushes::ActiveBrush)
 
 #endif
-
-

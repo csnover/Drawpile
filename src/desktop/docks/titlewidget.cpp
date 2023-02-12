@@ -190,7 +190,6 @@ void TitleWidget::addCustomWidget(QWidget *widget, bool stretch)
 		m_layout->setStretchFactor(widget, 1);
 }
 
-
 void TitleWidget::addSpace(int space)
 {
 	m_layout->insertSpacing(m_layout->count()-2, space);

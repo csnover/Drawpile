@@ -169,7 +169,6 @@ static Reader::Encoding detectEncoding(QIODevice *dev)
 	return Reader::Encoding::Autodetect;
 }
 
-
 Compatibility Reader::open()
 {
 	return open(false);
@@ -477,4 +476,3 @@ MessageRecord Reader::readNext()
 }
 
 }
-

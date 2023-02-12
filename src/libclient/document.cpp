@@ -782,7 +782,6 @@ void Document::copyMerged()
 	copyFromLayer(-1);
 }
 
-
 void Document::copyLayer()
 {
 	copyFromLayer(m_toolctrl->activeLayer());
@@ -850,4 +849,3 @@ void Document::addServerLogEntry(const QString &log)
 	m_serverLog->insertRow(i);
 	m_serverLog->setData(m_serverLog->index(i), log);
 }
-

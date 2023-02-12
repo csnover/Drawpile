@@ -445,6 +445,4 @@ Log Client::log() const {
 	return Log().user(d->id, d->socket->peerAddress(), d->username);
 }
 
-
 }
-

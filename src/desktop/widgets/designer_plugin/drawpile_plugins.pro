@@ -33,4 +33,3 @@ SOURCES += collection.cpp \
 	../presetselector.cpp presetselector_plugin.cpp \
 	../modifierkeys.cpp modifierkeys_plugin.cpp \
 	../../../libshared/util/paths.cpp
-

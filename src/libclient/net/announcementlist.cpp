@@ -77,7 +77,6 @@ QVariant AnnouncementListModel::headerData(int section, Qt::Orientation orientat
 	return QVariant();
 }
 
-
 int AnnouncementListModel::rowCount(const QModelIndex& parent) const
 {
 	if(parent.isValid())

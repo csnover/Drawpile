@@ -51,7 +51,7 @@ struct TimelineWidget::Private {
 };
 
 TimelineWidget::TimelineWidget(QWidget *parent)
-    : QWidget{parent}, d{new Private}
+	: QWidget{parent}, d{new Private}
 {
 	d->verticalScroll = new QScrollBar(Qt::Vertical, this);
 	d->horizontalScroll = new QScrollBar(Qt::Horizontal, this);
@@ -64,7 +64,6 @@ TimelineWidget::~TimelineWidget()
 {
 	delete d;
 }
-
 
 void TimelineWidget::setModel(canvas::TimelineModel *model)
 {
@@ -157,9 +156,9 @@ void TimelineWidget::updateScrollbars()
 	const QSize vsh = d->verticalScroll->sizeHint();
 
 	d->horizontalScroll->setMaximum(
-	            qMax(0, (d->headerWidth + vsh.width() + (d->model->frames().size()+1) * d->columnWidth) - width()));
+		qMax(0, (d->headerWidth + vsh.width() + (d->model->frames().size()+1) * d->columnWidth) - width()));
 	d->verticalScroll->setMaximum(
-	            qMax(0, (hsh.height() + d->model->layers().size() * d->rowHeight) - height()));
+		qMax(0, (hsh.height() + d->model->layers().size() * d->rowHeight) - height()));
 
 }
 void TimelineWidget::setHorizontalScroll(int pos)
@@ -272,7 +271,7 @@ void TimelineWidget::mousePressEvent(QMouseEvent *event)
 
 	const int col = qMin(
 		(mousePos.x() - d->headerWidth + d->xScroll) / d->columnWidth,
-	    d->model->frames().size()
+		d->model->frames().size()
 	);
 
 	if(event->button() == Qt::LeftButton) {
@@ -296,8 +295,8 @@ void TimelineWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
 	const auto mousePos = compat::mousePos(*event);
 	const int col = qMin(
-	    (mousePos.x() - d->headerWidth + d->xScroll) / d->columnWidth,
-	    d->model->frames().size() - 1
+		(mousePos.x() - d->headerWidth + d->xScroll) / d->columnWidth,
+		d->model->frames().size() - 1
 	);
 
 	net::EnvelopeBuilder eb;

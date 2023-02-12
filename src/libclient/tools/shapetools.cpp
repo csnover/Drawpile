@@ -191,4 +191,3 @@ canvas::PointVector Ellipse::pointVector() const
 }
 
 }
-

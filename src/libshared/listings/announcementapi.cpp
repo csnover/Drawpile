@@ -183,7 +183,7 @@ AnnouncementApiResponse *getApiInfo(const QUrl &apiUrl)
 				return;
 			}
 
-			const auto realApiUrl = findListserverLinkHtml(reply);  
+			const auto realApiUrl = findListserverLinkHtml(reply);
 			if(realApiUrl.isEmpty()) {
 				res->setError("No listserver link found!");
 
@@ -273,7 +273,7 @@ AnnouncementApiResponse *getSessionList(const QUrl &apiUrl, const QString &proto
 		res->setResult(QVariant::fromValue(sessions));
 	});
 	reply->connect(reply, &QNetworkReply::finished, reply, &QObject::deleteLater);
-	
+
 	return res;
 }
 
@@ -360,7 +360,7 @@ AnnouncementApiResponse *refreshSession(const Announcement &a, const Session &se
 	AnnouncementApiResponse *res = new AnnouncementApiResponse(a.apiUrl);
 
 	QNetworkReply *reply = networkaccess::getInstance()->put(req, QJsonDocument(o).toJson());
-	reply->connect(reply, &QNetworkReply::finished, res, [reply, res, a]() { 
+	reply->connect(reply, &QNetworkReply::finished, res, [reply, res, a]() {
 		auto r = readReply(reply);
 		if(IsApiError(r)) {
 			res->setError(ApiError(r));
@@ -401,8 +401,6 @@ AnnouncementApiResponse *refreshSessions(const QVector<QPair<Announcement, Sessi
 
 		batch[QString::number(listing.first.listingId)] = o;
 	}
-
-
 
 	// Send request
 	QUrl url = apiUrl;
@@ -498,4 +496,3 @@ AnnouncementApiResponse *queryRoomcode(const QUrl &apiUrl, const QString &roomco
 }
 
 }
-

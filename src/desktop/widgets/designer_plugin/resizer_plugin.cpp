@@ -96,4 +96,3 @@ QString ResizerPlugin::includeFile() const
 {
 	return "widgets/resizerwidget.h";
 }
-

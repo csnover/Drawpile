@@ -156,4 +156,3 @@ void LayerAclMenu::setCensored(bool censor)
 }
 
 }
-

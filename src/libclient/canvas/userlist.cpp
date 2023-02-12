@@ -38,7 +38,6 @@ UserListModel::UserListModel(QObject *parent)
 	m_onlineUsers->setSourceModel(this);
 }
 
-
 QVariant UserListModel::data(const QModelIndex& index, int role) const
 {
 	if(!index.isValid() || index.row() < 0 || index.row() >= m_users.size())

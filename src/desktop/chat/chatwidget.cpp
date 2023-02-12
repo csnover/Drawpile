@@ -785,4 +785,3 @@ void ChatWidget::setCompactMode(bool compact)
 }
 
 }
-

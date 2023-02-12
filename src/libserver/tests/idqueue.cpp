@@ -24,7 +24,5 @@ private slots:
 	}
 };
 
-
 QTEST_MAIN(TestIdQueue)
 #include "idqueue.moc"
-

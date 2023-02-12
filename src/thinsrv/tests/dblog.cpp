@@ -55,7 +55,5 @@ private:
 	DbLog *logger;
 };
 
-
 QTEST_MAIN(TestDbLog)
 #include "dblog.moc"
-

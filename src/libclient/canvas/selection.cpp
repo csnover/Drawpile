@@ -40,7 +40,6 @@ void Selection::saveShape()
 	m_originalShape = m_shape;
 }
 
-
 bool Selection::isTransformed() const
 {
 	return m_shape != m_originalShape;
@@ -61,7 +60,6 @@ bool Selection::isOnlyTranslated() const
 
 	return true;
 }
-
 
 void Selection::reset()
 {
@@ -96,7 +94,6 @@ void Selection::setShapeRect(const QRect &rect)
 	}));
 	saveShape();
 }
-
 
 void Selection::translate(const QPoint &offset)
 {
@@ -422,7 +419,6 @@ void Selection::adjustDistort(const QPointF &delta, int corner1, int corner2)
 
 	emit shapeChanged(m_shape);
 }
-
 
 void Selection::addPointToShape(const QPointF &point)
 {

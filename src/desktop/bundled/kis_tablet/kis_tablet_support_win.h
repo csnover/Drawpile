@@ -28,5 +28,4 @@ public:
 	static void enableRelativePenModeHack(bool enable);
 };
 
-
 #endif // KIS_TABLET_SUPPORT_WIN_H

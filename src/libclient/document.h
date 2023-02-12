@@ -292,4 +292,3 @@ private:
 };
 
 #endif // DOCUMENT_H
-

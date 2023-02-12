@@ -26,4 +26,3 @@ bool validateSessionIdAlias(const QString &alias);
 bool validateUsername(const QString &username);
 
 #endif
-

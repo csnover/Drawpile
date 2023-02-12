@@ -814,7 +814,6 @@ void BrushPresetTagModel::newClassicPreset(int tagId, const QString &name,
 	}
 }
 
-
 BrushPresetModel::BrushPresetModel(BrushPresetTagModel *tagModel)
 	: QAbstractItemModel(tagModel)
 	, d(tagModel->d)

@@ -64,4 +64,3 @@ int findPaletteColor(const color_widgets::ColorPalette &pal, const QColor &color
 }
 
 #endif
-

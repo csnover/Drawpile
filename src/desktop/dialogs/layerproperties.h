@@ -50,7 +50,7 @@ signals:
 	void visibilityChanged(int layerId, bool visible);
 
 protected:
-    virtual void showEvent(QShowEvent *event) override;
+	virtual void showEvent(QShowEvent *event) override;
 
 private slots:
 	void emitChanges();
@@ -58,7 +58,7 @@ private slots:
 private:
 	int searchBlendModeIndex(rustpile::Blendmode mode);
 
-    Ui_LayerProperties *m_ui;
+	Ui_LayerProperties *m_ui;
 	canvas::LayerListItem m_item;
 	uint8_t m_user;
 };

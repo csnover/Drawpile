@@ -55,4 +55,3 @@ ToolProperties ToolProperties::load(QSettings &cfg, const QString &toolType)
 }
 
 }
-

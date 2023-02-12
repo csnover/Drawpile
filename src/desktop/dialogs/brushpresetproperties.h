@@ -31,24 +31,24 @@ class BrushPresetProperties : public QDialog
 Q_OBJECT
 public:
 	explicit BrushPresetProperties(int id, const QString &name, const QString &description,
-        const QPixmap &thumbnail, QWidget *parent = nullptr);
+		const QPixmap &thumbnail, QWidget *parent = nullptr);
 
 	virtual ~BrushPresetProperties();
 
 signals:
-    void presetPropertiesApplied(int id, const QString &name, const QString &description,
-        const QPixmap &thumbnail);
+	void presetPropertiesApplied(int id, const QString &name, const QString &description,
+		const QPixmap &thumbnail);
 
 private slots:
-    void chooseThumbnailFile();
-    void emitChanges();
+	void chooseThumbnailFile();
+	void emitChanges();
 
 private:
-    int m_id;
-    QPixmap m_thumbnail;
-    Ui_BrushPresetProperties *m_ui;
+	int m_id;
+	QPixmap m_thumbnail;
+	Ui_BrushPresetProperties *m_ui;
 
-    void showThumbnail(const QPixmap &thumbnail);
+	void showThumbnail(const QPixmap &thumbnail);
 };
 
 }

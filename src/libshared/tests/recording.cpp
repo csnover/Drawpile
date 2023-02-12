@@ -63,7 +63,7 @@ private slots:
 
 		// Followed by the JSON encoded metadata block
 		quint16 mdlen = qFromBigEndian<quint16>((const uchar*)b.constData()+6);
-        QJsonDocument mddoc = QJsonDocument::fromJson(b.mid(8, mdlen));
+		QJsonDocument mddoc = QJsonDocument::fromJson(b.mid(8, mdlen));
 
 		QVERIFY(mddoc.isObject());
 
@@ -225,7 +225,5 @@ private slots:
 	}
 };
 
-
 QTEST_MAIN(TestRecording)
 #include "recording.moc"
-

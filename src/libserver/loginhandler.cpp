@@ -477,7 +477,7 @@ void LoginHandler::guestLogin(const QString &username)
 
 	m_client->setUsername(username);
 	m_state = State::WaitForLogin;
-	
+
 	protocol::ServerReply identReply;
 	identReply.type = protocol::ServerReply::RESULT;
 	identReply.message = "Guest login OK!";

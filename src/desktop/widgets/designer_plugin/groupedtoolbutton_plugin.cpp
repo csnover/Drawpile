@@ -96,4 +96,3 @@ QString GroupedToolButtonPlugin::includeFile() const
 {
 	return "widgets/groupedtoolbutton.h";
 }
-

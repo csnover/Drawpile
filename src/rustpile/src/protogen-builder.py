@@ -1,7 +1,6 @@
 from protogen import load_protocol_definition, MSG_TYPES
 from jinja2 import Template
 
-
 template = Template("""
 // Generated with protogen-builder.py
 
@@ -76,7 +75,6 @@ pub extern "C" fn write_putimage(
 }
 """)
 
-
 def field_parameter(field):
     if field.field_type in ('Bytes', 'Vec<u8>'):
         ff = ((field.name, '*const u8'), (f'{field.name}_len', 'usize'))
@@ -92,7 +90,6 @@ def field_parameter(field):
         ff = ((field.name, field.field_type),)
 
     return ''.join('{}: {},'.format(*f) for f in ff)
-
 
 def field_argument(field, named=False):
     if field.field_type in ('Bytes', 'Vec<u8>', 'Vec<u16>'):
@@ -110,7 +107,6 @@ def field_argument(field, named=False):
     if named:
         return f'{field.name}: {ff}'
     return ff
-
 
 if __name__ == '__main__':
     protocol = load_protocol_definition('../../dpcore/src/protocol/protocol.yaml')

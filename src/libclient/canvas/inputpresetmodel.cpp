@@ -114,7 +114,6 @@ const Preset *PresetModel::searchPresetById(const QString &id) const
 	return i >= 0 ? &m_presets.at(i) : nullptr;
 }
 
-
 void PresetModel::add(const Preset &preset)
 {
 	int size = m_presets.size();
@@ -197,7 +196,6 @@ void PresetModel::saveSettings()
 	}
 	cfg.endArray();
 }
-
 
 Preset Preset::loadFromSettings(const QSettings &cfg)
 {

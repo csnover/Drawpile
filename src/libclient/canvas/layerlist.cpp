@@ -404,4 +404,3 @@ uint8_t LayerListItem::attributeFlags() const
 }
 
 }
-

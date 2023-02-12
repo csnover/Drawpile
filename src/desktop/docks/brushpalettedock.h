@@ -45,40 +45,39 @@ public:
 	void connectBrushSettings(tools::ToolSettings *toolSettings);
 
 private slots:
-   void tagIndexChanged(int proxyRow);
-   void presetsReset();
-   void presetSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
-   void newTag();
-   void editCurrentTag();
-   void deleteCurrentTag();
-   void newPreset();
-   void duplicateCurrentPreset();
-   void overwriteCurrentPreset();
-   void editCurrentPreset();
-   void deleteCurrentPreset();
-   void importMyPaintBrushes();
-   void applyPresetProperties(int id, const QString &name, const QString &description,
-        const QPixmap &thumbnail);
-   void applyToBrushSettings(const QModelIndex &index);
-   void showPresetContextMenu(const QPoint &pos);
+	void tagIndexChanged(int proxyRow);
+	void presetsReset();
+	void presetSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
+	void newTag();
+	void editCurrentTag();
+	void deleteCurrentTag();
+	void newPreset();
+	void duplicateCurrentPreset();
+	void overwriteCurrentPreset();
+	void editCurrentPreset();
+	void deleteCurrentPreset();
+	void importMyPaintBrushes();
+	void applyPresetProperties(int id, const QString &name, const QString &description,
+		const QPixmap &thumbnail);
+	void applyToBrushSettings(const QModelIndex &index);
+	void showPresetContextMenu(const QPoint &pos);
 
 private:
 	struct Private;
 	Private *d;
 
-   void changeTagAssignment(int tagId, bool assigned);
+	void changeTagAssignment(int tagId, bool assigned);
 
-   int tagIdToProxyRow(int tagId);
+	int tagIdToProxyRow(int tagId);
 
-   int presetRowToSource(int proxyRow);
-   int presetRowToProxy(int sourceRow);
-   QModelIndex presetIndexToSource(const QModelIndex &proxyIndex);
-   QModelIndex presetIndexToProxy(const QModelIndex &sourceIndex);
-   int presetProxyIndexToId(const QModelIndex &proxyIndex);
-   int currentPresetId();
+	int presetRowToSource(int proxyRow);
+	int presetRowToProxy(int sourceRow);
+	QModelIndex presetIndexToSource(const QModelIndex &proxyIndex);
+	QModelIndex presetIndexToProxy(const QModelIndex &sourceIndex);
+	int presetProxyIndexToId(const QModelIndex &proxyIndex);
+	int currentPresetId();
 };
 
 }
 
 #endif
-

@@ -58,7 +58,7 @@ public:
 			return 0;
 		}
 	}
-        rustpile::LayerID nearestLayerTo(int frame, rustpile::LayerID nearet) const;
+	rustpile::LayerID nearestLayerTo(int frame, rustpile::LayerID nearet) const;
 
 	void makeToggleCommand(net::EnvelopeBuilder &eb, int frameCol, int layerRow) const;
 	void makeRemoveCommand(net::EnvelopeBuilder &eb, int frameCol) const;

@@ -23,15 +23,16 @@ File format in a nutshell:
 
 Examples:
 
-    1 brush color=#ff0000 size=5 opacity=50.0
-    1 penmove 0 0 20.0
-    1 penmove {
-        100 0
-        100 100
-        0 100
-        0 0
-    }
-    1 penup
+```
+1 brush color=#ff0000 size=5 opacity=50.0
+1 penmove 0 0 20.0
+1 penmove {
+    100 0
+    100 100
+    0 100
+    0 0
+}
+1 penup
+```
 
 For a full list of commands, see `src/shared/net/textmode.cpp` and the message class definitions.
-

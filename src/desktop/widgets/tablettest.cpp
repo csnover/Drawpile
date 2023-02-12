@@ -143,4 +143,3 @@ void TabletTester::tabletEvent(QTabletEvent *e)
 }
 
 }
-

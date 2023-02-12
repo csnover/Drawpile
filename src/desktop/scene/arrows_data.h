@@ -68,4 +68,3 @@ static const QPointF
 ;
 
 }
-

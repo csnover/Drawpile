@@ -49,7 +49,5 @@ private slots:
 	}
 };
 
-
 QTEST_MAIN(TestPasswordHash)
 #include "passwordhash.moc"
-

@@ -167,4 +167,3 @@ AnnouncementApiResponse *queryRoomcode(const QUrl &apiUrl, const QString &roomco
 }
 
 #endif
-

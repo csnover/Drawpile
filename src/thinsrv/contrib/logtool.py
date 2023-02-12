@@ -72,7 +72,6 @@ def logtool(db, *, columns, output_fn, ips=None, names=None, sessions=None,
     rows = db.execute(query, params)
     output_fn([r[0] for r in rows.description], rows)
 
-
 # Output formatters
 def print_table(header, rows):
     rows = list(rows)
@@ -116,7 +115,6 @@ FORMATS = {
     'csv': print_csv,
 }
 
-
 def _sqlite_extract_ip(value):
     if not isinstance(value, str):
         return ''
@@ -136,7 +134,6 @@ def _sqlite_extract_username(value):
     if idx < 0:
         return ''
     return value[idx+1:]
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -197,4 +194,3 @@ if __name__ == '__main__':
     except BadArg as e:
         print(str(e), file=sys.stderr)
         sys.exit(1)
-

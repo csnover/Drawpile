@@ -196,4 +196,3 @@ QImage AnnotationItem::toImage() const
 }
 
 }
-

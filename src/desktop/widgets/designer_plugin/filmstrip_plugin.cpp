@@ -96,4 +96,3 @@ QString FilmstripPlugin::includeFile() const
 {
 	return "widgets/filmstrip.h";
 }
-

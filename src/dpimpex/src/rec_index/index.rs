@@ -49,4 +49,3 @@ impl error::Error for IndexError {
 }
 
 type IndexResult<T> = Result<T, IndexError>;
-

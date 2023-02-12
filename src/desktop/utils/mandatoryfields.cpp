@@ -77,4 +77,3 @@ void MandatoryFields::update()
 	}
 	m_okButton->setEnabled(enable);
 }
-

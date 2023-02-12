@@ -29,7 +29,7 @@ namespace docks {
 
 class LayerAclMenu : public QMenu
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
 	explicit LayerAclMenu(QWidget *parent=nullptr);
 

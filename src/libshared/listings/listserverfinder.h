@@ -36,4 +36,3 @@ QString findListserverLinkHtml(QIODevice *htmlFile);
 }
 
 #endif
-

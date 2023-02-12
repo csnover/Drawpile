@@ -31,7 +31,7 @@ class WhatIsMyIp : public QObject
 {
 	Q_OBJECT
 public:
-    explicit WhatIsMyIp(QObject *parent = 0);
+	explicit WhatIsMyIp(QObject *parent = 0);
 
 	/**
 	 * @brief Get the local address
@@ -48,7 +48,6 @@ public:
 	 * @return
 	 */
 	static WhatIsMyIp *instance();
-
 
 	/**
 	 * @brief Is this address one of this host's non-public addresses?
@@ -82,7 +81,7 @@ signals:
 public slots:
 	/**
 	 * @brief Start the external IP query
-	 * 
+	 *
 	 * The signal myAddressIs(QString) will be emitted when the address is known.
 	 */
 	void discoverMyIp();
@@ -93,4 +92,3 @@ private:
 };
 
 #endif
-

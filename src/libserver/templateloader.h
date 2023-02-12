@@ -40,7 +40,7 @@ public:
 	 *
 	 * The template description is a subset of a session description. Specifically,
 	 * it includes the following attributes:
-	 * 
+	 *
 	 *  - alias
 	 *  - protocol
 	 *  - maxUserCount
@@ -82,4 +82,3 @@ public:
 }
 
 #endif
-

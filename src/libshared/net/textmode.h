@@ -80,4 +80,3 @@ inline uint8_t parseDecimal8(const QString &str) { return qBound(0, qRound(str.t
 }
 
 #endif
-

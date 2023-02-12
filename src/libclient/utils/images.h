@@ -62,4 +62,3 @@ QString fileFormatFilter(FileFormatOptions formats);
 }
 
 #endif
-

@@ -43,7 +43,5 @@ private:
 	}
 };
 
-
 QTEST_MAIN(TestFilename)
 #include "filename.moc"
-

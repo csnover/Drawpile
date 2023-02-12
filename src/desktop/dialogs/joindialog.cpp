@@ -470,4 +470,3 @@ void JoinDialog::addListServerUrl(const QUrl &url)
 }
 
 }
-

@@ -54,4 +54,3 @@ void IdQueue::reserveId(uint8_t id)
 }
 
 }
-

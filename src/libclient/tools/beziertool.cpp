@@ -197,7 +197,6 @@ PointVector BezierTool::calculateBezierCurve() const
 	return pv;
 }
 
-
 void BezierTool::updatePreview()
 {
 	const PointVector pv = calculateBezierCurve();
@@ -219,4 +218,3 @@ void BezierTool::updatePreview()
 }
 
 }
-

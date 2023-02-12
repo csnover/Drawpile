@@ -89,7 +89,6 @@ UserJoin *UserJoin::fromText(uint8_t ctx, const Kwargs &kwargs)
 		);
 }
 
-
 SessionOwner *SessionOwner::deserialize(uint8_t ctx, const uchar *data, int len)
 {
 	if(len>255)
@@ -127,7 +126,6 @@ SessionOwner *SessionOwner::fromText(uint8_t ctx, const Kwargs &kwargs)
 {
 	return new SessionOwner(ctx, text::parseIdListString8(kwargs["users"]));
 }
-
 
 TrustedUsers *TrustedUsers::deserialize(uint8_t ctx, const uchar *data, int len)
 {
@@ -263,4 +261,3 @@ PrivateChat *PrivateChat::fromText(uint8_t ctx, const Kwargs &kwargs)
 }
 
 }
-

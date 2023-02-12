@@ -201,4 +201,3 @@ QString Ping::toString() const
 }
 
 }
-

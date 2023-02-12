@@ -109,13 +109,13 @@ public:
 
 	Message(MessageType type, uint8_t ctx): m_type(type), _undone(DONE), m_refcount(0), m_contextid(ctx) {}
 	virtual ~Message() {}
-	
+
 	/**
 	 * @brief Get the type of this message.
 	 * @return message type
 	 */
 	MessageType type() const { return m_type; }
-	
+
 	/**
 	 * @brief Is this a control message
 	 *
@@ -135,7 +135,7 @@ public:
 
 	/**
 	 * @brief Check if this message type is a command stream type
-	 * 
+	 *
 	 * Command stream messages are the messages directly related to drawing.
 	 * The canvas can be reconstructed exactly using only command messages.
 	 * @return true if this is a drawing command

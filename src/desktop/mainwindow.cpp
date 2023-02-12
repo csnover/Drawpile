@@ -342,7 +342,6 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	connect(m_view, &widgets::CanvasView::viewRectChange, m_dockNavigator, &docks::Navigator::setViewFocus);
 	connect(m_dockNavigator, &docks::Navigator::wheelZoom, m_view, &widgets::CanvasView::zoomSteps);
 
-
 	// Network client <-> UI connections
 	connect(m_view, &widgets::CanvasView::pointerMoved, m_doc, &Document::sendPointerMove);
 
@@ -421,7 +420,7 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 
 	// Restore settings
 	readSettings(restoreWindowPosition);
-	
+
 	// Set status indicators
 	updateLockWidget();
 	setRecorderStatus(false);
@@ -755,7 +754,6 @@ void MainWindow::updateLayerViewMode()
 			mode = rustpile::LayerViewMode::Frame;
 	}
 
-
 	m_doc->canvas()->paintEngine()->setViewMode(mode, censor);
 	updateLockWidget();
 }
@@ -816,10 +814,10 @@ void MainWindow::writeSettings()
 {
 	QSettings cfg;
 	cfg.beginGroup("window");
-	
+
 	cfg.setValue("pos", normalGeometry().topLeft());
 	cfg.setValue("size", normalGeometry().size());
-	
+
 	cfg.setValue("maximized", isMaximized());
 	cfg.setValue("state", saveState());
 	cfg.setValue("viewstate", m_splitter->saveState());
@@ -1093,7 +1091,7 @@ bool MainWindow::confirmFlatten(QString& file) const
 	// Don't save at all
 	if(box.exec() == QMessageBox::Cancel)
 		return false;
-	
+
 	// Save
 	if(box.clickedButton() == saveora) {
 		file = file.left(file.lastIndexOf('.')) + ".ora";
@@ -1484,7 +1482,7 @@ void MainWindow::leave()
 		if(result == 0)
 			m_doc->client()->disconnectFromServer();
 	});
-	
+
 	if(m_doc->client()->uploadQueueBytes() > 0) {
 		leavebox->setIcon(QMessageBox::Warning);
 		leavebox->setInformativeText(tr("There is still unsent data! Please wait until transmission completes!"));
@@ -2221,7 +2219,7 @@ void MainWindow::about()
 			"<p>Copyright © 2006-2022 Calle Laakkonen</p>"
 
 			"<p>This program is free software; you may redistribute it and/or "
-			"modify it under the terms of the GNU General Public License as " 
+			"modify it under the terms of the GNU General Public License as "
 			"published by the Free Software Foundation, either version 3, or "
 			"(at your opinion) any later version.</p>"
 
@@ -2672,11 +2670,8 @@ void MainWindow::setupActions()
 	userpointermenu->addAction(showuserlayers);
 	userpointermenu->addAction(showuseravatars);
 
-
 	viewmenu->addAction(showannotations);
-
 	viewmenu->addAction(showgrid);
-
 	viewmenu->addSeparator();
 	viewmenu->addAction(fullscreen);
 
@@ -2723,8 +2718,6 @@ void MainWindow::setupActions()
 	layerMenu->addSeparator();
 	layerMenu->addAction(nextFrameAct);
 	layerMenu->addAction(prevFrameAct);
-
-
 
 	//
 	// Session menu

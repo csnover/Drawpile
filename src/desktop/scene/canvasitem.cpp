@@ -72,4 +72,3 @@ void CanvasItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 }
 
 }
-

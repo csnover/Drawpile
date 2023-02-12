@@ -65,4 +65,3 @@ void ZeroConfAnnouncement::setTitle(const QString &title)
 			m_service->setTextData(m_textData);
 	}
 }
-

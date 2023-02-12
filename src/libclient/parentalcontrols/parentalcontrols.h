@@ -79,4 +79,3 @@ bool isLayerUncensoringBlocked();
 }
 
 #endif // PARENTALCONTROLS_H
-

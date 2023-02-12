@@ -9,7 +9,6 @@ Homepage: https://gitlab.com/mattia.basaglia/Qt-Color-Widgets
 
 Last commit ID: 091c29463bbeec1a672598af4597055ba24842cd (01/2022)
 
-
 kis_tablet
 -----------
 
@@ -21,4 +20,3 @@ kis_tablet_support_win8.cpp: b0dbfeb13c368ce262a2e959fd1ffa0bca32f099 (12/2017)
 kis_tablet_support_win.cpp: d7345683f218d90c9b933ff5226b98d023c643c2 (9/2017)
 
 Path in repository: /libs/ui/input/wintab/
-

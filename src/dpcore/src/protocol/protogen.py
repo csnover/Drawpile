@@ -2,7 +2,6 @@
 
 from yaml import safe_load as load_yaml
 
-
 MSG_TYPE_CTRL = "Control"
 MSG_TYPE_SRV_META = "ServerMeta"
 MSG_TYPE_CLIENT_META = "ClientMeta"
@@ -16,7 +15,6 @@ MSG_TYPES = (
 
 class BadDefinition(Exception):
     pass
-
 
 class Message:
     def __init__(self, name, desc, messages):
@@ -129,7 +127,6 @@ class Message:
             out.append(f'{self.name}(name="{self.cmd_name}", id={self.id})')
         return '\n'.join(out)
 
-
 def make_field(message, desc, is_last, prev_minlen, prev_maxlen):
     if isinstance(desc, str):
         try:
@@ -166,7 +163,6 @@ def make_field(message, desc, is_last, prev_minlen, prev_maxlen):
         prev_maxlen=prev_maxlen,
     )
 
-
 class Field:
     def __init__(self, name):
         self.name = name
@@ -182,7 +178,6 @@ class Field:
 
         return f'[{self.min_len}-{self.max_len}] {self.name}: {self.field_type}'
 
-
 class IntegerField(Field):
     def __init__(self, name, attributes, **kwargs):
         super().__init__(name)
@@ -196,7 +191,6 @@ class IntegerField(Field):
             'field_type': field_type}
         )
 
-
 FieldI8 = IntegerField.F('i8', 1)
 FieldI16 = IntegerField.F('i16', 2)
 FieldI32 = IntegerField.F('i32', 4)
@@ -207,7 +201,6 @@ FieldArgb32 = IntegerField.F('argb32', 4)
 FieldBlendmode = IntegerField.F('blendmode', 1)
 
 FieldBool = IntegerField.F('bool', 1)
-
 
 class FieldFlags(Field):
     def __init__(self, name, attributes, **kwargs):
@@ -241,7 +234,6 @@ class FieldFlags(Field):
     def __repr__(self):
         return super().__repr__() + ' ' + str(self.flags)
 
-
 class FieldEnum(Field):
     def __init__(self, name, attributes, **kwargs):
         super().__init__(name)
@@ -256,7 +248,6 @@ class FieldEnum(Field):
 
     def __repr__(self):
         return super().__repr__() + ' ' + str(self.variants)
-
 
 class FieldBytes(Field):
     field_type = 'Bytes'
@@ -293,20 +284,16 @@ class FieldBytes(Field):
         else:
             return f'{len_range} {self.name}: {self.field_type}'
 
-
 # Note: This is typically a synonym for FieldBytes
 class FieldVec_u8(FieldBytes):
     field_type = 'Vec<u8>'
-
 
 class FieldVec_u16(FieldBytes):
     field_type = 'Vec<u16>'
     item_len = 2
 
-
 class FieldUtf8(FieldBytes):
     field_type = 'String'
-
 
 class FieldStruct(Field):
     field_type = 'struct'
@@ -349,7 +336,6 @@ class FieldStruct(Field):
         out += list('\t\t' + repr(f) for f in self.subfields)
         return '\n'.join(out)
 
-
 def _required(name, obj, key, valuetype):
     try:
         val = obj[key]
@@ -360,7 +346,6 @@ def _required(name, obj, key, valuetype):
         raise BadDefinition(f"{name} property {key} must be of type {valuetype}")
 
     return val
-
 
 def load_protocol_definition(path='protocol.yaml'):
     with open(path) as f:
@@ -391,7 +376,6 @@ def load_protocol_definition(path='protocol.yaml'):
         **protocol,
         'messages': sorted(messages.values(), key=lambda x: x.id)
     }
-
 
 if __name__ == '__main__':
     import sys
@@ -428,4 +412,3 @@ if __name__ == '__main__':
         if not m.reserved:
             print(repr(m))
             print("")
-

@@ -35,7 +35,7 @@ LayerListDelegate::LayerListDelegate(QObject *parent)
 	  m_visibleIcon(icon::fromTheme("layer-visible-on")),
 	  m_groupIcon(icon::fromTheme("folder")),
 	  m_censoredIcon(QIcon(":/icons/censored.svg")),
-      m_hiddenIcon(icon::fromTheme("layer-visible-off"))
+	  m_hiddenIcon(icon::fromTheme("layer-visible-off"))
 {
 }
 

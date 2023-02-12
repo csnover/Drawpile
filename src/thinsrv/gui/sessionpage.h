@@ -71,7 +71,6 @@ private:
 	QString m_id;
 };
 
-
 }
 }
 

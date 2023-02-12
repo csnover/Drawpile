@@ -38,47 +38,47 @@ void ModifierKeysPlugin::initialize(QDesignerFormEditorInterface * /* core */)
 
 bool ModifierKeysPlugin::isInitialized() const
 {
-    return initialized;
+	return initialized;
 }
 
 QWidget *ModifierKeysPlugin::createWidget(QWidget *parent)
 {
-    return new widgets::ModifierKeys(parent);
+	return new widgets::ModifierKeys(parent);
 }
 
 QString ModifierKeysPlugin::name() const
 {
-    return "widgets::ModifierKeys";
+	return "widgets::ModifierKeys";
 }
 
 QString ModifierKeysPlugin::group() const
 {
-    return "Drawpile Widgets";
+	return "Drawpile Widgets";
 }
 
 QIcon ModifierKeysPlugin::icon() const
 {
-    return QIcon();
+	return QIcon();
 }
 
 QString ModifierKeysPlugin::toolTip() const
 {
-    return "A widget for previewing brushes";
+	return "A widget for previewing brushes";
 }
 
 QString ModifierKeysPlugin::whatsThis() const
 {
-    return "";
+	return "";
 }
 
 bool ModifierKeysPlugin::isContainer() const
 {
-    return false;
+	return false;
 }
 
 QString ModifierKeysPlugin::domXml() const
 {
-    return 
+	return
 		"<ui language=\"c++\" displayname=\"ModifierKeys\">\n"
 		"<widget class=\"widgets::ModifierKeys\" name=\"modifierKeys\">\n"
 		" <property name=\"geometry\">\n"
@@ -95,6 +95,5 @@ QString ModifierKeysPlugin::domXml() const
 
 QString ModifierKeysPlugin::includeFile() const
 {
-    return "widgets/modifierkeys.h";
+	return "widgets/modifierkeys.h";
 }
-

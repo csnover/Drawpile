@@ -231,7 +231,6 @@ void ListServerModel::loadServers(bool includeReadOnly)
 	endResetModel();
 }
 
-
 void ListServerModel::saveServers() const
 {
 	QSettings cfg;

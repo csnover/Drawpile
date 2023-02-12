@@ -61,7 +61,6 @@ public:
 	BanListPage *makePage(Server *server) const override { return new BanListPage(server); }
 };
 
-
 }
 }
 

@@ -71,7 +71,7 @@ public:
 	 * Is a new version check needed?
 	 *
 	 * A version check should be performed if:
-	 * 
+	 *
 	 *  - the user hasn't opted out (QSettings: versioncheck/enabled, default=true)
 	 *  - it has been at least one day since the previous check
 	 *  - if the last version checked failed, it has been at least one week
@@ -165,4 +165,3 @@ private:
 };
 
 #endif
-

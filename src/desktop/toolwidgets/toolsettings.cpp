@@ -45,4 +45,3 @@ void ToolSettings::restoreToolSettings(const ToolProperties &)
 }
 
 }
-

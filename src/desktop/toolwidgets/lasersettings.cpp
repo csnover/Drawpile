@@ -137,4 +137,3 @@ void LaserPointerSettings::quickAdjust1(qreal adjustment)
 }
 
 }
-

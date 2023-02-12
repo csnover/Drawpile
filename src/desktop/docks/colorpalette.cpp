@@ -380,4 +380,3 @@ void ColorPaletteDock::setColor(const QColor& color)
 }
 
 }
-

@@ -45,7 +45,7 @@ public slots:
 signals:
 	void focusMoved(const QPoint& to);
 	void wheelZoom(int steps);
-	
+
 protected:
 	void paintEvent(QPaintEvent *event);
 	void resizeEvent(QResizeEvent *event);
@@ -106,7 +106,7 @@ signals:
 	void focusMoved(const QPoint& to);
 	void wheelZoom(int steps);
 	void zoomChanged(qreal newZoom);
-	
+
 private:
 	QSlider *m_zoomSlider;
 	QToolButton *m_resetZoomButton;

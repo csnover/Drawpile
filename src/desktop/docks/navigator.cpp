@@ -162,7 +162,6 @@ void NavigatorView::setViewFocus(const QPolygonF& rect)
 	update();
 }
 
-
 void NavigatorView::onChange()
 {
 	if(isVisible() && !m_refreshTimer->isActive())
@@ -406,4 +405,3 @@ void Navigator::setMinimumZoom(int zoom)
 }
 
 }
-

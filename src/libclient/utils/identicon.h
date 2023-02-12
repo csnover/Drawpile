@@ -28,5 +28,3 @@
 QImage make_identicon(const QString &name, const QSize &size=QSize(32,32));
 
 #endif
-
-

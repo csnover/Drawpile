@@ -77,4 +77,3 @@ int skipRecordingMessage(QIODevice *file, uint8_t *msgType=nullptr, uint8_t *ctx
 }
 
 #endif
-

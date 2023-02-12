@@ -144,4 +144,3 @@ void ColorPickerSettings::addColor(const QColor &color)
 }
 
 }
-

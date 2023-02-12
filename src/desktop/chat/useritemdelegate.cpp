@@ -112,7 +112,7 @@ void UserItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 		index.data(canvas::UserListModel::AvatarRole).value<QPixmap>()
 		);
 
-	// Draw status overlay	
+	// Draw status overlay
 	const bool isLocked = index.data(canvas::UserListModel::IsLockedRole).toBool();
 	if(isLocked || index.data(canvas::UserListModel::IsMutedRole).toBool()) {
 		const QRect statusOverlayRect(

@@ -192,7 +192,5 @@ private:
 	QByteArray m_docLax;
 };
 
-
 QTEST_MAIN(TestNewVersionCheck)
 #include "newversion.moc"
-

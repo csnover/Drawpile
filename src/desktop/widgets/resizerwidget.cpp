@@ -178,4 +178,3 @@ void ResizerWidget::resizeEvent(QResizeEvent *e)
 }
 
 }
-

@@ -24,4 +24,3 @@ RUN adduser -D drawpile
 EXPOSE 27750
 USER drawpile
 ENTRYPOINT ["/bin/drawpile-srv"]
-

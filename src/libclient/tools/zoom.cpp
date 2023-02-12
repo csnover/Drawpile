@@ -76,4 +76,3 @@ void ZoomTool::end()
 }
 
 }
-

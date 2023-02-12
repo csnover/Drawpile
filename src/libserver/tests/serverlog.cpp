@@ -31,7 +31,7 @@ class TestServerLog: public QObject
 	Q_OBJECT
 private slots:
 	void testUserSessionLogEntry()
-	{	
+	{
 		Log e = Log()
 			.about(Log::Level::Info, Log::Topic::Join)
 			.session("12345678-1234-1234-1234-123456789abc")
@@ -87,7 +87,5 @@ private slots:
 	}
 };
 
-
 QTEST_MAIN(TestServerLog)
 #include "serverlog.moc"
-

@@ -65,7 +65,7 @@ void Filmstrip::setCursor(int c) {
 }
 
 void Filmstrip::resizeEvent(QResizeEvent *e)
-{ 
+{
 	Q_UNUSED(e);
 	m_scrollbar->setGeometry(0, height() - m_scrollbar->height(), width(), m_scrollbar->height());
 	m_scrollbar->setMaximum(qMax((frameSize().width()+FRAME_MARGIN) * m_frames - width() + FRAME_MARGIN*2, 0));
@@ -159,4 +159,3 @@ QPixmap Filmstrip::getFrame(int idx) const
 }
 
 }
-

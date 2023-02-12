@@ -46,7 +46,7 @@ class ServerLog;
  */
 class Client : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
 	~Client();
@@ -307,4 +307,3 @@ private:
 }
 
 #endif
-

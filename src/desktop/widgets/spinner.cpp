@@ -57,4 +57,3 @@ void Spinner::timerEvent(QTimerEvent *)
 }
 
 }
-

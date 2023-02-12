@@ -34,7 +34,7 @@ namespace canvas {
 }
 
 namespace widgets {
-    class TimelineWidget;
+	class TimelineWidget;
 }
 
 namespace docks {

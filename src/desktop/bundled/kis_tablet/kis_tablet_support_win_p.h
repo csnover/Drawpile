@@ -21,7 +21,6 @@
 #ifndef KIS_TABLET_SUPPORT_WIN_P_H
 #define KIS_TABLET_SUPPORT_WIN_P_H
 
-
 #include <QtCore/QVector>
 #include <QtCore/QPointF>
 #include <QMap>
@@ -110,7 +109,6 @@ public:
     int absoluteRange() const { return m_absoluteRange; }
     void setAbsoluteRange(int a) { m_absoluteRange = a; }
 
-
     void tabletUpdateCursor(const int pkCursor);
     static QWindowsWinTab32DLL m_winTab32DLL;
 
@@ -125,7 +123,6 @@ private:
     QVector<QWindowsTabletDeviceData> m_devices;
     int m_currentDevice;
     QPointF m_oldGlobalPosF;
-
 
     QWidget *targetWidget{0};
 /**

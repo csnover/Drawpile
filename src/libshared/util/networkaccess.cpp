@@ -60,7 +60,6 @@ QNetworkAccessManager *getInstance()
 	return nam;
 }
 
-
 FileDownload::FileDownload(QObject *parent)
 	: QObject(parent), m_file(nullptr), m_reply(nullptr), m_maxSize(0), m_size(0)
 {

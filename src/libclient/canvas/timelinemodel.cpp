@@ -63,7 +63,7 @@ namespace {
 }
 
 TimelineModel::TimelineModel(QObject *parent)
-    : QObject(parent), m_manualMode(true)
+	: QObject(parent), m_manualMode(true)
 {
 }
 
@@ -95,10 +95,10 @@ void TimelineModel::setLayers(const QVector<LayerListItem> &layers)
 		}
 
 		m_layers << TimelineLayer {
-		    l.id,
-		    l.left < prefixUntil ? prefixUntil : 0,
-		    l.left < prefixUntil ? QStringLiteral("%1 / %2").arg(prefix, l.title) : l.title
-	    };
+			l.id,
+			l.left < prefixUntil ? prefixUntil : 0,
+			l.left < prefixUntil ? QStringLiteral("%1 / %2").arg(prefix, l.title) : l.title
+		};
 		m_layerIdsToRows[l.id] = m_layers.size() - 1;
 	}
 

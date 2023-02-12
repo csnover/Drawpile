@@ -94,5 +94,3 @@ void RecentFiles::initMenu(QMenu *menu)
 		++index;
 	}
 }
-
-

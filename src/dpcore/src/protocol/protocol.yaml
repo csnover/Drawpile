@@ -161,7 +161,6 @@ PrivateChat:
         - oflags u8
         - message utf8
 
-
 # Meta messages (opaque)
 
 Interval:

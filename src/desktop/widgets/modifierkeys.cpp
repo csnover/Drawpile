@@ -69,4 +69,3 @@ void ModifierKeys::setModifiers(Qt::KeyboardModifiers mods)
 }
 
 }
-

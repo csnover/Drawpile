@@ -50,4 +50,3 @@ bool HotBorderEventFilter::eventFilter(QObject *object, QEvent *event)
 
 	return false;
 }
-

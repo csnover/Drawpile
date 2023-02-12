@@ -79,4 +79,3 @@ bool saveToFile(const QString &filename, const QPalette &palette)
 }
 
 }
-

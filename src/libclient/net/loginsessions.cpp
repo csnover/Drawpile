@@ -173,4 +173,3 @@ void LoginSessionModel::removeSession(const QString &id)
 }
 
 }
-

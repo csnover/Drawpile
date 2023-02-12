@@ -97,13 +97,10 @@ static inline Point operator+(const Point& p1, const QPointF& p2)
 	return Point(p1.x()+p2.x(), p1.y()+p2.y(), p1.pressure());
 }
 
-
 typedef QVector<Point> PointVector;
 
 }
 
 Q_DECLARE_TYPEINFO(canvas::Point, Q_MOVABLE_TYPE);
 
-
 #endif
-

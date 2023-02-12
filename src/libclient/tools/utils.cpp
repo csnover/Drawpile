@@ -56,4 +56,3 @@ QPointF square(const QPointF &p1, const QPointF &p2)
 }
 
 }
-

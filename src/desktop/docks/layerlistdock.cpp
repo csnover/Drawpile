@@ -93,7 +93,6 @@ LayerList::LayerList(QWidget *parent)
 	m_view->setItemDelegate(del);
 }
 
-
 void LayerList::setCanvas(canvas::CanvasModel *canvas)
 {
 	m_canvas = canvas;

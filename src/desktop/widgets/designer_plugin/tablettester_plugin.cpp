@@ -96,4 +96,3 @@ QString TabletTesterPlugin::includeFile() const
 {
 	return "widgets/tablettest.h";
 }
-

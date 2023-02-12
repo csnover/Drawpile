@@ -37,10 +37,9 @@ Example usage:
 
 The above does the following things:
 
- * Create a container named `drawpile-server` from the `drawpile-srv:2.0` image and run in in the background
- * Publish port 27750 on all interfaces and 27780 on loopback only
- * Mount the named volume `dpsessions` at `/home/drawpile`
- * Restart the container if it crashes or the server is restarted
- * Start drawpile server using file backed sessions, database config and web admin enabled
- * Note: web admin access is limited to localhost by the `127.0.0.1:27780:27780` mapping, but `all` access should be used inside the container
-
+* Create a container named `drawpile-server` from the `drawpile-srv:2.0` image and run in in the background
+* Publish port 27750 on all interfaces and 27780 on loopback only
+* Mount the named volume `dpsessions` at `/home/drawpile`
+* Restart the container if it crashes or the server is restarted
+* Start drawpile server using file backed sessions, database config and web admin enabled
+* Note: web admin access is limited to localhost by the `127.0.0.1:27780:27780` mapping, but `all` access should be used inside the container

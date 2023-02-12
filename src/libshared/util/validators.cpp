@@ -69,4 +69,3 @@ bool validateUsername(const QString &username)
 
 	return true;
 }
-

@@ -141,4 +141,3 @@ void Freehand::offsetActiveTool(int x, int y)
 }
 
 }
-

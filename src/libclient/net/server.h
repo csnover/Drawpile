@@ -41,16 +41,16 @@ public:
 	};
 
 	Server(QObject *parent);
-	
+
 	/**
 	 * \brief Send a message to the server
 	 */
 	virtual void sendEnvelope(const Envelope &e) = 0;
 
-    /**
-     * @brief Log out from the server
-     */
-    virtual void logout() = 0;
+	/**
+	 * @brief Log out from the server
+	 */
+	virtual void logout() = 0;
 
 	/**
 	 * @brief Is the user in a session
@@ -82,8 +82,6 @@ signals:
 	void envelopeReceived(const Envelope &envelope);
 };
 
-
 }
 
 #endif
-

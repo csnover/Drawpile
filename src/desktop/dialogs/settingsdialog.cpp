@@ -737,7 +737,6 @@ void SettingsDialog::removeSelectedAvatar()
 		m_avatars->removeRow(idx.row());
 }
 
-
 void SettingsDialog::changeColorWheelShape(int index)
 {
 	ColorWheel::ShapeEnum shape;
@@ -799,4 +798,3 @@ void SettingsDialog::changeColorWheelSpace(int index)
 }
 
 }
-

@@ -23,8 +23,8 @@
 #include "libclient/utils/kis_cubic_curve.h"
 
 enum enumState {
-    ST_NORMAL,
-    ST_DRAG
+	ST_NORMAL,
+	ST_DRAG
 };
 
 /**
@@ -32,252 +32,238 @@ enum enumState {
  */
 class KisCurveWidget::Private
 {
-
-    KisCurveWidget *m_curveWidget;
-
+	KisCurveWidget *m_curveWidget;
 
 public:
-    Private(KisCurveWidget *parent);
-    virtual ~Private();
+	Private(KisCurveWidget *parent);
+	virtual ~Private();
 
-    /* Dragging variables */
-    int m_grab_point_index;
-    double m_grabOffsetX;
-    double m_grabOffsetY;
-    double m_grabOriginalX;
-    double m_grabOriginalY;
-    QPointF m_draggedAwayPoint;
-    int m_draggedAwayPointIndex;
+	/* Dragging variables */
+	int m_grab_point_index;
+	double m_grabOffsetX;
+	double m_grabOffsetY;
+	double m_grabOriginalX;
+	double m_grabOriginalY;
+	QPointF m_draggedAwayPoint;
+	int m_draggedAwayPointIndex;
 
-    bool m_readOnlyMode;
-    bool m_guideVisible;
-    QColor m_colorGuide;
+	bool m_readOnlyMode;
+	bool m_guideVisible;
+	QColor m_colorGuide;
 
-
-    /* The curve itself */
-    bool    m_splineDirty;
-    KisCubicCurve m_curve;
+	/* The curve itself */
+	bool    m_splineDirty;
+	KisCubicCurve m_curve;
 	KisCubicCurve m_defaultcurve;
 
-    QPixmap m_pix;
-    QPixmap m_pixmapBase;
-    bool m_pixmapDirty;
-    QPixmap *m_pixmapCache;
+	QPixmap m_pix;
+	QPixmap m_pixmapBase;
+	bool m_pixmapDirty;
+	QPixmap *m_pixmapCache;
 
-    /* In/Out controls */
-    QSpinBox *m_intIn;
-    QSpinBox *m_intOut;
+	/* In/Out controls */
+	QSpinBox *m_intIn;
+	QSpinBox *m_intOut;
 
-    /* Working range of them */
-    int m_inOutMin;
-    int m_inOutMax;
+	/* Working range of them */
+	int m_inOutMin;
+	int m_inOutMax;
 
 	/* Context menu */
 	QMenu *m_ctxmenu;
 	QAction *m_removeCurrentPointAction;
 
-    /**
-     * State functions.
-     * At the moment used only for dragging.
-     */
-    enumState m_state;
+	/**
+	 * State functions.
+	 * At the moment used only for dragging.
+	 */
+	enumState m_state;
 
-    inline void setState(enumState st);
-    inline enumState state() const;
+	inline void setState(enumState st);
+	inline enumState state() const;
 
+	/*** Internal routins ***/
 
+	/**
+	 * Common update routins
+	 */
+	void setCurveModified();
+	void setCurveRepaint();
 
-    /*** Internal routins ***/
+	/**
+	 * Convert working range of
+	 * In/Out controls to normalized
+	 * range of spline (and reverse)
+	 */
+	double io2sp(int x);
+	int sp2io(double x);
 
-    /**
-     * Common update routins
-     */
-    void setCurveModified();
-    void setCurveRepaint();
+	/**
+	 * Check whether newly created/moved point @pt doesn't overlap
+	 * with any of existing ones from @m_points and adjusts its coordinates.
+	 * @skipIndex is the index of the point, that shouldn't be taken
+	 * into account during the search
+	 * (e.g. beacuse it's @pt itself)
+	 *
+	 * Returns false in case the point can't be placed anywhere
+	 * without overlapping
+	 */
+	bool jumpOverExistingPoints(QPointF &pt, int skipIndex);
 
+	/**
+	 * Synchronize In/Out spinboxes with the curve
+	 */
+	void syncIOControls();
 
-    /**
-     * Convert working range of
-     * In/Out controls to normalized
-     * range of spline (and reverse)
-     */
-    double io2sp(int x);
-    int sp2io(double x);
+	/**
+	 * Find the nearest point to @pt from m_points
+	 */
+	int nearestPointInRange(QPointF pt, int wWidth, int wHeight) const;
 
-
-    /**
-     * Check whether newly created/moved point @pt doesn't overlap
-     * with any of existing ones from @m_points and adjusts its coordinates.
-     * @skipIndex is the index of the point, that shouldn't be taken
-     * into account during the search
-     * (e.g. beacuse it's @pt itself)
-     *
-     * Returns false in case the point can't be placed anywhere
-     * without overlapping
-     */
-    bool jumpOverExistingPoints(QPointF &pt, int skipIndex);
-
-
-    /**
-     * Synchronize In/Out spinboxes with the curve
-     */
-    void syncIOControls();
-
-    /**
-     * Find the nearest point to @pt from m_points
-     */
-    int nearestPointInRange(QPointF pt, int wWidth, int wHeight) const;
-
-    /**
-     * Nothing to be said! =)
-     */
-    inline
+	/**
+	 * Nothing to be said! =)
+	 */
+	inline
 	void drawGrid(QPainter &p, int wWidth, int wHeight);
-
 };
 
 KisCurveWidget::Private::Private(KisCurveWidget *parent)
 {
-    m_curveWidget = parent;
+	m_curveWidget = parent;
 }
 
 KisCurveWidget::Private::~Private()
 {
 }
 
-
 double KisCurveWidget::Private::io2sp(int x)
 {
-    int rangeLen = m_inOutMax - m_inOutMin;
-    return double(x - m_inOutMin) / rangeLen;
+	int rangeLen = m_inOutMax - m_inOutMin;
+	return double(x - m_inOutMin) / rangeLen;
 }
 
 int KisCurveWidget::Private::sp2io(double x)
 {
-    int rangeLen = m_inOutMax - m_inOutMin;
-    return int(x*rangeLen + 0.5) + m_inOutMin;
+	int rangeLen = m_inOutMax - m_inOutMin;
+	return int(x*rangeLen + 0.5) + m_inOutMin;
 }
-
 
 bool KisCurveWidget::Private::jumpOverExistingPoints(QPointF &pt, int skipIndex)
 {
-    foreach(const QPointF &it, m_curve.points()) {
-        if (m_curve.points().indexOf(it) == skipIndex)
-            continue;
-        if (fabs(it.x() - pt.x()) < POINT_AREA)
-            pt.rx() = pt.x() >= it.x() ?
-                      it.x() + POINT_AREA : it.x() - POINT_AREA;
-    }
-    return (pt.x() >= 0 && pt.x() <= 1.);
+	foreach(const QPointF &it, m_curve.points()) {
+		if (m_curve.points().indexOf(it) == skipIndex)
+			continue;
+		if (fabs(it.x() - pt.x()) < POINT_AREA)
+			pt.rx() = pt.x() >= it.x() ?
+			          it.x() + POINT_AREA : it.x() - POINT_AREA;
+	}
+	return (pt.x() >= 0 && pt.x() <= 1.);
 }
 
 int KisCurveWidget::Private::nearestPointInRange(QPointF pt, int wWidth, int wHeight) const
 {
-    double nearestDistanceSquared = 1000;
-    int nearestIndex = -1;
-    int i = 0;
+	double nearestDistanceSquared = 1000;
+	int nearestIndex = -1;
+	int i = 0;
 
-    foreach(const QPointF & point, m_curve.points()) {
-        double distanceSquared = (pt.x() - point.x()) *
-                                 (pt.x() - point.x()) +
-                                 (pt.y() - point.y()) *
-                                 (pt.y() - point.y());
+	foreach(const QPointF & point, m_curve.points()) {
+		double distanceSquared = (pt.x() - point.x()) *
+		                         (pt.x() - point.x()) +
+		                         (pt.y() - point.y()) *
+		                         (pt.y() - point.y());
 
-        if (distanceSquared < nearestDistanceSquared) {
-            nearestIndex = i;
-            nearestDistanceSquared = distanceSquared;
-        }
-        ++i;
-    }
+		if (distanceSquared < nearestDistanceSquared) {
+			nearestIndex = i;
+			nearestDistanceSquared = distanceSquared;
+		}
+		++i;
+	}
 
-    if (nearestIndex >= 0) {
+	if (nearestIndex >= 0) {
 		if (fabs(pt.x() - m_curve.points()[nearestIndex].x()) *(wWidth - 1) < 10 &&
 				fabs(pt.y() - m_curve.points()[nearestIndex].y()) *(wHeight - 1) < 10) {
-            return nearestIndex;
-        }
-    }
+			return nearestIndex;
+		}
+	}
 
-    return -1;
+	return -1;
 }
-
 
 template<typename T>
 static inline constexpr auto div2_round(T x) {
-    return (x+1)>>1;
+	return (x+1)>>1;
 }
 template<typename T>
 static inline constexpr auto div4_round(T x) {
-    return (x+2)>>2;
+	return (x+2)>>2;
 }
 
 void KisCurveWidget::Private::drawGrid(QPainter &p, int wWidth, int wHeight)
 {
-    /**
-     * Hint: widget size should conform
-     * formula 4n+5 to draw grid correctly
-     * without curious shifts between
-     * spline and it caused by rounding
-     *
-     * That is not mandatory but desirable
-     */
+	/**
+	 * Hint: widget size should conform
+	 * formula 4n+5 to draw grid correctly
+	 * without curious shifts between
+	 * spline and it caused by rounding
+	 *
+	 * That is not mandatory but desirable
+	 */
 
-    p.drawLine(div4_round(wWidth), 0, div4_round(wWidth), wHeight);
-    p.drawLine(div2_round(wWidth), 0, div2_round(wWidth), wHeight);
-    p.drawLine(div4_round(3*wWidth), 0, div4_round(3*wWidth), wHeight);
+	p.drawLine(div4_round(wWidth), 0, div4_round(wWidth), wHeight);
+	p.drawLine(div2_round(wWidth), 0, div2_round(wWidth), wHeight);
+	p.drawLine(div4_round(3*wWidth), 0, div4_round(3*wWidth), wHeight);
 
-    p.drawLine(0, div4_round(wHeight), wWidth, div4_round(wHeight));
-    p.drawLine(0, div2_round(wHeight), wWidth, div2_round(wHeight));
-    p.drawLine(0, div4_round(3*wHeight), wWidth, div4_round(3*wHeight));
+	p.drawLine(0, div4_round(wHeight), wWidth, div4_round(wHeight));
+	p.drawLine(0, div2_round(wHeight), wWidth, div2_round(wHeight));
+	p.drawLine(0, div4_round(3*wHeight), wWidth, div4_round(3*wHeight));
 
 }
 
 void KisCurveWidget::Private::syncIOControls()
 {
-    if (!m_intIn || !m_intOut)
-        return;
+	if (!m_intIn || !m_intOut)
+		return;
 
-    bool somethingSelected = (m_grab_point_index >= 0);
+	bool somethingSelected = (m_grab_point_index >= 0);
 
-    m_intIn->setEnabled(somethingSelected);
-    m_intOut->setEnabled(somethingSelected);
+	m_intIn->setEnabled(somethingSelected);
+	m_intOut->setEnabled(somethingSelected);
 
-    if (m_grab_point_index >= 0) {
-        m_intIn->blockSignals(true);
-        m_intOut->blockSignals(true);
+	if (m_grab_point_index >= 0) {
+		m_intIn->blockSignals(true);
+		m_intOut->blockSignals(true);
 
-        m_intIn->setValue(sp2io(m_curve.points()[m_grab_point_index].x()));
-        m_intOut->setValue(sp2io(m_curve.points()[m_grab_point_index].y()));
+		m_intIn->setValue(sp2io(m_curve.points()[m_grab_point_index].x()));
+		m_intOut->setValue(sp2io(m_curve.points()[m_grab_point_index].y()));
 
-        m_intIn->blockSignals(false);
-        m_intOut->blockSignals(false);
-    } else {
-        /*FIXME: Ideally, these controls should hide away now */
-    }
+		m_intIn->blockSignals(false);
+		m_intOut->blockSignals(false);
+	} else {
+		/*FIXME: Ideally, these controls should hide away now */
+	}
 }
 
 void KisCurveWidget::Private::setCurveModified()
 {
-    syncIOControls();
-    m_splineDirty = true;
-    m_curveWidget->update();
-    m_curveWidget->emit modified();
+	syncIOControls();
+	m_splineDirty = true;
+	m_curveWidget->update();
+	m_curveWidget->emit modified();
 }
 
 void KisCurveWidget::Private::setCurveRepaint()
 {
-    m_curveWidget->update();
+	m_curveWidget->update();
 }
 
 void KisCurveWidget::Private::setState(enumState st)
 {
-    m_state = st;
+	m_state = st;
 }
-
 
 enumState KisCurveWidget::Private::state() const
 {
-    return m_state;
+	return m_state;
 }
-
 
 #endif /* _KIS_CURVE_WIDGET_P_H_ */

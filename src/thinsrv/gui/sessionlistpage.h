@@ -58,7 +58,6 @@ public:
 	SessionListPage *makePage(Server *server) const override { return new SessionListPage(server); }
 };
 
-
 }
 }
 

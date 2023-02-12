@@ -37,7 +37,6 @@ Writer::Writer(const QString &filename, QObject *parent)
 		m_encoding = Encoding::Text;
 }
 
-
 Writer::Writer(QIODevice *file, bool autoclose, QObject *parent)
 	: QObject(parent), m_file(file),
 	m_autoclose(autoclose), m_minInterval(0), m_timestampInterval(0), m_lastTimestamp(0),
@@ -228,4 +227,3 @@ void Writer::close()
 }
 
 }
-

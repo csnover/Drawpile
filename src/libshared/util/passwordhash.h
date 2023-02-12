@@ -44,7 +44,6 @@ enum Algorithm {
 #endif
 };
 
-
 /**
  * @brief Check the given password against the hash
  * @param password
@@ -73,4 +72,3 @@ bool isValidHash(const QByteArray &hash);
 }
 
 #endif // PASSWORDHASH_H
-

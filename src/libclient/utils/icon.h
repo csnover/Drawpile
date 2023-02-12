@@ -43,4 +43,3 @@ inline QIcon fromTheme(const QString &name) {
 }
 
 #endif
-

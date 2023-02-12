@@ -39,7 +39,6 @@
 #include <unistd.h>
 #endif
 
-
 int main(int argc, char *argv[]) {
 #ifdef Q_OS_UNIX
 	// Security check
@@ -76,7 +75,6 @@ int main(int argc, char *argv[]) {
 #endif
 		app = new QCoreApplication(argc, argv);
 
-
 	// Set common settings
 	QCoreApplication::setOrganizationName("drawpile");
 	QCoreApplication::setOrganizationDomain("drawpile.net");
@@ -97,4 +95,3 @@ int main(int argc, char *argv[]) {
 	initsys::notifyReady();
 	return app->exec();
 }
-

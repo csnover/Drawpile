@@ -180,7 +180,6 @@ Blendmode fromSvgName(const QString &name)
 	return rustpile::blendmode_from_svgname(reinterpret_cast<const uint16_t*>(name.constData()), name.length());
 }
 
-
 QVector<QPair<rustpile::Blendmode, QString>> brushModeNames()
 {
 	QVector<QPair<rustpile::Blendmode, QString>> list;

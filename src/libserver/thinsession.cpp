@@ -171,4 +171,3 @@ void ThinSession::onClientJoin(Client *client, bool host)
 }
 
 }
-

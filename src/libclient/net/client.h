@@ -29,7 +29,7 @@ class QJsonObject;
 class QJsonArray;
 
 namespace net {
-	
+
 class LoginHandler;
 struct ServerReply;
 

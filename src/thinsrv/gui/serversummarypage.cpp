@@ -219,7 +219,6 @@ ServerSummaryPage::ServerSummaryPage(Server *server, QWidget *parent)
 
 	layout->addItem(new QSpacerItem(1,10), row++, 0);
 
-
 	// Serverwide settings that are adjustable via the API
 	layout->addWidget(new SubheaderWidget(tr("Settings"), 2), row++, 0, 1,	2);
 
@@ -251,7 +250,6 @@ ServerSummaryPage::ServerSummaryPage(Server *server, QWidget *parent)
 	addWidgets(d, layout, row++, QString(), d->extAuthMod);
 	addWidgets(d, layout, row++, QString(), d->extAuthHost);
 	addWidgets(d, layout, row++, QString(), d->extAuthAvatars);
-
 
 	layout->addItem(new QSpacerItem(1,1, QSizePolicy::Minimum, QSizePolicy::Expanding), row, 0);
 

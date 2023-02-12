@@ -58,7 +58,7 @@ public:
 	 * Create a new session
 	 *
 	 * In case of error, one of the following error codes may be returned:
-	 * 
+	 *
 	 *  - idInuse     - a session with this ID or alias already exists
 	 *  - badProtocol - this protocol version is not supported by this server
 	 *  - closed      - this server is full or not accepting new sessions

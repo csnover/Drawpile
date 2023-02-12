@@ -122,4 +122,3 @@ QJsonArray SessionBanList::toJson(bool showIp) const
 }
 
 }
-

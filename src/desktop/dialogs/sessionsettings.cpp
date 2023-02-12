@@ -109,7 +109,6 @@ SessionSettingsDialog::SessionSettingsDialog(Document *doc, QWidget *parent)
 		m_ui->baseResetThreshold->setText(QStringLiteral("+ %1 MB").arg(threshold/(1024.0*1024.0), 0, 'f', 1));
 	});
 
-
 	// Set up permissions tab
 	connect(m_ui->permissionPresets, &widgets::PresetSelector::saveRequested, this, &SessionSettingsDialog::permissionPresetSaving);
 	connect(m_ui->permissionPresets, &widgets::PresetSelector::loadRequested, this, &SessionSettingsDialog::permissionPresetSelected);

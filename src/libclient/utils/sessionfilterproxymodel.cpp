@@ -90,4 +90,3 @@ bool SessionFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex
 
 	return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
 }
-

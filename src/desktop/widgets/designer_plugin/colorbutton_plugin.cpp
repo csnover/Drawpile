@@ -96,4 +96,3 @@ QString ColorButtonPlugin::includeFile() const
 {
 	return "widgets/colorbutton.h";
 }
-

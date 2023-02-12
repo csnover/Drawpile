@@ -73,4 +73,3 @@ void LaserPointer::end()
 }
 
 }
-

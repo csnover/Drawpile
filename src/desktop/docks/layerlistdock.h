@@ -79,7 +79,7 @@ signals:
 private slots:
 	void beforeLayerReset();
 	void afterLayerReset();
-	
+
 	void onFeatureAccessChange(canvas::Feature feature, bool canuse);
 
 	void addLayer();
@@ -138,4 +138,3 @@ private:
 }
 
 #endif
-

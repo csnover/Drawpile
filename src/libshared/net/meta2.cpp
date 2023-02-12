@@ -201,7 +201,6 @@ Kwargs LayerACL::kwargs() const
 	kw["id"] = text::idString(m_id);
 	kw["locked"] = locked() ? "true" : "false";
 
-
 	if(m_id > 0) {
 		kw["tier"] = tierName(tier());
 		if(!m_exclusive.isEmpty())

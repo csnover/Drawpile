@@ -25,7 +25,7 @@ namespace tools {
 
 /**
  * @brief Zoom tool
- * 
+ *
  * This changes the view only and has no actual drawing effect.
  */
 class ZoomTool : public Tool {
@@ -44,4 +44,3 @@ private:
 }
 
 #endif
-

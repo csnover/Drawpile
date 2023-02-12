@@ -111,4 +111,3 @@ private:
 
 QTEST_MAIN(TestListingFiltering)
 #include "listingfiltering.moc"
-

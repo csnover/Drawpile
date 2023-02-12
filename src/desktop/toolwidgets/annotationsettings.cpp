@@ -29,7 +29,6 @@
 #include "desktop/widgets/groupedtoolbutton.h"
 #include "desktop/utils/qtguicompat.h"
 
-
 #include "ui_textsettings.h"
 
 #include <QActionGroup>
@@ -448,4 +447,3 @@ void AnnotationSettings::bake()
 }
 
 }
-

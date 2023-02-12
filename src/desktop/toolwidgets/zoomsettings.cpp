@@ -49,4 +49,3 @@ QWidget *ZoomSettings::createUiWidget(QWidget *parent)
 }
 
 }
-

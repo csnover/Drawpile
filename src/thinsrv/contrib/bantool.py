@@ -74,7 +74,6 @@ def command_list(db, *, format, expired=False, ip=None):
 
     FORMATS[format]([r[0] for r in rows.description], rows)
 
-
 def command_autoban(db, *, sessions, days, penalty, verbose=False, dryrun=False):
     """Scan the server log for users who have been banned from at least the
     given number of different sessions in the last number of days and add
@@ -118,7 +117,7 @@ def command_autoban(db, *, sessions, days, penalty, verbose=False, dryrun=False)
             users[userip] = {'names': set(), 'sessions': set()}
         users[userip]['names'].add(username)
         users[userip]['sessions'].add(row[1])
-    
+
     # Gather a list of potential serverwide bans
     verbose_output = []
     bans = []
@@ -157,11 +156,9 @@ def command_autoban(db, *, sessions, days, penalty, verbose=False, dryrun=False)
             db.execute("INSERT INTO ipbans VALUES (:ip, 0, datetime('now', :expiration), :comment, datetime('now'))", b)
         db.commit()
 
-
 def command_info(db, *, ip):
     """Get ban related information about the given IP address.
     """
-
 
     # Serverwide bans:
     banned_until = db.execute(
@@ -190,7 +187,6 @@ def command_info(db, *, ip):
     else:
         print("Not banned from any session recently")
 
-
 def command_ban(db, *, ip, days, message=""):
     """Add a ban entry manually.
     """
@@ -218,7 +214,6 @@ def command_ban(db, *, ip, days, message=""):
     )
     db.commit()
 
-
 def command_unban(db, *, ip):
     """Remove all active ban entries for the given IP"""
     if ip == 'all':
@@ -241,7 +236,6 @@ def command_unban(db, *, ip):
     db.commit()
 
     print("Removed %d entries" % c.rowcount)
-
 
 # Output formatters
 def print_table(header, rows):
@@ -277,7 +271,6 @@ FORMATS = {
     'csv': print_csv,
 }
 
-
 def _sqlite_in_subnet(ip, subnet, mask):
     try:
         ipaddr = ipaddress.ip_address(ip)
@@ -288,7 +281,6 @@ def _sqlite_in_subnet(ip, subnet, mask):
     except Exception as e:
         print(e)
         raise
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -364,4 +356,3 @@ if __name__ == '__main__':
     except BadArg as e:
         print(str(e), file=sys.stderr)
         sys.exit(1)
-

@@ -43,4 +43,3 @@ std::tuple<QString, QStringList> popApiPath(const QStringList &path)
 }
 
 }
-

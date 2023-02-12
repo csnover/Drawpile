@@ -24,7 +24,7 @@
 #include <QMessageBox>
 
 namespace sessionlisting {
-    class ListServerModel;
+	class ListServerModel;
 }
 
 namespace dialogs {
@@ -57,4 +57,3 @@ private:
 }
 
 #endif
-

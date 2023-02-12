@@ -7,4 +7,3 @@
 #define ppVar( var ) #var << "=" << (var)
 
 #define ENTER_FUNCTION()
-

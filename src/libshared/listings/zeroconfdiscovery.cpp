@@ -98,4 +98,3 @@ void ZeroconfDiscovery::removeService(KDNSSD::RemoteService::Ptr service)
 		}
 	}
 }
-

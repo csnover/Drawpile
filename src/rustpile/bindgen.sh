@@ -8,4 +8,3 @@ then
 fi
 
 cbindgen --config cbindgen.toml --lang c++ --crate rustpile --output rustpile.h
-

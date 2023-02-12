@@ -356,19 +356,16 @@ def read_field(ftype, length=None):
 
     return f"read::<{ftype}>()"
 
-
 def write_field(ftype, value):
     if ftype in ('String', 'Vec<u8>', 'Vec<u16>', 'Bytes'):
         value = "&" + value
 
     return f"write({value})"
 
-
 def deref_primitive(field):
     if field.field_type in ('u8', 'u16', 'u32', 'i32', 'bool'):
         return '*'
     return ''
-
 
 def textmessage_setfield(field, name):
     if field.field_type == 'String':
@@ -401,7 +398,6 @@ def textmessage_setfield(field, name):
 
     return f'{setter}("{field.name}", {name})'
 
-
 def textmessage_getfield(var, field):
     if field.field_type == 'Bytes':
         getter = 'get_bytes'
@@ -431,7 +427,6 @@ def textmessage_getfield(var, field):
 
     return f'{var}.{getter}("{field.name}")';
 
-
 def payload_len(message):
     fixed, vectors = message.length()
 
@@ -448,10 +443,8 @@ def payload_len(message):
 
     return '+'.join(total)
 
-
 def comment(comments):
     return '\n'.join('/// ' + c for c in comments.split('\n'))
-
 
 if __name__ == '__main__':
     protocol = load_protocol_definition()

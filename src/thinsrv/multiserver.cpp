@@ -266,7 +266,6 @@ void MultiServer::newClient()
 	}
 }
 
-
 void MultiServer::printStatusUpdate()
 {
 	initsys::notifyStatus(QString("%1 users and %2 sessions")
@@ -501,7 +500,7 @@ JsonApiResult MultiServer::banlistJsonApi(JsonApiMethod method, const QStringLis
 }
 
 /**
- * @brief View and modify the list server URL whitelist 
+ * @brief View and modify the list server URL whitelist
  *
  * @param method
  * @param path

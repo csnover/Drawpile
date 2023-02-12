@@ -112,5 +112,4 @@ QString ProtocolVersion::asString() const
 	return QString("%1:%2.%3.%4").arg(m_namespace).arg(m_server).arg(m_major).arg(m_minor);
 }
 
-
 }

@@ -84,11 +84,11 @@ public:
 	QString versionName() const;
 
 	/**
-	 * @brief Get the protocol namespace. 
+	 * @brief Get the protocol namespace.
 	 *
 	 * Namespacing allows the server to host other client types than Drawpile.
 	 */
-	QString ns() const { return m_namespace; }	
+	QString ns() const { return m_namespace; }
 
 	/**
 	 * @brief Get the server protocol version

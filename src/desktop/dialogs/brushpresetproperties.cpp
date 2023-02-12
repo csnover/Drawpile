@@ -23,7 +23,6 @@
 
 #include <QFileDialog>
 
-
 namespace dialogs {
 
 BrushPresetProperties::BrushPresetProperties(int id, const QString &name,
@@ -32,8 +31,8 @@ BrushPresetProperties::BrushPresetProperties(int id, const QString &name,
 	, m_id(id)
 	, m_thumbnail()
 {
-    m_ui = new Ui_BrushPresetProperties;
-    m_ui->setupUi(this);
+	m_ui = new Ui_BrushPresetProperties;
+	m_ui->setupUi(this);
 
 	m_ui->name->setText(name);
 	m_ui->description->setPlainText(description);
@@ -42,11 +41,11 @@ BrushPresetProperties::BrushPresetProperties(int id, const QString &name,
 	m_ui->thumbnail->setScene(scene);
 	showThumbnail(thumbnail);
 
-    connect(m_ui->name, &QLineEdit::returnPressed, this, &QDialog::accept);
+	connect(m_ui->name, &QLineEdit::returnPressed, this, &QDialog::accept);
 	connect(m_ui->chooseThumbnailButton, &QPushButton::pressed,
 		this, &BrushPresetProperties::chooseThumbnailFile);
-    connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
-    connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+	connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+	connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 	connect(this, &QDialog::accepted, this, &BrushPresetProperties::emitChanges);
 }
 

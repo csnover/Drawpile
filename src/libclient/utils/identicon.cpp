@@ -38,4 +38,3 @@ QImage make_identicon(const QString &name, const QSize &size)
 
 	return image;
 }
-

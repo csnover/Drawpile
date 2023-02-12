@@ -212,4 +212,3 @@ bool FfmpegExporter::checkIsFfmpegAvailable()
 
 	return found;
 }
-

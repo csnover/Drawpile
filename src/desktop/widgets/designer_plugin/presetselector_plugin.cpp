@@ -96,4 +96,3 @@ QString PresetSelectorPlugin::includeFile() const
 {
 	return "widgets/presetselector.h";
 }
-

@@ -161,7 +161,6 @@ int LayerAttributes::payloadLength() const
 	return 6;
 }
 
-
 int LayerAttributes::serializePayload(uchar *data) const
 {
 	uchar *ptr=data;
@@ -223,7 +222,6 @@ int LayerVisibility::payloadLength() const
 	return 3;
 }
 
-
 int LayerVisibility::serializePayload(uchar *data) const
 {
 	uchar *ptr=data;
@@ -264,7 +262,6 @@ int LayerRetitle::payloadLength() const
 {
 	return 2 + m_title.length();
 }
-
 
 int LayerRetitle::serializePayload(uchar *data) const
 {
@@ -405,4 +402,3 @@ LayerDelete *LayerDelete::fromText(uint8_t ctx, const Kwargs &kwargs)
 }
 
 }
-

@@ -55,4 +55,3 @@ void InMemoryHistory::historyReset(const protocol::MessageList &newHistory)
 }
 
 }
-

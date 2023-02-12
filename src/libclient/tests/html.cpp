@@ -26,7 +26,5 @@ private slots:
 	}
 };
 
-
 QTEST_MAIN(TestHtmlUtils)
 #include "html.moc"
-

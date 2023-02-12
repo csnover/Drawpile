@@ -162,4 +162,3 @@ void ServerLogDialog::redoSelected()
 }
 
 }
-

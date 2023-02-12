@@ -30,26 +30,26 @@ namespace rustpile { enum class AnimationExportMode; }
  */
 class AnimationSaverRunnable : public QObject, public QRunnable
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    AnimationSaverRunnable(const canvas::PaintEngine *pe, rustpile::AnimationExportMode mode, const QString &filename, QObject *parent = nullptr);
+	AnimationSaverRunnable(const canvas::PaintEngine *pe, rustpile::AnimationExportMode mode, const QString &filename, QObject *parent = nullptr);
 
-    void run() override;
+	void run() override;
 
 public slots:
-    void cancelExport();
+	void cancelExport();
 
 signals:
-    void progress(int progress);
-    void saveComplete(const QString &error, const QString &errorDetail);
+	void progress(int progress);
+	void saveComplete(const QString &error, const QString &errorDetail);
 
 private:
-    friend bool animationSaverProgressCallback(void *ctx, float progress);
-    const canvas::PaintEngine *m_pe;
-    QString m_filename;
-    rustpile::AnimationExportMode m_mode;
+	friend bool animationSaverProgressCallback(void *ctx, float progress);
+	const canvas::PaintEngine *m_pe;
+	QString m_filename;
+	rustpile::AnimationExportMode m_mode;
 
-    bool m_cancelled;
+	bool m_cancelled;
 };
 
 #endif

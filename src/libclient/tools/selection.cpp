@@ -131,7 +131,6 @@ void SelectionTool::cancelMultipart()
 	owner.model()->setSelection(nullptr);
 }
 
-
 void SelectionTool::undoMultipart()
 {
 	canvas::Selection *sel = owner.model()->selection();

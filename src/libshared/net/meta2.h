@@ -217,7 +217,6 @@ private:
 	uint16_t m_id;
 };
 
-
 }
 
 #endif

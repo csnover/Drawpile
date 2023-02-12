@@ -28,11 +28,10 @@
 
 namespace drawingboard {
 
-
 namespace {
-static const int ARROW = 10;
-
+	static const int ARROW = 10;
 }
+
 UserMarkerItem::UserMarkerItem(int id, QGraphicsItem *parent)
 	: QGraphicsItem(parent),
 	  m_id(id), m_fadeout(0), m_lastMoved(0),

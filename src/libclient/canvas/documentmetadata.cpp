@@ -24,7 +24,7 @@
 namespace canvas {
 
 DocumentMetadata::DocumentMetadata(PaintEngine *engine, QObject *parent)
-    : QObject{parent}, m_engine(engine), m_framerate(15), m_useTimeline(false)
+	: QObject{parent}, m_engine(engine), m_framerate(15), m_useTimeline(false)
 {
 	Q_ASSERT(engine);
 	refreshMetadata();

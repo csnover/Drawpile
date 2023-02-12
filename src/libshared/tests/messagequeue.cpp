@@ -95,7 +95,6 @@ private:
 	int m_port;
 };
 
-
 // The actual test case
 class TestMessageQueue : public QObject
 {
@@ -219,7 +218,5 @@ private:
 	EchoServer *m_server;
 };
 
-
 QTEST_MAIN(TestMessageQueue)
 #include "messagequeue.moc"
-

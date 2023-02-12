@@ -168,7 +168,6 @@ private:
 	uint8_t m_mode;
 };
 
-
 /**
  * @brief Draw Pixel Brush Dabs
  *

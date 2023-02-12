@@ -152,7 +152,5 @@ private slots:
 	}
 };
 
-
 QTEST_MAIN(TestMessages)
 #include "messages.moc"
-

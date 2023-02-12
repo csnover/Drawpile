@@ -22,11 +22,12 @@ a filled background layer is generated with the `background-tile` attribute set.
 The animation timeline (if used) is saved under a Drawpile specific element `<drawpile:timeline>`.
 It contains `<frame>` elements, which again contain a list of layer indexes, where 0 is the topmost layer.
 
-Compatability has been tested with the following programs:
- * MyPaint
- * GIMP
- * Krita
+Compatibility has been tested with the following programs:
+
+* MyPaint
+* GIMP
+* Krita
 
 Further reading
- * http://www.freedesktop.org/wiki/Specifications/OpenRaster/
 
+* http://www.freedesktop.org/wiki/Specifications/OpenRaster/

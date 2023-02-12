@@ -321,7 +321,5 @@ private:
 	QDir m_dir;
 };
 
-
 QTEST_MAIN(TestFiledHistory)
 #include "filedhistory.moc"
-

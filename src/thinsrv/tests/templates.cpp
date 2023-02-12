@@ -82,7 +82,5 @@ private:
 	}
 };
 
-
 QTEST_MAIN(TestTemplates)
 #include "templates.moc"
-

@@ -278,4 +278,3 @@ void SessionListingModel::setList(const QString &listing, const QVector<Session>
 	m_listings << Listing { listing, QString(), sessions };
 	endInsertRows();
 }
-

@@ -79,4 +79,3 @@ private:
 Q_DECLARE_METATYPE(net::Announcement)
 
 #endif
-

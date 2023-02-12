@@ -91,7 +91,6 @@ Marker *Marker::fromText(uint8_t ctx, const Kwargs &kwargs)
 		);
 }
 
-
 Filtered::Filtered(uint8_t ctx, uchar *payload, int payloadLen)
 	: Message(MSG_FILTERED, ctx), m_payload(payload), m_length(payloadLen)
 { }
@@ -128,12 +127,11 @@ int Filtered::serializePayload(uchar *data) const
 
 bool Filtered::payloadEquals(const Message &m) const
 {
-        const Filtered &fm = static_cast<const Filtered&>(m);
-        if(m_length != fm.m_length)
-                return false;
+		const Filtered &fm = static_cast<const Filtered&>(m);
+		if(m_length != fm.m_length)
+				return false;
 
-        return memcmp(m_payload, fm.m_payload, m_length) == 0;
+		return memcmp(m_payload, fm.m_payload, m_length) == 0;
 }
 
 }
-

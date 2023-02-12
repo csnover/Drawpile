@@ -150,4 +150,3 @@ void BrushPreview::mouseDoubleClickEvent(QMouseEvent*)
 }
 
 }
-

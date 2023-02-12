@@ -185,7 +185,5 @@ private slots:
 	}
 };
 
-
 QTEST_MAIN(TestServerConfig)
 #include "serverconfig.moc"
-

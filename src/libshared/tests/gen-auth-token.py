@@ -23,4 +23,3 @@ print ("Auth token version: 1")
 print ("Payload: " + serialized_token.decode('utf-8'))
 print ("Signature: " + signature.decode('utf-8'))
 print ("Token: 1." + serialized_token.decode('utf-8') + "." + signature.decode('utf-8'))
-

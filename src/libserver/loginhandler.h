@@ -127,4 +127,3 @@ private:
 }
 
 #endif // LOGINHANDLER_H
-

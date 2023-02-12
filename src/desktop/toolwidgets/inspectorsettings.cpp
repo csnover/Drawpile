@@ -59,4 +59,3 @@ void InspectorSettings::onCanvasInspected(int lastEditedBy)
 }
 
 }
-

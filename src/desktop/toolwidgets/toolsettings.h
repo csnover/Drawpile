@@ -137,7 +137,7 @@ public slots:
 	virtual void toggleEraserMode() { }
 
 protected:
-	virtual QWidget *createUiWidget(QWidget *parent) = 0;	
+	virtual QWidget *createUiWidget(QWidget *parent) = 0;
 	ToolController *controller() { return m_ctrl; }
 
 private:
@@ -148,4 +148,3 @@ private:
 }
 
 #endif
-

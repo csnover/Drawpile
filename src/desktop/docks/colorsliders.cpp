@@ -46,7 +46,7 @@ struct ColorSliderDock::Private {
 	QSpinBox *greenbox = nullptr;
 	QSpinBox *bluebox = nullptr;
 
-    bool updating = false;
+	bool updating = false;
 };
 
 ColorSliderDock::ColorSliderDock(const QString& title, QWidget *parent)
@@ -250,4 +250,3 @@ void ColorSliderDock::setLastUsedColors(const color_widgets::ColorPalette &pal)
 }
 
 }
-

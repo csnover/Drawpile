@@ -48,42 +48,42 @@ class KisCubicCurve;
  */
 class KisCurveWidget : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
 
-    /**
-     * Create a new curve widget with a default curve, that is a straight
-     * line from bottom-left to top-right.
-     */
+	/**
+	 * Create a new curve widget with a default curve, that is a straight
+	 * line from bottom-left to top-right.
+	 */
 	KisCurveWidget(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
-    virtual ~KisCurveWidget();
+	virtual ~KisCurveWidget();
 
-    /**
-     * Enable the guide and set the guide color to the specified color.
-     *
-     * XXX: it seems that the guide feature isn't actually implemented yet?
-     */
-    void setCurveGuide(const QColor & color);
+	/**
+	 * Enable the guide and set the guide color to the specified color.
+	 *
+	 * XXX: it seems that the guide feature isn't actually implemented yet?
+	 */
+	void setCurveGuide(const QColor & color);
 
 	/**
 	 * Set the default shape
 	 */
 	void setDefaultCurve(KisCubicCurve curve);
 
-    /**
-     * Set a background pixmap. The background pixmap will be drawn under
-     * the grid and the curve.
-     *
-     * XXX: or is the pixmap what is drawn to the  left and bottom of the curve
-     * itself?
-     */
-    void setPixmap(const QPixmap & pix);
-    QPixmap getPixmap();
-    
-    void setBasePixmap(const QPixmap & pix);
-    QPixmap getBasePixmap();
+	/**
+	 * Set a background pixmap. The background pixmap will be drawn under
+	 * the grid and the curve.
+	 *
+	 * XXX: or is the pixmap what is drawn to the  left and bottom of the curve
+	 * itself?
+	 */
+	void setPixmap(const QPixmap & pix);
+	QPixmap getPixmap();
+
+	void setBasePixmap(const QPixmap & pix);
+	QPixmap getBasePixmap();
 
 public slots:
 	/**
@@ -93,10 +93,10 @@ public slots:
 
 signals:
 
-    /**
-     * Emitted whenever a control point has changed position.
-     */
-    void modified(void);
+	/**
+	 * Emitted whenever a control point has changed position.
+	 */
+	void modified(void);
 
 	/**
 	 * Emitted when curve editing has finished
@@ -104,55 +104,52 @@ signals:
 	void curveChanged(const KisCubicCurve &curve);
 
 protected slots:
-    void inOutChanged(int);
+	void inOutChanged(int);
 	void removeCurrentPoint();
 
 protected:
 
-    void keyPressEvent(QKeyEvent *);
-    void paintEvent(QPaintEvent *);
-    void mousePressEvent(QMouseEvent * e);
-    void mouseReleaseEvent(QMouseEvent * e);
-    void mouseMoveEvent(QMouseEvent * e);
+	void keyPressEvent(QKeyEvent *);
+	void paintEvent(QPaintEvent *);
+	void mousePressEvent(QMouseEvent * e);
+	void mouseReleaseEvent(QMouseEvent * e);
+	void mouseMoveEvent(QMouseEvent * e);
 	void contextMenuEvent(QContextMenuEvent * e);
-    void leaveEvent(QEvent *);
-    void resizeEvent(QResizeEvent *e);
+	void leaveEvent(QEvent *);
+	void resizeEvent(QResizeEvent *e);
 
 public:
 
-    /**
-     * @return get a list with all defined points. If you want to know what the
-     * y value for a given x is on the curve defined by these points, use getCurveValue().
-     * @see getCurveValue
-     */
-    KisCubicCurve curve();
+	/**
+	 * @return get a list with all defined points. If you want to know what the
+	 * y value for a given x is on the curve defined by these points, use getCurveValue().
+	 * @see getCurveValue
+	 */
+	KisCubicCurve curve();
 
-    /**
-     * Replace the current curve with a curve specified by the curve defined by the control
-     * points in @param inlist.
-     */
-    void setCurve(KisCubicCurve inlist);
+	/**
+	 * Replace the current curve with a curve specified by the curve defined by the control
+	 * points in @param inlist.
+	 */
+	void setCurve(KisCubicCurve inlist);
 
-    /**
-     * Connect/disconnect external spinboxes to the curve
-     * @min/@max - is the range for their values
-     */
-    void setupInOutControls(QSpinBox *in, QSpinBox *out, int min, int max);
-    void dropInOutControls();
+	/**
+	 * Connect/disconnect external spinboxes to the curve
+	 * @min/@max - is the range for their values
+	 */
+	void setupInOutControls(QSpinBox *in, QSpinBox *out, int min, int max);
+	void dropInOutControls();
 
-    /**
-     * Handy function that creates new point in the middle
-     * of the curve and sets focus on the m_intIn field,
-     * so the user can move this point anywhere in a moment
-     */
-    void addPointInTheMiddle();
+	/**
+	 * Handy function that creates new point in the middle
+	 * of the curve and sets focus on the m_intIn field,
+	 * so the user can move this point anywhere in a moment
+	 */
+	void addPointInTheMiddle();
 
 private:
-
-    class Private;
-    Private * const d;
-
+	class Private;
+	Private * const d;
 };
-
 
 #endif /* KIS_CURVE_WIDGET_H */

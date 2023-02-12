@@ -164,4 +164,3 @@ bool TemplateFiles::init(SessionHistory *session) const
 }
 
 }
-

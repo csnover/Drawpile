@@ -23,20 +23,20 @@
 #include <QWidget>
 
 namespace canvas {
-    class TimelineModel;
+	class TimelineModel;
 }
 
 namespace net {
-    class Envelope;
+	class Envelope;
 }
 
 namespace widgets {
 
 class TimelineWidget : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit TimelineWidget(QWidget *parent = nullptr);
+	explicit TimelineWidget(QWidget *parent = nullptr);
 	~TimelineWidget();
 
 	void setModel(canvas::TimelineModel *model);

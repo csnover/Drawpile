@@ -67,4 +67,3 @@ bool isNsfmTitle(const QString &title)
 }
 
 }
-

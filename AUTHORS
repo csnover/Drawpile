@@ -4,6 +4,7 @@ Drawpile developers
 Main developer: Calle Laakkonen
 
 Contributors:
+
 * M.K.A. (the original server)
 * Marco Molteni (build script fixes)
 * Christian Frisson (OSX compatibility fixes)
@@ -24,5 +25,5 @@ Contributors:
 * askmeaboutloom (MyPaint brush support, Drawdance and other development)
 
 The project also includes GPL licensed code from:
- * Krita (curve editing widget, pixel blending functions and tablet support code)
 
+* Krita (curve editing widget, pixel blending functions and tablet support code)

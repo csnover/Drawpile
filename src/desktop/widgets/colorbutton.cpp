@@ -132,4 +132,3 @@ void ColorButton::dropEvent(QDropEvent *event)
 }
 
 }
-

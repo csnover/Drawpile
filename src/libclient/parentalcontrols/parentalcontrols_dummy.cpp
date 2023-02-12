@@ -22,13 +22,13 @@ namespace parentalcontrols {
 
 void init()
 {
-    // Dummy implementation -- no integration
+	// Dummy implementation -- no integration
 }
 
 bool isOSActive()
 {
-    // Dummy implementation -- no integration
-    return false;
+	// Dummy implementation -- no integration
+	return false;
 }
 
 }

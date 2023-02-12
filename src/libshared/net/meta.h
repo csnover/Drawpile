@@ -225,7 +225,7 @@ public:
 	QString messageName() const override { return QStringLiteral("chat"); }
 
 protected:
-    int payloadLength() const override;
+	int payloadLength() const override;
 	int serializePayload(uchar *data) const override;
 	Kwargs kwargs() const override;
 

@@ -57,7 +57,7 @@ public:
 	 * @param socket file descriptor
 	 */
 	bool listenFd(int socket);
-	
+
 	void stop();
 
 	/**
@@ -108,7 +108,7 @@ public:
 
 	//! HTTP headers (note: all lower case)
 	const QHash<QString, QString> &headers() const { return _headers; }
-	
+
 	//! POST arguments
 	const QHash<QString, QString> &postData() const { return _postdata; }
 
@@ -172,4 +172,3 @@ private:
 };
 
 #endif
-

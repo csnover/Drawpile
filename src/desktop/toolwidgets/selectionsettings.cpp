@@ -40,7 +40,6 @@ SelectionSettings::~SelectionSettings()
 	delete m_ui;
 }
 
-
 QWidget *SelectionSettings::createUiWidget(QWidget *parent)
 {
 	QWidget *uiwidget = new QWidget(parent);
@@ -211,4 +210,3 @@ void SelectionSettings::selectionAdjustmentModeChanged(canvas::Selection::Adjust
 }
 
 }
-

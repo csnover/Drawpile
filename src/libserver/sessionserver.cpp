@@ -156,7 +156,7 @@ Session *SessionServer::createFromTemplate(const QString &idAlias)
 
 	SessionHistory *history = initHistory(
 		Ulid::make().toString(),
-		idAlias, 
+		idAlias,
 		protocol::ProtocolVersion::fromString(desc["protocol"].toString()),
 		desc["founder"].toString());
 
@@ -311,7 +311,6 @@ JsonApiResult SessionServer::callSessionJsonApi(JsonApiMethod method, const QStr
 
 	if(method == JsonApiMethod::Get) {
 		return {JsonApiResult::Ok, QJsonDocument(sessionDescriptions())};
-
 	} else if(method == JsonApiMethod::Update) {
 		const QString msg = request["message"].toString();
 		if(!msg.isEmpty())
@@ -322,8 +321,6 @@ JsonApiResult SessionServer::callSessionJsonApi(JsonApiMethod method, const QStr
 			messageAll(alert, true);
 
 		return {JsonApiResult::Ok, QJsonDocument(QJsonObject())};
-
-
 	} else {
 		return JsonApiBadMethod();
 	}

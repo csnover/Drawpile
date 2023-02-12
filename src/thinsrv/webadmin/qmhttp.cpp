@@ -188,7 +188,7 @@ MHD_Result request_handler(void *cls, MHD_Connection *connection, const char *ur
 		QHash<QString,QString> headers;
 		MHD_get_connection_values(connection, MHD_HEADER_KIND, &assign_to_hash, &headers);
 		ctx->request.setHeaders(headers);
-		
+
 		// Demand authentication if basic auth is enabled
 		if(!d->baPass.isEmpty()) {
 			char *user, *pass = nullptr;
@@ -465,4 +465,3 @@ HttpResponse HttpResponse::FileResponse(const QString &path, bool head)
 
 	return r;
 }
-

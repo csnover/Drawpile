@@ -35,4 +35,3 @@ void logMessage(int level, const char *file, uint32_t line, const char *msg);
 }
 
 #endif
-

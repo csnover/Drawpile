@@ -108,7 +108,6 @@ bool DrawDabsClassic::payloadEquals(const Message &m) const
 	return true;
 }
 
-
 QString ClassicBrushDab::toString() const
 {
 	return QStringLiteral("%1 %2 %3 %4 %5")
@@ -453,4 +452,3 @@ bool DrawDabsPixel::extend(const DrawDabs &dabs)
 }
 
 }
-

@@ -96,4 +96,3 @@ void ColorSpinnerDock::updateSettings()
 }
 
 }
-

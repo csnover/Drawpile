@@ -87,7 +87,7 @@ void playSound(Event event)
 			qWarning() << filename << "not found!";
 			return;
 		}
-		
+
 		QSoundEffect *fx = new QSoundEffect;
 		fx->setSource(QUrl::fromLocalFile(fullpath));
 		sounds[event] = fx;

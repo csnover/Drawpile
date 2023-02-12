@@ -101,4 +101,3 @@ uint SessionHistory::effectiveAutoResetThreshold() const
 }
 
 }
-

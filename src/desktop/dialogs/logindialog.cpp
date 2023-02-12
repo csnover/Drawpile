@@ -136,8 +136,8 @@ struct LoginDialog::Private {
 			QSettings().setValue("history/filternsfw", show);
 			sessions->setShowNsfw(show);
 		});
-        connect(ui->filter, &QLineEdit::textChanged,
-                        sessions, &SessionFilterProxyModel::setFilterFixedString);
+		connect(ui->filter, &QLineEdit::textChanged,
+		        sessions, &SessionFilterProxyModel::setFilterFixedString);
 
 		ui->sessionList->setModel(sessions);
 
@@ -242,7 +242,6 @@ static QString keychainSecretName(const QString &username, const QUrl &extAuthUr
 	return prefix + username.toLower() + "@" + host;
 }
 #endif
-
 
 LoginDialog::LoginDialog(net::LoginHandler *login, QWidget *parent) :
 	QDialog(parent), d(new Private(login, this))

@@ -37,4 +37,3 @@ struct PressureMapping {
 Q_DECLARE_METATYPE(PressureMapping)
 
 #endif
-

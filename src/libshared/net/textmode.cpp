@@ -277,4 +277,3 @@ QList<uint16_t> parseIdListString16(const QString &ids)
 
 }
 }
-

@@ -67,7 +67,6 @@ private:
 	bool m_allowTransform;
 };
 
-
 class RectangleSelection : public SelectionTool {
 public:
 	RectangleSelection(ToolController &owner);
@@ -76,7 +75,6 @@ protected:
 	void initSelection(canvas::Selection *selection);
 	void newSelectionMotion(const canvas::Point &point, bool constrain, bool center);
 };
-
 
 class PolygonSelection : public SelectionTool {
 public:
@@ -90,4 +88,3 @@ protected:
 }
 
 #endif
-

@@ -73,4 +73,3 @@ int AbuseReportDialog::userId() const
 }
 
 }
-

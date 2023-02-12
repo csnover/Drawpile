@@ -47,13 +47,13 @@ struct LayerListItem {
 
 	//! ID of the frame layer this layer belongs to
 	uint16_t frameId;
-	
+
 	//! Layer title
 	QString title;
-	
+
 	//! Layer opacity
 	float opacity;
-	
+
 	//! Blending mode
 	rustpile::Blendmode blend;
 
@@ -109,7 +109,7 @@ public:
 	};
 
 	LayerListModel(QObject *parent=nullptr);
-	
+
 	int rowCount(const QModelIndex &parent=QModelIndex()) const override;
 	int columnCount(const QModelIndex &parent=QModelIndex()) const override;
 	QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const override;
@@ -217,4 +217,3 @@ private:
 Q_DECLARE_METATYPE(canvas::LayerListItem)
 
 #endif
-

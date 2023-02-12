@@ -29,7 +29,5 @@ private slots:
 	}
 };
 
-
 QTEST_MAIN(TestUlid)
 #include "ulid.moc"
-

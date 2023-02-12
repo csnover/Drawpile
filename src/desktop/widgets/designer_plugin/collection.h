@@ -24,9 +24,9 @@
 
 class DrawpileWidgetCollection : public QObject, public QDesignerCustomWidgetCollectionInterface
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "drawpile.DrawpileWidgets")
-    Q_INTERFACES(QDesignerCustomWidgetCollectionInterface)
+	Q_OBJECT
+	Q_PLUGIN_METADATA(IID "drawpile.DrawpileWidgets")
+	Q_INTERFACES(QDesignerCustomWidgetCollectionInterface)
 
 public:
 	explicit DrawpileWidgetCollection(QObject *parent=0);
@@ -38,4 +38,3 @@ private:
 };
 
 #endif
-

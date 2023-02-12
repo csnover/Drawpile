@@ -54,7 +54,7 @@ public:
 
 	static PutImage *deserialize(uint8_t ctx, const uchar *data, uint len);
 	static PutImage *fromText(uint8_t ctx, const Kwargs &kwargs);
-	
+
 	uint16_t layer() const override { return m_layer; }
 	uint8_t blendmode() const { return m_mode; }
 	uint32_t x() const { return m_x; }
@@ -199,7 +199,6 @@ protected:
 private:
 	QByteArray m_image;
 };
-
 
 /**
  * @brief Fill a rectangle with solid color

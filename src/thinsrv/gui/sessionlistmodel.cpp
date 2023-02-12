@@ -35,7 +35,6 @@ SessionListModel::SessionListModel(QObject *parent)
 {
 }
 
-
 QVariant SessionListModel::getData(const QString &key, const QJsonObject &s) const
 {
 	if(key == "users") {

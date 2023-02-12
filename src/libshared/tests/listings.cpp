@@ -46,7 +46,5 @@ private slots:
 	}
 };
 
-
 QTEST_MAIN(TestListings)
 #include "listings.moc"
-

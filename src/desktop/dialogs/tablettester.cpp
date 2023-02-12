@@ -47,4 +47,3 @@ TabletTestDialog::~TabletTestDialog()
 }
 
 }
-

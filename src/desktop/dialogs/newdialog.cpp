@@ -87,4 +87,3 @@ void NewDialog::done(int r)
 }
 
 }
-
