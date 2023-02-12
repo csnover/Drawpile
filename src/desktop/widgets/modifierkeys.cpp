@@ -21,14 +21,19 @@
 
 #include <QHBoxLayout>
 #include <QCheckBox>
+#include <QtGlobal>
 
 namespace widgets {
 
+static inline constexpr auto MAC_OR_PC(const char * const mac, const char * const pc) {
 #ifdef Q_OS_MACOS
-#define MAC_OR_PC(mac, pc) (mac)
+	Q_UNUSED(pc);
+	return mac;
 #else
-#define MAC_OR_PC(mac, pc) (pc)
+	Q_UNUSED(mac);
+	return pc;
 #endif
+}
 
 ModifierKeys::ModifierKeys(QWidget *parent)
 	: QWidget(parent)
