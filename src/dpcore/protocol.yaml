@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Calle Laakkonen
 
 _protocol:
+    # see doc/protocol.md for protocol version history
     version: dp:4.22.2
     undo_depth: 30
 

@@ -13,31 +13,21 @@ pub struct ProtocolVersion {
 
 impl ProtocolVersion {
     pub fn from_string(s: &str) -> Option<ProtocolVersion> {
-        if let Some(ns_delim) = s.find(':') {
-            let ns = &s[..ns_delim];
-            let parts: Vec<&str> = s[ns_delim + 1..].split('.').collect();
-            if parts.len() == 3 {
-                return Some(ProtocolVersion {
-                    ns: ns.to_string(),
-                    server: parts[0].parse().ok()?,
-                    major: parts[1].parse().ok()?,
-                    minor: parts[2].parse().ok()?,
-                });
-            }
-        }
-        None
+        s.split_once(':').and_then(|(ns, version)| {
+            let mut version = version.split('.');
+            Some(ProtocolVersion {
+                ns: ns.into(),
+                server: version.next()?.parse().ok()?,
+                major: version.next()?.parse().ok()?,
+                minor: version.next()?.parse().ok()?,
+            })
+        })
     }
 }
 
 impl Default for ProtocolVersion {
     fn default() -> Self {
-        let version = include!("protover.version");
-        Self {
-            ns: "dp".into(),
-            server: version[0],
-            major: version[1],
-            minor: version[2],
-        }
+        Self::from_string(super::PROTOCOL_VERSION).unwrap()
     }
 }
 

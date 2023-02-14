@@ -11,7 +11,7 @@ use std::path::Path;
 use std::str;
 
 use dpcore::protocol::textparser::{ParseResult, TextParser};
-use dpcore::protocol::{Message, ProtocolVersion, HEADER_LEN, PROTOCOL_VERSION};
+use dpcore::protocol::{Message, ProtocolVersion, HEADER_LEN};
 
 #[derive(Debug)]
 pub enum ReadMessage {
@@ -50,7 +50,7 @@ pub trait RecordingReader {
     /// Check the recordings version number against the current protocol version
     fn check_compatibility(&self) -> Compatibility {
         if let Some(vstr) = self.get_metadata("version") {
-            let our = ProtocolVersion::from_string(PROTOCOL_VERSION).unwrap();
+            let our = ProtocolVersion::default();
             if let Some(their) = ProtocolVersion::from_string(vstr) {
                 compare_versions(&our, &their)
             } else {

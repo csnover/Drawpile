@@ -109,7 +109,7 @@ def field_argument(field, named=False):
     return ff
 
 if __name__ == '__main__':
-    protocol = load_protocol_definition('../../dpcore/src/protocol/protocol.yaml')
+    protocol = load_protocol_definition('../dpcore/protocol.yaml')
 
     # Produce builder functions for these messages.
     # The other messages are generated solely from Rust code
