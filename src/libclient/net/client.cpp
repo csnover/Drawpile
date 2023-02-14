@@ -52,7 +52,7 @@ void Client::connectToServer(LoginHandler *loginhandler)
 			chat = tr("The server is shutting down!");
 			break;
 		default:
-			chat = "Unknown error";
+			chat = tr("Unknown error");
 		}
 
 		if(!message.isEmpty())
