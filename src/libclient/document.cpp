@@ -80,6 +80,7 @@ void Document::initCanvas()
 	connect(m_client, &net::Client::messageReceived, m_canvas, &canvas::CanvasModel::handleCommand);
 	connect(m_client, &net::Client::drawingCommandLocal, m_canvas, &canvas::CanvasModel::handleLocalCommand);
 	connect(m_canvas, &canvas::CanvasModel::canvasModified, this, &Document::markDirty);
+	connect(m_canvas->layerlist(), &canvas::LayerListModel::layerCommand, m_client, &net::Client::sendEnvelope);
 	connect(m_canvas->layerlist(), &canvas::LayerListModel::moveRequested, this, [this](int sourceId, int targetId, bool intoGroup, bool below) {
 		net::EnvelopeBuilder eb;
 		rustpile::write_undopoint(eb, m_client->myId());

@@ -52,7 +52,7 @@ public:
 
 	net::Envelope generateSnapshot() const;
 
-	uint8_t localUserId() const { return m_localUserId; }
+	uint8_t localUserId() const;
 
 	QImage selectionToImage(int layerId) const;
 	void pasteFromImage(const QImage &image, const QPoint &defaultPoint, bool forceDefault);
@@ -158,8 +158,6 @@ private:
 
 	QString m_title;
 	QString m_pinnedMessage;
-
-	uint8_t m_localUserId;
 };
 
 }

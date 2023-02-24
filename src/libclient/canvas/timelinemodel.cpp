@@ -65,7 +65,7 @@ void TimelineModel::setLayers(const QVector<LayerListItem> &layers)
 			continue;
 
 		if(l.group) {
-			if(l.isolated) {
+			if(l.attributes.isolated) {
 				// We don't include the content of isolated groups in the timeline,
 				// as we want to treat them as individual layers
 				skipUntil = l.right;

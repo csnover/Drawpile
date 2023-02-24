@@ -50,11 +50,13 @@ void paintEngineLayersChanged(void *pe, const rustpile::LayerInfo *layerInfos, u
 			uint16_t(li.id), // only internal (non-visible) layers have IDs outside the u16 range
 			uint16_t(li.frame_id),
 			QString::fromUtf8(reinterpret_cast<const char*>(li.title), li.titlelen),
-			li.opacity,
-			li.blendmode,
+			LayerListItem::Attributes {
+				li.opacity,
+				li.censored,
+				li.isolated,
+				li.blendmode
+			},
 			li.hidden,
-			li.censored,
-			li.isolated,
 			li.group,
 			li.children,
 			li.rel_index,

@@ -5,6 +5,9 @@
 #define DP_NET_LAYERLIST_H
 
 #include "libclient/canvas/acl.h"
+#include "libclient/canvas/canvasmodel.h"
+#include "libclient/net/envelope.h"
+#include "libclient/net/envelopebuilder.h"
 #include "libshared/util/qtcompat.h"
 
 #include <QAbstractItemModel>
@@ -13,12 +16,12 @@
 
 #include <functional>
 
-namespace net {
-	class Envelope;
-}
-
 namespace rustpile {
 	enum class Blendmode : uint8_t;
+}
+
+namespace canvas {
+	class AclState;
 }
 
 namespace canvas {
@@ -36,20 +39,44 @@ struct LayerListItem {
 	//! Layer title
 	QString title;
 
-	//! Layer opacity
-	float opacity;
+	//! Layer attributes
+	// These are combined as a single message so must be handled as a single
+	// thing to avoid broken instructions
+	struct Attributes {
+		//! Layer opacity in the range 0–1
+		float opacity;
 
-	//! Blending mode
-	rustpile::Blendmode blend;
+		//! Layer is flagged for censoring
+		bool censored;
+
+		//! Isolated (not pass-through) group?
+		bool isolated;
+
+		//! Blending mode
+		rustpile::Blendmode blend;
+
+		bool operator==(const Attributes &other) const {
+			return intOpacity() == other.intOpacity()
+				&& censored == other.censored
+				&& isolated == other.isolated
+				&& blend == other.blend;
+		}
+
+		bool operator!=(const Attributes &other) const {
+			return !operator==(other);
+		}
+
+		uint8_t intOpacity() const {
+			return qRound(opacity * 255);
+		}
+
+		uint8_t flags() const;
+
+		void setFlags(uint8_t flags);
+	} attributes;
 
 	//! Layer hidden flag (local only)
 	bool hidden;
-
-	//! Layer is flagged for censoring
-	bool censored;
-
-	//! Isolated (not pass-through) group?
-	bool isolated;
 
 	//! Is this a layer group?
 	bool group;
@@ -67,7 +94,9 @@ struct LayerListItem {
 	int right;
 
 	//! Get the LayerAttributes flags as a bitfield
-	uint8_t attributeFlags() const;
+	uint8_t attributeFlags() const {
+		return attributes.flags();
+	}
 
 	//! Get the ID of the user who created this layer
 	uint8_t creatorId() const { return uint8_t((id & 0xff00) >> 8); }
@@ -76,6 +105,7 @@ struct LayerListItem {
 }
 
 Q_DECLARE_TYPEINFO(canvas::LayerListItem, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(canvas::LayerListItem::Attributes, Q_MOVABLE_TYPE);
 
 namespace canvas {
 
@@ -86,18 +116,20 @@ class LayerListModel : public QAbstractItemModel {
 	friend class LayerMimeData;
 public:
 	enum LayerListRoles {
-		IdRole = Qt::UserRole + 1,
-		TitleRole,
-		IsDefaultRole,
-		IsLockedRole,
-		IsGroupRole,
+		IdRole = Qt::UserRole + 1, // uint16_t
+		IsDefaultRole,             // bool
+		IsLockedRole,              // bool
+		IsGroupRole,               // bool
+		AttributesRole,            // canvas::LayerListItem::Attributes
+		ItemRole,                  // canvas::LayerListItem
 	};
 
-	LayerListModel(QObject *parent=nullptr);
+	LayerListModel(AclState &aclState, QObject *parent=nullptr);
 
 	int rowCount(const QModelIndex &parent=QModelIndex()) const override;
 	int columnCount(const QModelIndex &parent=QModelIndex()) const override;
 	QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const override;
+	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 	Qt::ItemFlags flags(const QModelIndex& index) const override;
 	Qt::DropActions supportedDropActions() const override;
 	QStringList mimeTypes() const override;
@@ -109,8 +141,15 @@ public:
 	QModelIndex layerIndex(uint16_t id) const;
 	const QVector<LayerListItem> &layerItems() const { return m_items; }
 
+	void addGroup(int target);
+	void addLayer(int target);
+	void duplicateLayer(const QModelIndex &index);
+	void removeLayer(const QModelIndex &index);
+	void mergeLayers(const QModelIndex &index, const QModelIndex &below);
+	void toggleLayerFlags(const QModelIndex &index, uint8_t flags, bool on);
+	void changeLayerAcl(const QModelIndex &index, bool lock, rustpile::Tier tier, QVector<uint8_t> exclusive);
+
 	void setLayerGetter(GetLayerFunction fn) { m_getlayerfn = fn; }
-	void setAclState(AclState *state) { m_aclstate = state; }
 
 	/**
 	 * Enable/disable any (not just own) layer autoselect requests
@@ -151,10 +190,14 @@ public:
 	int findNearestLayer(int layerId) const;
 
 public slots:
+	void revert() override;
+	bool submit() override;
 	void setLayers(const QVector<LayerListItem> &items);
 	void setLayersVisibleInFrame(const QVector<int> &layers, bool frameMode);
 
 signals:
+	void layerCommand(net::Envelope envelope);
+
 	//! A new layer was created that should be automatically selected
 	void autoSelectRequest(int);
 
@@ -162,10 +205,13 @@ signals:
 	void moveRequested(int sourceId, int targetId, bool intoGroup, bool below);
 
 private:
+	void addLayerWithFlags(int target, QString basename, uint8_t flags);
+
+	net::EnvelopeBuilder m_eb;
 	QVector<LayerListItem> m_items;
 	QVector<int> m_frameLayers;
 	GetLayerFunction m_getlayerfn;
-	AclState *m_aclstate;
+	AclState &m_aclstate;
 	int m_rootLayerCount;
 	uint16_t m_defaultLayer;
 	bool m_autoselectAny;
@@ -200,5 +246,6 @@ private:
 }
 
 Q_DECLARE_METATYPE(canvas::LayerListItem)
+Q_DECLARE_METATYPE(canvas::LayerListItem::Attributes)
 
 #endif

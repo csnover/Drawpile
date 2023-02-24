@@ -4,13 +4,14 @@
 #include "desktop/docks/layeraclmenu.h"
 #include "libclient/canvas/userlist.h"
 #include "libclient/parentalcontrols/parentalcontrols.h"
+#include "rustpile/rustpile.h"
 
 #include <QApplication>
 #include <QActionGroup>
 
 namespace docks {
 
-static void addTier(QActionGroup *group, const QString &title, canvas::Tier tier)
+static void addTier(QActionGroup *group, const QString &title, rustpile::Tier tier)
 {
 	QAction *a = group->addAction(title);
 	a->setProperty("userTier", int(tier));
@@ -29,11 +30,10 @@ LayerAclMenu::LayerAclMenu(QWidget *parent) :
 
 	addSection(tr("Access tier:"));
 	m_tiers = new QActionGroup(this);
-	addTier(m_tiers, tr("Operators"), canvas::Tier::Op);
-	addTier(m_tiers, tr("Trusted"), canvas::Tier::Trusted);
-	addTier(m_tiers, tr("Registered"), canvas::Tier::Auth);
-	addTier(m_tiers, tr("Everyone"), canvas::Tier::Guest);
-	static_assert(canvas::TierCount == 4, "update LayerAclMenu tiers!");
+	addTier(m_tiers, tr("Operators"), rustpile::Tier::Operator);
+	addTier(m_tiers, tr("Trusted"), rustpile::Tier::Trusted);
+	addTier(m_tiers, tr("Registered"), rustpile::Tier::Authenticated);
+	addTier(m_tiers, tr("Everyone"), rustpile::Tier::Guest);
 	addActions(m_tiers->actions());
 
 	addSection(tr("Exclusive access:"));
@@ -89,10 +89,10 @@ void LayerAclMenu::userClicked(QAction *useraction)
 	}
 
 	// Get selected tier
-	canvas::Tier tier = canvas::Tier::Guest;
+	rustpile::Tier tier = rustpile::Tier::Guest;
 	for(const QAction *a : m_tiers->actions()) {
 		if(a->isChecked()) {
-			tier = canvas::Tier(a->property("userTier").toInt());
+			tier = rustpile::Tier(a->property("userTier").toInt());
 			break;
 		}
 	}
@@ -117,7 +117,7 @@ void LayerAclMenu::userClicked(QAction *useraction)
 	emit layerAclChange(m_lock->isChecked(), tier, exclusive);
 }
 
-void LayerAclMenu::setAcl(bool lock, int tier, const QVector<uint8_t> exclusive)
+void LayerAclMenu::setAcl(bool lock, rustpile::Tier tier, const QVector<uint8_t> exclusive)
 {
 	m_lock->setChecked(lock);
 
@@ -125,7 +125,7 @@ void LayerAclMenu::setAcl(bool lock, int tier, const QVector<uint8_t> exclusive)
 	m_tiers->setEnabled(!lock && exclusive.isEmpty());
 
 	for(QAction *t : m_tiers->actions()) {
-		if(t->property("userTier").toInt() == tier) {
+		if(rustpile::Tier(t->property("userTier").toInt()) == tier) {
 			t->setChecked(true);
 			break;
 		}

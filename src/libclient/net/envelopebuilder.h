@@ -26,7 +26,9 @@ public:
 	~EnvelopeBuilder();
 
 	EnvelopeBuilder(const EnvelopeBuilder&) = delete;
+	EnvelopeBuilder(EnvelopeBuilder&&);
 	EnvelopeBuilder &operator=(const EnvelopeBuilder&) = delete;
+	EnvelopeBuilder &operator=(EnvelopeBuilder&&);
 
 	Envelope toEnvelope();
 

@@ -14,6 +14,23 @@ EnvelopeBuilder::EnvelopeBuilder()
 {
 }
 
+EnvelopeBuilder::EnvelopeBuilder(EnvelopeBuilder&& other) :
+	m_writer(other.m_writer)
+{
+	other.m_writer = nullptr;
+}
+
+EnvelopeBuilder &EnvelopeBuilder::operator=(EnvelopeBuilder&& other)
+{
+	if(this == &other)
+		return *this;
+	if(m_writer)
+		rustpile::messagewriter_free(m_writer);
+	m_writer = other.m_writer;
+	other.m_writer = nullptr;
+	return *this;
+}
+
 EnvelopeBuilder::~EnvelopeBuilder()
 {
 	if(m_writer)

@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "libclient/canvas/layerlist.h"
+#include "libclient/utils/changeflags.h"
 #include "rustpile/rustpile.h"
 #include "libshared/util/qtcompat.h"
 
@@ -12,9 +13,13 @@
 
 namespace canvas {
 
-LayerListModel::LayerListModel(QObject *parent)
-	: QAbstractItemModel(parent), m_aclstate(nullptr),
-	  m_rootLayerCount(0), m_defaultLayer(0), m_autoselectAny(true), m_frameMode(false)
+LayerListModel::LayerListModel(AclState &aclState, QObject *parent)
+	: QAbstractItemModel(parent)
+	, m_aclstate(aclState)
+	, m_rootLayerCount(0)
+	, m_defaultLayer(0)
+	, m_autoselectAny(true)
+	, m_frameMode(false)
 {
 }
 
@@ -26,26 +31,223 @@ QVariant LayerListModel::data(const QModelIndex &index, int role) const
 	const LayerListItem &item = m_items.at(index.internalId());
 
 	switch(role) {
-	case Qt::DisplayRole: return QVariant::fromValue(item);
-	case TitleRole:
-	case Qt::EditRole: return item.title;
-	case IdRole: return item.id;
-	case IsDefaultRole: return item.id == m_defaultLayer;
-	case IsLockedRole: return (m_frameMode && !m_frameLayers.contains(item.frameId)) || (m_aclstate && m_aclstate->isLayerLocked(item.id));
-	case IsGroupRole: return item.group;
+	case Qt::DisplayRole:
+	case Qt::EditRole:
+		return item.title;
+	case IdRole:
+		return item.id;
+	case IsDefaultRole:
+		return item.id == m_defaultLayer;
+	case IsLockedRole:
+		return (m_frameMode && !m_frameLayers.contains(item.frameId))
+			|| (m_aclstate.isLayerLocked(item.id));
+	case IsGroupRole:
+		return item.group;
+	case ItemRole:
+		return QVariant::fromValue(item);
+	default:
+		return QVariant();
+	}
+}
+
+void LayerListModel::addGroup(int target)
+{
+	addLayerWithFlags(target, tr("Group"), rustpile::LayerCreateMessage_FLAGS_GROUP);
+}
+
+void LayerListModel::addLayer(int target)
+{
+	addLayerWithFlags(target, tr("Layer"), 0);
+}
+
+void LayerListModel::duplicateLayer(const QModelIndex &index)
+{
+	const int id = getAvailableLayerId();
+	if(!index.isValid() || id==0)
+		return;
+
+	const auto layer = index.data(IdRole).toInt();
+	const auto title = index.data(Qt::DisplayRole).toString();
+
+	const QString name = getAvailableLayerName(title);
+
+	rustpile::write_undopoint(m_eb, m_aclstate.localUserId());
+	rustpile::write_newlayer(
+		m_eb,
+		m_aclstate.localUserId(),
+		id,
+		layer, // source
+		layer, // target
+		0, // fill
+		0, // flags
+		reinterpret_cast<const uint16_t*>(name.constData()),
+		name.length()
+	);
+}
+
+void LayerListModel::removeLayer(const QModelIndex &index)
+{
+	rustpile::write_undopoint(m_eb, m_aclstate.localUserId());
+	rustpile::write_deletelayer(m_eb, m_aclstate.localUserId(), index.data(IdRole).toUInt(), false);
+}
+
+void LayerListModel::mergeLayers(const QModelIndex &index, const QModelIndex &below)
+{
+	rustpile::write_undopoint(m_eb, m_aclstate.localUserId());
+	rustpile::write_deletelayer(
+		m_eb,
+		m_aclstate.localUserId(),
+		index.data(IdRole).value<uint16_t>(),
+		below.data(IdRole).value<uint16_t>()
+	);
+}
+
+void LayerListModel::toggleLayerFlags(const QModelIndex &index, uint8_t flags, bool on)
+{
+	if (!index.isValid())
+		return;
+
+	auto &item = m_items[index.internalId()];
+	const auto newFlags = ChangeFlags<uint8_t>().set(flags, on).update(item.attributeFlags());
+	item.attributes.setFlags(newFlags);
+	rustpile::write_layerattr(
+		m_eb,
+		m_aclstate.localUserId(),
+		item.id,
+		0,
+		newFlags,
+		item.attributes.intOpacity(),
+		item.attributes.blend
+	);
+	emit dataChanged(index, index, { AttributesRole, ItemRole });
+}
+
+void LayerListModel::changeLayerAcl(const QModelIndex &index, bool lock, rustpile::Tier tier, QVector<uint8_t> exclusive)
+{
+	if (!index.isValid())
+		return;
+
+	const auto layerId = m_items.at(index.internalId()).id;
+	const auto acl = m_aclstate.layerAcl(layerId);
+
+	if (acl.locked != lock || acl.tier != tier || acl.exclusive != exclusive) {
+		rustpile::write_layeracl(
+			m_eb,
+			m_aclstate.localUserId(),
+			layerId,
+			(lock ? 0x80 : 0) | uint8_t(tier),
+			exclusive.constData(),
+			exclusive.length()
+		);
+		emit dataChanged(index, index, { IsLockedRole });
+	}
+}
+
+void LayerListModel::addLayerWithFlags(int target, QString basename, uint8_t flags)
+{
+	const int id = getAvailableLayerId();
+	if(id==0) {
+		qWarning("Couldn't find a free ID for a new layer!");
+		return;
 	}
 
-	return QVariant();
+	const QString name = getAvailableLayerName(basename);
+
+	rustpile::write_undopoint(m_eb, m_aclstate.localUserId());
+	rustpile::write_newlayer(
+		m_eb,
+		m_aclstate.localUserId(),
+		id,
+		0, // source
+		target, // target
+		0, // fill
+		flags, // flags
+		reinterpret_cast<const uint16_t*>(name.constData()),
+		name.length()
+	);
+}
+
+bool LayerListModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+	if(!index.isValid())
+		return false;
+
+	auto &item = m_items[index.internalId()];
+
+	switch(role) {
+	case Qt::DisplayRole:
+	case Qt::EditRole: {
+		const auto title = value.toString();
+		if(title != item.title) {
+			item.title = title;
+			rustpile::write_retitlelayer(
+				m_eb,
+				m_aclstate.localUserId(),
+				item.id,
+				reinterpret_cast<const uint16_t*>(title.constData()),
+				title.length()
+			);
+			emit dataChanged(index, index, { Qt::DisplayRole, Qt::EditRole, ItemRole });
+		}
+		return true;
+	}
+	case AttributesRole: {
+		const auto attrs = value.value<canvas::LayerListItem::Attributes>();
+		if (item.attributes != attrs) {
+			item.attributes = attrs;
+			rustpile::write_layerattr(
+				m_eb,
+				m_aclstate.localUserId(),
+				item.id,
+				0,
+				attrs.flags(),
+				attrs.intOpacity(),
+				attrs.blend
+			);
+			emit dataChanged(index, index, { role, ItemRole });
+		}
+		return true;
+	}
+	case IsDefaultRole: {
+		if(value.toBool() && m_defaultLayer != item.id) {
+			rustpile::write_defaultlayer(m_eb, m_aclstate.localUserId(), item.id);
+			setDefaultLayer(item.id);
+		}
+		return true;
+	}
+	default: {}
+	}
+
+	return false;
+}
+
+void LayerListModel::revert()
+{
+	m_eb = net::EnvelopeBuilder{};
+}
+
+bool LayerListModel::submit()
+{
+	const auto envelope = m_eb.toEnvelope();
+	if (!envelope.isEmpty()) {
+		emit layerCommand(envelope);
+		m_eb = net::EnvelopeBuilder{};
+	}
+	return true;
 }
 
 Qt::ItemFlags LayerListModel::flags(const QModelIndex& index) const
 {
-	if(index.isValid()) {
-		const bool isGroup = m_items.at(index.internalId()).group;
+	auto flags = Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsSelectable;
 
-		return Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | (isGroup ? Qt::ItemIsDropEnabled : Qt::NoItemFlags);
+	if(index.isValid()) {
+		const auto isGroup = m_items.at(index.internalId()).group;
+		flags |= Qt::ItemIsEditable | (isGroup ? Qt::ItemIsDropEnabled : Qt::NoItemFlags);
+	} else {
+		flags |= Qt::ItemIsDropEnabled;
 	}
-	return Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEnabled;
+
+	return flags;
 }
 
 Qt::DropActions LayerListModel::supportedDropActions() const
@@ -54,12 +256,12 @@ Qt::DropActions LayerListModel::supportedDropActions() const
 }
 
 QStringList LayerListModel::mimeTypes() const {
-		return QStringList() << "application/x-qt-image";
+	return QStringList() << "application/x-qt-image";
 }
 
 QMimeData *LayerListModel::mimeData(const QModelIndexList& indexes) const
 {
-	return new LayerMimeData(this, indexes[0].data().value<LayerListItem>().id);
+	return new LayerMimeData(this, indexes[0].data(canvas::LayerListModel::ItemRole).value<LayerListItem>().id);
 }
 
 bool LayerListModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
@@ -233,7 +435,7 @@ void LayerListModel::setLayers(const QVector<LayerListItem> &items)
 	// See if there are any new layers we should autoselect
 	int autoselect = -1;
 
-	const uint8_t localUser = m_aclstate ? m_aclstate->localUserId() : 0;
+	const uint8_t localUser = m_aclstate.localUserId();
 
 	if(m_items.size() < items.size()) {
 		for(const LayerListItem &newItem : items) {
@@ -317,24 +519,9 @@ void LayerListModel::setDefaultLayer(uint16_t id)
 		emit dataChanged(newIdx, newIdx, role);
 }
 
-QStringList LayerMimeData::formats() const
-{
-	return QStringList() << "application/x-qt-image";
-}
-
-QVariant LayerMimeData::retrieveData(const QString &mimeType, compat::RetrieveDataMetaType type) const
-{
-	if(compat::isImageMime(mimeType, type) && m_source->m_getlayerfn)
-		return m_source->m_getlayerfn(m_id);
-
-	return QVariant();
-}
-
 int LayerListModel::getAvailableLayerId() const
 {
-	Q_ASSERT(m_aclstate);
-
-	const int prefix = int(m_aclstate->localUserId()) << 8;
+	const int prefix = int(m_aclstate.localUserId()) << 8;
 	QList<int> takenIds;
 	for(const LayerListItem &item : m_items) {
 		if((item.id & 0xff00) == prefix)
@@ -380,11 +567,27 @@ QString LayerListModel::getAvailableLayerName(QString basename) const
 	return QString("%2 %1").arg(suffix+1).arg(basename);
 }
 
-uint8_t LayerListItem::attributeFlags() const
+QStringList LayerMimeData::formats() const
 {
-	return (censored ? rustpile::LayerAttributesMessage_FLAGS_CENSOR : 0) |
-			(isolated ? rustpile::LayerAttributesMessage_FLAGS_ISOLATED : 0)
-			;
+	return QStringList() << "application/x-qt-image";
+}
+
+QVariant LayerMimeData::retrieveData(const QString &mimeType, compat::RetrieveDataMetaType type) const
+{
+	if(compat::isImageMime(mimeType, type) && m_source->m_getlayerfn)
+		return m_source->m_getlayerfn(m_id);
+
+	return QVariant();
+}
+
+uint8_t LayerListItem::Attributes::flags() const {
+	return (censored ? rustpile::LayerAttributesMessage_FLAGS_CENSOR : 0)
+		| (isolated ? rustpile::LayerAttributesMessage_FLAGS_ISOLATED : 0);
+}
+
+void LayerListItem::Attributes::setFlags(uint8_t flags) {
+	censored = (flags & rustpile::LayerAttributesMessage_FLAGS_CENSOR) != 0;
+	isolated = (flags & rustpile::LayerAttributesMessage_FLAGS_ISOLATED) != 0;
 }
 
 }

@@ -41,7 +41,7 @@ static QRect calcIconRect(const QStyleOptionViewItem &option)
 
 void LayerListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	const canvas::LayerListItem &layer = index.data().value<canvas::LayerListItem>();
+	const canvas::LayerListItem &layer = index.data(canvas::LayerListModel::ItemRole).value<canvas::LayerListItem>();
 
 	QStyleOptionViewItem opt = setOptions(index, option);
 	if(index.data(canvas::LayerListModel::IsDefaultRole).toBool()) {
@@ -58,7 +58,7 @@ void LayerListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 	painter->save();
 
 	drawBackground(painter, option, index);
-	drawOpacityGlyph(iconRect, painter, layer.opacity, layer.hidden, layer.censored, layer.group);
+	drawOpacityGlyph(iconRect, painter, layer.attributes.opacity, layer.hidden, layer.attributes.censored, layer.group);
 	drawDisplay(painter, opt, textRect,layer.title);
 
 	painter->restore();
@@ -75,7 +75,7 @@ bool LayerListDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, co
 			break;
 		}
 		if(calcIconRect(option).contains(me->pos())) {
-			const auto &layer = index.data().value<canvas::LayerListItem>();
+			const auto &layer = index.data(canvas::LayerListModel::ItemRole).value<canvas::LayerListItem>();
 			emit toggleVisibility(layer.id, layer.hidden);
 			return true;
 		} else if(type == QEvent::MouseButtonDblClick) {

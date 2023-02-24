@@ -14,7 +14,6 @@ add_library(dpclient STATIC
 	canvas/canvasmodel.h
 	canvas/documentmetadata.cpp
 	canvas/documentmetadata.h
-	canvas/features.h
 	canvas/indexbuilderrunnable.cpp
 	canvas/indexbuilderrunnable.h
 	canvas/inputpresetmodel.cpp

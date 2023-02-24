@@ -4,7 +4,7 @@
 #ifndef LAYERLISTDOCK_H
 #define LAYERLISTDOCK_H
 
-#include "libclient/canvas/features.h"
+#include "rustpile/rustpile.h"
 
 #include <QDockWidget>
 
@@ -59,8 +59,6 @@ signals:
 	void layerSelected(int id);
 	void activeLayerVisibilityChanged();
 
-	void layerCommand(const net::Envelope &msg);
-
 private slots:
 	void beforeLayerReset();
 	void afterLayerReset();
@@ -78,7 +76,7 @@ private slots:
 	void showContextMenu(const QPoint &pos);
 	void censorSelected(bool censor);
 	void setLayerVisibility(int layerId, bool visible);
-	void changeLayerAcl(bool lock, canvas::Tier tier, QVector<uint8_t> exclusive);
+	void changeLayerAcl(bool lock, rustpile::Tier tier, QVector<uint8_t> exclusive);
 
 	void lockStatusChanged(int layerId);
 	void selectionChanged(const QItemSelection &selected);
@@ -91,8 +89,6 @@ private:
 
 	QModelIndex currentSelection() const;
 	void selectLayerIndex(QModelIndex index, bool scrollTo=false);
-
-	QString layerCreatorName(uint16_t layerId) const;
 
 	canvas::CanvasModel *m_canvas;
 

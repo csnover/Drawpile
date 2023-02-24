@@ -339,7 +339,6 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	connect(m_dockTimeline, &docks::Timeline::timelineEditCommand, m_doc->client(), &net::Client::sendEnvelope);
 
 	connect(m_serverLogDialog, &dialogs::ServerLogDialog::opCommand, m_doc->client(), &net::Client::sendEnvelope);
-	connect(m_dockLayers, &docks::LayerList::layerCommand, m_doc->client(), &net::Client::sendEnvelope);
 
 	// Tool controller <-> UI connections
 	connect(m_doc->toolCtrl(), &tools::ToolController::activeAnnotationChanged, m_canvasscene, &drawingboard::CanvasScene::setActiveAnnotation);

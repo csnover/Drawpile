@@ -9,10 +9,10 @@
 namespace canvas {
 
 struct AclState::Data {
-	rustpile::UserACLs users;
-	rustpile::FeatureTiers features;
+	rustpile::UserACLs users = {};
+	rustpile::FeatureTiers features = {};
 	QHash<int, Layer> layers;
-	uint8_t localUser;
+	uint8_t localUser = {};
 
 	rustpile::Tier tier() const;
 };
@@ -62,9 +62,6 @@ static int featureFlags(const rustpile::FeatureTiers &features, rustpile::Tier t
 AclState::AclState(QObject *parent)
 	: QObject(parent), d(new Data)
 {
-	memset(&d->users, 0, sizeof(rustpile::UserACLs));
-	memset(&d->features, 0, sizeof(rustpile::FeatureTiers));
-	d->localUser = 0;
 }
 
 void AclState::setLocalUserId(uint8_t localUser)

@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/widgets/groupedtoolbutton.h"
+#include "libclient/canvas/acl.h"
 #include "libclient/canvas/layerlist.h"
 #include "libclient/canvas/canvasmodel.h"
 #include "libclient/canvas/userlist.h"
@@ -11,7 +12,6 @@
 #include "desktop/docks/layeraclmenu.h"
 #include "desktop/docks/titlewidget.h"
 #include "desktop/dialogs/layerproperties.h"
-#include "libclient/utils/changeflags.h"
 #include "libclient/utils/icon.h"
 #include "libclient/net/envelopebuilder.h"
 
@@ -31,11 +31,15 @@
 namespace docks {
 
 LayerList::LayerList(QWidget *parent)
-	: QDockWidget(tr("Layers"), parent),
-	  m_canvas(nullptr), m_selectedId(0), m_nearestToDeletedId(0),
-	  m_noupdate(false),
-	  m_addLayerAction(nullptr), m_duplicateLayerAction(nullptr),
-	  m_mergeLayerAction(nullptr), m_deleteLayerAction(nullptr)
+	: QDockWidget(tr("Layers"), parent)
+	, m_canvas(nullptr)
+	, m_selectedId(0)
+	, m_nearestToDeletedId(0)
+	, m_noupdate(false)
+	, m_addLayerAction(nullptr)
+	, m_duplicateLayerAction(nullptr)
+	, m_mergeLayerAction(nullptr)
+	, m_deleteLayerAction(nullptr)
 {
 	auto *titlebar = new TitleWidget(this);
 	setTitleBarWidget(titlebar);
@@ -214,38 +218,16 @@ void LayerList::selectLayerIndex(QModelIndex index, bool scrollTo)
 	}
 }
 
-QString LayerList::layerCreatorName(uint16_t layerId) const
-{
-	return m_canvas->userlist()->getUsername((layerId >> 8) & 0xff);
-}
-
-static net::Envelope updateLayerAttributesMessage(uint8_t contextId, const canvas::LayerListItem &layer, ChangeFlags<uint8_t> flagChanges, int opacity, int blend)
-{
-	net::EnvelopeBuilder eb;
-	rustpile::write_layerattr(
-		eb,
-		contextId,
-		layer.id,
-		0,
-		flagChanges.update(layer.attributeFlags()),
-		opacity>=0 ? opacity : layer.opacity*255,
-		blend >= 0 ? rustpile::Blendmode(blend) : layer.blend
-	);
-	return eb.toEnvelope();
-}
-
 void LayerList::censorSelected(bool censor)
 {
 	QModelIndex index = currentSelection();
-	if(index.isValid()) {
-		emit layerCommand(updateLayerAttributesMessage(
-			m_canvas->localUserId(),
-			index.data().value<canvas::LayerListItem>(),
-			ChangeFlags<uint8_t>().set(rustpile::LayerAttributesMessage_FLAGS_CENSOR, censor),
-			-1,
-			-1
-		));
-	}
+	if(!index.isValid())
+		return;
+
+	auto *layers = m_canvas->layerlist();
+	Q_ASSERT(layers);
+	layers->toggleLayerFlags(index, rustpile::LayerAttributesMessage_FLAGS_CENSOR, censor);
+	layers->submit();
 }
 
 void LayerList::setLayerVisibility(int layerId, bool visible)
@@ -257,23 +239,16 @@ void LayerList::setLayerVisibility(int layerId, bool visible)
 	);
 }
 
-void LayerList::changeLayerAcl(bool lock, canvas::Tier tier, QVector<uint8_t> exclusive)
+void LayerList::changeLayerAcl(bool lock, rustpile::Tier tier, QVector<uint8_t> exclusive)
 {
 	const QModelIndex index = currentSelection();
-	if(index.isValid()) {
-		const int layerId = index.data(canvas::LayerListModel::IdRole).toInt();
-		net::EnvelopeBuilder eb;
-		rustpile::write_layeracl(
-			eb,
-			m_canvas->localUserId(),
-			layerId,
-			(lock ? 0x80 : 0) | uint8_t(tier),
-			exclusive.constData(),
-			exclusive.length()
+	if(!index.isValid())
+		return;
 
-		);
-		emit layerCommand(eb.toEnvelope());
-	}
+	auto *layers = m_canvas->layerlist();
+	Q_ASSERT(layers);
+	layers->changeLayerAcl(index, lock, tier, exclusive);
+	layers->submit();
 }
 
 /**
@@ -281,90 +256,26 @@ void LayerList::changeLayerAcl(bool lock, canvas::Tier tier, QVector<uint8_t> ex
  */
 void LayerList::addLayer()
 {
-	const canvas::LayerListModel *layers = m_canvas->layerlist();
+	auto *layers = m_canvas->layerlist();
 	Q_ASSERT(layers);
-
-	const int id = layers->getAvailableLayerId();
-	if(id==0) {
-		qWarning("Couldn't find a free ID for a new layer!");
-		return;
-	}
-
-	const QString name = layers->getAvailableLayerName(tr("Layer"));
-
-	net::EnvelopeBuilder eb;
-	rustpile::write_undopoint(eb, m_canvas->localUserId());
-	rustpile::write_newlayer(
-		eb,
-		m_canvas->localUserId(),
-		id,
-		0, // source
-		m_selectedId, // target
-		0, // fill
-		0, // flags
-		reinterpret_cast<const uint16_t*>(name.constData()),
-		name.length()
-	);
-	emit layerCommand(eb.toEnvelope());
+	layers->addLayer(m_selectedId);
+	layers->submit();
 }
 
 void LayerList::addGroup()
 {
-	const canvas::LayerListModel *layers = m_canvas->layerlist();
+	auto *layers = m_canvas->layerlist();
 	Q_ASSERT(layers);
-
-	const int id = layers->getAvailableLayerId();
-	if(id==0) {
-		qWarning("Couldn't find a free ID for a new group!");
-		return;
-	}
-
-	const QString name = layers->getAvailableLayerName(tr("Group"));
-
-	net::EnvelopeBuilder eb;
-	rustpile::write_undopoint(eb, m_canvas->localUserId());
-	rustpile::write_newlayer(
-		eb,
-		m_canvas->localUserId(),
-		id,
-		0, // source
-		m_selectedId, // target (place above this)
-		0, // fill (not used for groups)
-		rustpile::LayerCreateMessage_FLAGS_GROUP,
-		reinterpret_cast<const uint16_t*>(name.constData()),
-		name.length()
-	);
-	emit layerCommand(eb.toEnvelope());
+	layers->addGroup(m_selectedId);
+	layers->submit();
 }
 
 void LayerList::duplicateLayer()
 {
-	const QModelIndex index = currentSelection();
-	const canvas::LayerListItem layer = index.data().value<canvas::LayerListItem>();
-
-	const canvas::LayerListModel *layers = m_canvas->layerlist();
+	auto *layers = m_canvas->layerlist();
 	Q_ASSERT(layers);
-
-	const int id = layers->getAvailableLayerId();
-	if(id==0)
-		return;
-
-	const QString name = layers->getAvailableLayerName(layer.title);
-
-	net::EnvelopeBuilder eb;
-	rustpile::write_undopoint(eb, m_canvas->localUserId());
-	rustpile::write_newlayer(
-		eb,
-		m_canvas->localUserId(),
-		id,
-		layer.id, // source
-		layer.id, // target
-		0, // fill
-		0, // flags
-		reinterpret_cast<const uint16_t*>(name.constData()),
-		name.length()
-	);
-	emit layerCommand(eb.toEnvelope());
+	layers->duplicateLayer(currentSelection());
+	layers->submit();
 }
 
 bool LayerList::canMergeCurrent() const
@@ -380,18 +291,17 @@ bool LayerList::canMergeCurrent() const
 
 void LayerList::deleteSelected()
 {
-	QModelIndex index = currentSelection();
-	if(!index.isValid())
-		return;
-
-	net::EnvelopeBuilder eb;
-	rustpile::write_undopoint(eb, m_canvas->localUserId());
-	rustpile::write_deletelayer(eb, m_canvas->localUserId(), index.data().value<canvas::LayerListItem>().id, false);
-	emit layerCommand(eb.toEnvelope());
+	auto *layers = m_canvas->layerlist();
+	Q_ASSERT(layers);
+	layers->removeLayer(currentSelection());
+	layers->submit();
 }
 
 void LayerList::mergeSelected()
 {
+	auto *layers = m_canvas->layerlist();
+	Q_ASSERT(layers);
+
 	QModelIndex index = currentSelection();
 	if(!index.isValid())
 		return;
@@ -400,15 +310,8 @@ void LayerList::mergeSelected()
 	if(!below.isValid())
 		return;
 
-	net::EnvelopeBuilder eb;
-	rustpile::write_undopoint(eb, m_canvas->localUserId());
-	rustpile::write_deletelayer(
-		eb,
-		m_canvas->localUserId(),
-		index.data(canvas::LayerListModel::IdRole).value<uint16_t>(),
-		below.data(canvas::LayerListModel::IdRole).value<uint16_t>()
-	);
-	emit layerCommand(eb.toEnvelope());
+	layers->mergeLayers(index, below);
+	layers->submit();
 }
 
 void LayerList::showPropertiesOfSelected()
@@ -418,44 +321,16 @@ void LayerList::showPropertiesOfSelected()
 
 void LayerList::showPropertiesOfIndex(QModelIndex index)
 {
-	if(index.isValid()) {
-		auto *dlg = new dialogs::LayerProperties(m_canvas->localUserId(), this);
-		dlg->setAttribute(Qt::WA_DeleteOnClose);
-		dlg->setModal(false);
+	if(!index.isValid())
+		return;
 
-		connect(dlg, &dialogs::LayerProperties::layerCommand, this, &LayerList::layerCommand);
-		connect(dlg, &dialogs::LayerProperties::visibilityChanged, this, &LayerList::setLayerVisibility);
-		connect(m_canvas->layerlist(), &canvas::LayerListModel::modelReset, dlg, [this, dlg]() {
-			const auto index = m_canvas->layerlist()->layerIndex(dlg->layerId());
-			if(index.isValid()) {
-				dlg->setLayerItem(
-					index.data().value<canvas::LayerListItem>(),
-					layerCreatorName(dlg->layerId()),
-					index.data(canvas::LayerListModel::IsDefaultRole).toBool()
-				);
-			} else {
-				dlg->deleteLater();
-			}
-		});
+	Q_ASSERT(m_canvas);
+	auto *dlg = new dialogs::LayerProperties(*m_canvas, index, this);
+	dlg->setAttribute(Qt::WA_DeleteOnClose);
+	dlg->setModal(false);
 
-		const int layerId = index.data(canvas::LayerListModel::IdRole).toInt();
-		dlg->setLayerItem(
-			index.data().value<canvas::LayerListItem>(),
-			layerCreatorName(layerId),
-			index.data(canvas::LayerListModel::IsDefaultRole).toBool()
-		);
-
-		const bool canEditAll = m_canvas->aclState()->canUseFeature(canvas::Feature::EditLayers);
-		const bool canEdit = canEditAll ||
-			(
-				m_canvas->aclState()->canUseFeature(canvas::Feature::OwnLayers) &&
-				(layerId & 0xff00) >> 8 == m_canvas->localUserId()
-			);
-		dlg->setControlsEnabled(canEdit);
-		dlg->setOpControlsEnabled(canEditAll);
-
-		dlg->show();
-	}
+	connect(dlg, &dialogs::LayerProperties::visibilityChanged, this, &LayerList::setLayerVisibility);
+	dlg->show();
 }
 
 void LayerList::showContextMenu(const QPoint &pos)
@@ -513,11 +388,11 @@ bool LayerList::isCurrentLayerLocked() const
 
 	QModelIndex idx = currentSelection();
 	if(idx.isValid()) {
-		const canvas::LayerListItem &item = idx.data().value<canvas::LayerListItem>();
+		const canvas::LayerListItem &item = idx.data(canvas::LayerListModel::ItemRole).value<canvas::LayerListItem>();
 		return item.hidden
 			|| item.group // group layers have no pixel content to edit
 			|| m_canvas->aclState()->isLayerLocked(item.id)
-			|| (item.censored && m_canvas->paintEngine()->isCensored())
+			|| (item.attributes.censored && m_canvas->paintEngine()->isCensored())
 			;
 	}
 	return false;
@@ -540,11 +415,11 @@ void LayerList::selectionChanged(const QItemSelection &selected)
 
 void LayerList::updateUiFromSelection()
 {
-	const canvas::LayerListItem &layer = currentSelection().data().value<canvas::LayerListItem>();
+	const canvas::LayerListItem &layer = currentSelection().data(canvas::LayerListModel::ItemRole).value<canvas::LayerListItem>();
 	m_noupdate = true;
 	m_selectedId = layer.id;
 
-	m_aclmenu->setCensored(layer.censored);
+	m_aclmenu->setCensored(layer.attributes.censored);
 
 	lockStatusChanged(layer.id);
 	updateLockedControls();
@@ -559,7 +434,7 @@ void LayerList::lockStatusChanged(int layerId)
 	if(m_selectedId == layerId) {
 		const auto acl = m_canvas->aclState()->layerAcl(layerId);
 		m_lockButton->setChecked(acl.locked || acl.tier != rustpile::Tier::Guest || !acl.exclusive.isEmpty());
-		m_aclmenu->setAcl(acl.locked, int(acl.tier), acl.exclusive);
+		m_aclmenu->setAcl(acl.locked, acl.tier, acl.exclusive);
 
 		emit activeLayerVisibilityChanged();
 	}

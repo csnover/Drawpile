@@ -4,7 +4,7 @@
 #ifndef LAYERACLMENU_H
 #define LAYERACLMENU_H
 
-#include "libclient/canvas/features.h"
+#include "rustpile/rustpile.h"
 
 #include <QMenu>
 
@@ -19,7 +19,7 @@ public:
 	explicit LayerAclMenu(QWidget *parent=nullptr);
 
 	void setUserList(QAbstractItemModel *model);
-	void setAcl(bool lock, int tier, const QVector<uint8_t> acl);
+	void setAcl(bool lock, rustpile::Tier tier, const QVector<uint8_t> acl);
 	void setCensored(bool censor);
 
 signals:
@@ -32,7 +32,7 @@ signals:
 	 * @param lock general layer lock
 	 * @param ids list of user IDs.
 	 */
-	void layerAclChange(bool lock, canvas::Tier tier, QVector<uint8_t> ids);
+	void layerAclChange(bool lock, rustpile::Tier tier, QVector<uint8_t> ids);
 
 	/**
 	 * @brief The censored checkbox was toggled

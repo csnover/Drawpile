@@ -299,7 +299,7 @@ void CanvasScene::userCursorMoved(uint8_t userId, uint16_t layerId, int x, int y
 	}
 
 	if(m_showUserLayers)
-		item->setSubtext(m_model->layerlist()->layerIndex(layerId).data(canvas::LayerListModel::TitleRole).toString());
+		item->setSubtext(m_model->layerlist()->layerIndex(layerId).data().toString());
 
 	// Smooth the movement by default so that the curser doesn't jump around
 	// like crazy when using MyPaint brushes with spread out dabs. If this is

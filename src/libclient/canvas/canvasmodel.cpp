@@ -29,12 +29,12 @@ void metaAclChange(void *ctx, uint32_t changes);
 void metaRecorderStateChanged(void *ctx, bool recording);
 
 CanvasModel::CanvasModel(uint8_t localUserId, QObject *parent)
-	: QObject(parent), m_selection(nullptr), m_localUserId(1)
+	: QObject(parent), m_selection(nullptr)
 {
 	m_paintengine = new PaintEngine(this);
 
 	m_aclstate = new AclState(this);
-	m_layerlist = new LayerListModel(this);
+	m_layerlist = new LayerListModel(*m_aclstate, this);
 	m_userlist = new UserListModel(this);
 	m_timeline = new TimelineModel(this);
 	m_metadata = new DocumentMetadata(m_paintengine, this);
@@ -54,9 +54,8 @@ CanvasModel::CanvasModel(uint8_t localUserId, QObject *parent)
 	);
 
 	m_aclstate->setLocalUserId(localUserId);
-	rustpile::paintengine_reset_acl(m_paintengine->engine(), m_localUserId);
+	rustpile::paintengine_reset_acl(m_paintengine->engine(), localUserId);
 
-	m_layerlist->setAclState(m_aclstate);
 	m_layerlist->setLayerGetter([this](int id)->QImage { return m_paintengine->getLayerImage(id); });
 
 	connect(m_layerlist, &LayerListModel::autoSelectRequest, this, &CanvasModel::layerAutoselectRequest);
@@ -113,13 +112,11 @@ void CanvasModel::connectedToServer(uint8_t myUserId, bool join)
 		qWarning("connectedToServer: local user ID is zero!");
 	}
 
-	m_localUserId = myUserId;
 	m_layerlist->setAutoselectAny(true);
-
 	m_aclstate->setLocalUserId(myUserId);
 
 	if(join)
-		rustpile::paintengine_reset_acl(m_paintengine->engine(), m_localUserId);
+		rustpile::paintengine_reset_acl(m_paintengine->engine(), myUserId);
 
 	m_userlist->reset();
 }
@@ -128,7 +125,7 @@ void CanvasModel::disconnectedFromServer()
 {
 	m_paintengine->cleanup();
 	m_userlist->allLogout();
-	rustpile::paintengine_reset_acl(m_paintengine->engine(), m_localUserId);
+	rustpile::paintengine_reset_acl(m_paintengine->engine(), m_aclstate->localUserId());
 	rustpile::paintengine_cleanup(m_paintengine->engine());
 }
 
@@ -149,7 +146,7 @@ net::Envelope CanvasModel::generateSnapshot() const
 	net::EnvelopeBuilder eb;
 
 	if(!m_pinnedMessage.isEmpty()) {
-		rustpile::write_chat(eb, m_localUserId, 0, rustpile::ChatMessage_OFLAGS_PIN, reinterpret_cast<const uint16_t*>(m_pinnedMessage.constData()), m_pinnedMessage.length());
+		rustpile::write_chat(eb, m_aclstate->localUserId(), 0, rustpile::ChatMessage_OFLAGS_PIN, reinterpret_cast<const uint16_t*>(m_pinnedMessage.constData()), m_pinnedMessage.length());
 	}
 
 	if(m_layerlist->defaultLayer() > 0)
@@ -158,6 +155,11 @@ net::Envelope CanvasModel::generateSnapshot() const
 	rustpile::paintengine_get_reset_snapshot(m_paintengine->engine(), eb);
 
 	return eb.toEnvelope();
+}
+
+uint8_t CanvasModel::localUserId() const
+{
+	return m_aclstate->localUserId();
 }
 
 void CanvasModel::pickLayer(int x, int y)

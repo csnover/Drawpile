@@ -278,7 +278,7 @@ void SessionSettingsDialog::onFeatureTiersChanged(const rustpile::FeatureTiers &
 
 void SessionSettingsDialog::initPermissionComboBoxes()
 {
-	// Note: these must match the canvas::Tier enum
+	// Note: these must match the rustpile::Tier enum
 	const QString items[] = {
 		tr("Operators"),
 		tr("Trusted"),
