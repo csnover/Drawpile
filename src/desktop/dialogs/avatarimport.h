@@ -4,6 +4,8 @@
 #ifndef AVATARIMPORT_H
 #define AVATARIMPORT_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDialog>
 #include <QPointer>
 
@@ -14,9 +16,10 @@ class AvatarListModel;
 
 namespace dialogs {
 
-class AvatarImport : public QDialog
+class AvatarImport : public DynamicUiWidget<QDialog, Ui_AvatarImport>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	AvatarImport(const QImage &source, QWidget *parent=nullptr);
 	~AvatarImport();
@@ -29,7 +32,6 @@ public:
 	static void importAvatar(AvatarListModel *avatarList, QPointer<QWidget> parentWindow=QPointer<QWidget>());
 
 private:
-	Ui_AvatarImport *m_ui;
 	QImage m_originalImage;
 };
 

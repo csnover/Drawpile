@@ -17,8 +17,9 @@ struct ColorSpinnerDock::Private {
 	color_widgets::ColorWheel *colorwheel = nullptr;
 };
 
-ColorSpinnerDock::ColorSpinnerDock(const QString& title, QWidget *parent)
-	: QDockWidget(title, parent), d(new Private)
+ColorSpinnerDock::ColorSpinnerDock(QWidget *parent)
+	: QDockWidget(parent)
+	, d(new Private)
 {
 	// Create title bar widget
 	auto *titlebar = new TitleWidget(this);
@@ -45,12 +46,27 @@ ColorSpinnerDock::ColorSpinnerDock(const QString& title, QWidget *parent)
 	// Restore UI state
 	connect(static_cast<DrawpileApp*>(qApp), &DrawpileApp::settingsChanged,
 			this, &ColorSpinnerDock::updateSettings);
+	retranslateUi();
 	updateSettings();
 }
 
 ColorSpinnerDock::~ColorSpinnerDock()
+{}
+
+void ColorSpinnerDock::retranslateUi()
 {
-	delete d;
+	setWindowTitle(tr("Color Wheel"));
+}
+
+void ColorSpinnerDock::changeEvent(QEvent *event)
+{
+	QDockWidget::changeEvent(event);
+	switch (event->type()) {
+	case QEvent::LanguageChange:
+		retranslateUi();
+		break;
+	default: {}
+	}
 }
 
 void ColorSpinnerDock::setColor(const QColor& color)

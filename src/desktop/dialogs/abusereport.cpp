@@ -11,18 +11,21 @@
 namespace dialogs {
 
 AbuseReportDialog::AbuseReportDialog(QWidget *parent)
-	: QDialog(parent), m_sessionId(QString()), m_userId(0)
+	: DynamicUiWidget(parent)
+	, m_sessionId(QString())
+	, m_userId(0)
 {
-	m_ui = new Ui_AbuseReportDialog;
-	m_ui->setupUi(this);
-	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Report"));
-
 	new MandatoryFields(this, m_ui->buttons->button(QDialogButtonBox::Ok));
+	retranslateUi();
 }
 
 AbuseReportDialog::~AbuseReportDialog()
+{}
+
+void AbuseReportDialog::retranslateUi()
 {
-	delete m_ui;
+	m_ui->retranslateUi(this);
+	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Report"));
 }
 
 void AbuseReportDialog::setSessionInfo(const QString &id, const QString &alias, const QString &title)

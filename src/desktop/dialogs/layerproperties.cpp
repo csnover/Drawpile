@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/dialogs/layerproperties.h"
+#include "desktop/utils/dynamicui.h"
 #include "libclient/canvas/blendmodes.h"
 #include "libclient/canvas/layerlist.h"
 #include "libclient/canvas/userlist.h"
@@ -13,15 +14,14 @@
 
 namespace dialogs {
 
+DP_DYNAMIC_DEFAULT_IMPL(LayerProperties)
+
 LayerProperties::LayerProperties(canvas::CanvasModel &canvas, QPersistentModelIndex index, QWidget *parent)
-	: QDialog(parent)
-	, m_ui(new Ui_LayerProperties)
+	: DynamicUiWidget(parent)
 	, m_canvas(canvas)
 	, m_item(index)
 	, m_layerId(index.data(canvas::LayerListModel::IdRole).toInt())
 {
-	m_ui->setupUi(this);
-
 	const auto modes = canvas::blendmode::layerModeNames();
 	for(const auto &bm : modes) {
 		m_ui->blendMode->addItem(bm.second, int(bm.first));
@@ -41,9 +41,7 @@ LayerProperties::LayerProperties(canvas::CanvasModel &canvas, QPersistentModelIn
 }
 
 LayerProperties::~LayerProperties()
-{
-	delete m_ui;
-}
+{}
 
 void LayerProperties::modelReset()
 {

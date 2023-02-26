@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: askmeaboutloom
 
 #include "desktop/dialogs/brushpresetproperties.h"
+#include "desktop/utils/dynamicui.h"
 
 #include "ui_brushpresetproperties.h"
 
@@ -9,15 +10,14 @@
 
 namespace dialogs {
 
+DP_DYNAMIC_DEFAULT_IMPL(BrushPresetProperties)
+
 BrushPresetProperties::BrushPresetProperties(int id, const QString &name,
 		const QString &description, const QPixmap &thumbnail, QWidget *parent)
-	: QDialog(parent)
+	: DynamicUiWidget(parent)
 	, m_id(id)
 	, m_thumbnail()
 {
-	m_ui = new Ui_BrushPresetProperties;
-	m_ui->setupUi(this);
-
 	m_ui->name->setText(name);
 	m_ui->description->setPlainText(description);
 
@@ -34,9 +34,7 @@ BrushPresetProperties::BrushPresetProperties(int id, const QString &name,
 }
 
 BrushPresetProperties::~BrushPresetProperties()
-{
-	delete m_ui;
-}
+{}
 
 void BrushPresetProperties::chooseThumbnailFile()
 {

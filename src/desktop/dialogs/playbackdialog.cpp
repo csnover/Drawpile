@@ -24,21 +24,18 @@
 
 namespace dialogs {
 
-PlaybackDialog::PlaybackDialog(canvas::CanvasModel *canvas, QWidget *parent) :
-	QDialog(parent), m_ui(new Ui_PlaybackDialog),
-	m_paintengine(canvas->paintEngine()),
-	m_index(nullptr),
-	m_speedFactor(1.0),
-	m_intervalAfterExport(0),
-	m_autoplay(false), m_awaiting(false)
+PlaybackDialog::PlaybackDialog(canvas::CanvasModel *canvas, QWidget *parent)
+	: DynamicUiWidget(parent)
+	, m_paintengine(canvas->paintEngine())
+	, m_index(nullptr)
+	, m_speedFactor(1.0)
+	, m_intervalAfterExport(0)
+	, m_autoplay(false)
+	, m_awaiting(false)
 {
-	setWindowTitle(tr("Playback"));
 	setWindowFlags(Qt::Tool);
 	setMinimumSize(200, 80);
 	resize(420, 250);
-
-	// Set up the UI
-	m_ui->setupUi(this);
 
 	m_ui->buildIndexProgress->hide();
 
@@ -46,9 +43,8 @@ PlaybackDialog::PlaybackDialog(canvas::CanvasModel *canvas, QWidget *parent) :
 	connect(m_ui->configureExportButton, &QAbstractButton::clicked, this, &PlaybackDialog::onVideoExportClicked);
 
 	// Step timer is used to limit playback speed
-	m_autoStepTimer = new QTimer(this);
-	m_autoStepTimer->setSingleShot(true);
-	connect(m_autoStepTimer, &QTimer::timeout, this, &PlaybackDialog::stepNext);
+	m_autoStepTimer.setSingleShot(true);
+	connect(&m_autoStepTimer, &QTimer::timeout, this, &PlaybackDialog::stepNext);
 
 	connect(m_ui->speedcontrol, &QAbstractSlider::valueChanged, this, [this](int speed) {
 		qreal s;
@@ -58,7 +54,7 @@ PlaybackDialog::PlaybackDialog(canvas::CanvasModel *canvas, QWidget *parent) :
 			s = 1.0 + ((speed-100) / 100.0) * 8.0;
 
 		m_speedFactor = 1.0 / s;
-		m_ui->speedLabel->setText(QString("x %1").arg(s, 0, 'f', 1));
+		m_ui->speedLabel->setText(tr("× %1").arg(s, 0, 'f', 1));
 	});
 
 	// The paint engine's playback callback lets us know when the step/sequence
@@ -91,11 +87,17 @@ PlaybackDialog::PlaybackDialog(canvas::CanvasModel *canvas, QWidget *parent) :
 	connect(m_ui->filmStrip, &widgets::Filmstrip::doubleClicked, this, &PlaybackDialog::jumpTo);
 
 	loadIndex();
+	retranslateUi();
 }
 
 PlaybackDialog::~PlaybackDialog()
+{}
+
+void PlaybackDialog::retranslateUi()
 {
-	delete m_ui;
+	m_ui->retranslateUi(this);
+	m_ui->speedLabel->setText(tr("× %1").arg(m_speedFactor / 1.0, 0, 'f', 1));
+	setWindowTitle(tr("Playback"));
 }
 
 /**
@@ -143,9 +145,9 @@ void PlaybackDialog::autoStepNext(qint32 interval)
 		const auto elapsed = m_lastInterval.elapsed();
 		m_lastInterval.restart();
 
-		m_autoStepTimer->start(qMax(0.0f, qMin(interval, 5000) * m_speedFactor - elapsed));
+		m_autoStepTimer.start(qMax(0.0f, qMin(interval, 5000) * m_speedFactor - elapsed));
 	} else {
-		m_autoStepTimer->start(33.0 * m_speedFactor);
+		m_autoStepTimer.start(33.0 * m_speedFactor);
 	}
 }
 
@@ -239,7 +241,7 @@ void PlaybackDialog::setPlaying(bool playing)
 	if(playing)
 		m_lastInterval.restart();
 	else
-		m_autoStepTimer->stop();
+		m_autoStepTimer.stop();
 
 	m_autoplay = playing;
 	if(playing && !m_awaiting) {
@@ -273,16 +275,18 @@ void PlaybackDialog::keyPressEvent(QKeyEvent *event)
 void PlaybackDialog::onVideoExportClicked()
 {
 
-	QScopedPointer<VideoExportDialog> dialog(new VideoExportDialog(this));
-	VideoExporter *ve=nullptr;
+	VideoExporter *ve = nullptr;
 
-	// Loop until the user has selected a valid exporter
-	// configuration or cancelled.
-	while(!ve) {
-		if(dialog->exec() != QDialog::Accepted)
-			return;
+	{
+		VideoExportDialog dialog;
+		// Loop until the user has selected a valid exporter
+		// configuration or cancelled.
+		while(!ve) {
+			if(dialog.exec() != QDialog::Accepted)
+				return;
 
-		ve = dialog->getExporter();
+			ve = dialog.getExporter();
+		}
 	}
 
 	m_exporter = ve;

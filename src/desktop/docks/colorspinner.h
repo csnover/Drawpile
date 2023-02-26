@@ -5,6 +5,9 @@
 #define COLORSPINNERDOCK_H
 
 #include <QDockWidget>
+#include <memory>
+
+class QEvent;
 
 namespace color_widgets {
 	class ColorPalette;
@@ -15,7 +18,7 @@ namespace docks {
 class ColorSpinnerDock : public QDockWidget {
 	Q_OBJECT
 public:
-	ColorSpinnerDock(const QString& title, QWidget *parent);
+	ColorSpinnerDock(QWidget *parent);
 	~ColorSpinnerDock();
 
 public slots:
@@ -25,12 +28,17 @@ public slots:
 signals:
 	void colorSelected(const QColor& color);
 
+protected:
+	virtual void changeEvent(QEvent *event) override;
+
 private slots:
 	void updateSettings();
 
 private:
+	void retranslateUi();
+
 	struct Private;
-	Private *d;
+	std::unique_ptr<Private> d;
 };
 
 }

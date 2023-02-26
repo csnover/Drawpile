@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/dialogs/serverlogdialog.h"
+#include "desktop/utils/dynamicui.h"
 #include "libclient/canvas/userlist.h"
 #include "libclient/net/servercmd.h"
 #include "libclient/net/envelopebuilder.h"
@@ -11,12 +12,12 @@
 
 namespace dialogs {
 
-ServerLogDialog::ServerLogDialog(QWidget *parent)
-	: QDialog(parent), m_opMode(false)
-{
-	m_ui = new Ui_ServerLogDialog;
-	m_ui->setupUi(this);
+DP_DYNAMIC_DEFAULT_IMPL(ServerLogDialog)
 
+ServerLogDialog::ServerLogDialog(QWidget *parent)
+	: DynamicUiWidget(parent)
+	, m_opMode(false)
+{
 	m_eventlogProxy = new QSortFilterProxyModel(this);
 	m_ui->view->setModel(m_eventlogProxy);
 
@@ -41,9 +42,7 @@ ServerLogDialog::ServerLogDialog(QWidget *parent)
 }
 
 ServerLogDialog::~ServerLogDialog()
-{
-	delete m_ui;
-}
+{}
 
 void ServerLogDialog::hideEvent(QHideEvent *event)
 {

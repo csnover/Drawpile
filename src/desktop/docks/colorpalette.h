@@ -15,7 +15,7 @@ namespace docks {
 class ColorPaletteDock : public QDockWidget {
 	Q_OBJECT
 public:
-	ColorPaletteDock(const QString& title, QWidget *parent);
+	ColorPaletteDock(QWidget *parent);
 	~ColorPaletteDock();
 
 public slots:
@@ -23,6 +23,9 @@ public slots:
 
 signals:
 	void colorSelected(const QColor& color);
+
+protected:
+	virtual void changeEvent(QEvent *event) override;
 
 private slots:
 	void paletteChanged(int index);
@@ -40,8 +43,10 @@ private slots:
 	void paletteRightClicked(int index);
 
 private:
+	void retranslateUi();
+
 	struct Private;
-	Private *d;
+	std::unique_ptr<Private> d;
 };
 
 int findPaletteColor(const color_widgets::ColorPalette &pal, const QColor &color);

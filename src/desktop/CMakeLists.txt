@@ -171,6 +171,7 @@ add_executable(drawpile MACOSX_BUNDLE
 	ui/versioncheck.ui
 	ui/videoexport.ui
 	utils/actionbuilder.h
+	utils/dynamicui.h
 	utils/hotbordereventfilter.cpp
 	utils/hotbordereventfilter.h
 	utils/listserverdelegate.cpp

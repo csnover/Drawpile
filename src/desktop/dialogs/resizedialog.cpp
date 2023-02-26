@@ -11,19 +11,17 @@
 
 namespace dialogs {
 
-ResizeDialog::ResizeDialog(const QSize &oldsize, QWidget *parent) :
-	QDialog(parent), m_oldsize(oldsize), m_aspectratio(0), m_lastchanged(0)
+ResizeDialog::ResizeDialog(const QSize &oldsize, QWidget *parent)
+	: DynamicUiWidget(parent)
+	, m_oldsize(oldsize)
+	, m_aspectratio(0)
+	, m_lastchanged(0)
 {
-	m_ui = new Ui_ResizeDialog;
-	m_ui->setupUi(this);
-
 	m_ui->resizer->setOriginalSize(oldsize);
 	m_ui->resizer->setTargetSize(oldsize);
 
-	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Resize"));
-
-	QPushButton *centerButton = new QPushButton(tr("Center"));
-	m_ui->buttons->addButton(centerButton, QDialogButtonBox::ActionRole);
+	m_centerButton = new QPushButton;
+	m_ui->buttons->addButton(m_centerButton, QDialogButtonBox::ActionRole);
 
 	m_ui->width->setValue(m_oldsize.width());
 	m_ui->height->setValue(m_oldsize.height());
@@ -32,15 +30,21 @@ ResizeDialog::ResizeDialog(const QSize &oldsize, QWidget *parent) :
 	connect(m_ui->height, QOverload<int>::of(&QSpinBox::valueChanged), this, &ResizeDialog::heightChanged);
 	connect(m_ui->keepaspect, &QCheckBox::toggled, this, &ResizeDialog::toggleAspectRatio);
 
-	connect(centerButton, &QPushButton::clicked, m_ui->resizer, &widgets::ResizerWidget::center);
+	connect(m_centerButton, &QPushButton::clicked, m_ui->resizer, &widgets::ResizerWidget::center);
 	connect(m_ui->buttons->button(QDialogButtonBox::Reset), &QAbstractButton::clicked, this, &ResizeDialog::reset);
 
 	m_ui->keepaspect->setChecked(true);
+	retranslateUi();
 }
 
 ResizeDialog::~ResizeDialog()
+{}
+
+void ResizeDialog::retranslateUi()
 {
-	delete m_ui;
+	m_ui->retranslateUi(this);
+	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Resize"));
+	m_centerButton->setText(tr("Center"));
 }
 
 void ResizeDialog::setPreviewImage(const QImage &image)

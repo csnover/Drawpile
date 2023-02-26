@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-FileCopyrightText: Drawpile contributors
+
 #ifndef DP_DESKTOP_UTILS_QTGUICOMPAT_H
 #define DP_DESKTOP_UTILS_QTGUICOMPAT_H
 

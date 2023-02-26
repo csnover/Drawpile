@@ -4,6 +4,7 @@
 #ifndef VIDEOEXPORTDIALOG_H
 #define VIDEOEXPORTDIALOG_H
 
+#include "desktop/utils/dynamicui.h"
 #include <QDialog>
 
 class VideoExporter;
@@ -11,9 +12,10 @@ class Ui_VideoExport;
 
 namespace dialogs {
 
-class VideoExportDialog : public QDialog
+class VideoExportDialog : public DynamicUiWidget<QDialog, Ui_VideoExport>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	explicit VideoExportDialog(QWidget *parent=nullptr);
 	~VideoExportDialog();
@@ -30,8 +32,6 @@ private slots:
 private:
 	VideoExporter *getImageSeriesExporter();
 	VideoExporter *getFfmpegExporter();
-
-	Ui_VideoExport *m_ui;
 };
 
 }

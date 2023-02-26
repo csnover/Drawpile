@@ -6,8 +6,10 @@
 
 #include <QMainWindow>
 #include <QElapsedTimer>
+#include <QMenu>
 #include <QUrl>
 #include <QPointer>
+#include <QVariant>
 
 #include "libclient/tools/tool.h"
 #include "libclient/canvas/acl.h"
@@ -19,6 +21,7 @@ class QToolButton;
 
 class Document;
 class ActionBuilder;
+class MenuBuilder;
 
 namespace widgets {
 	class CanvasView;
@@ -55,12 +58,20 @@ namespace rustpile {
 	enum class AnimationExportMode;
 }
 
+#ifdef Q_OS_MACOS
+class MacMenu;
+#endif
+
 class ShortcutDetector;
 
 //! The application main window
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 public:
+	static ActionBuilder makeAction(const char *text, const char *name, QObject *parent);
+	static MenuBuilder makeMenu(const char *title, QWidget *parent);
+	static void retranslateMenuChildren(QObject &object);
+
 	MainWindow(bool restoreWindowPosition=true);
 	~MainWindow();
 
@@ -172,7 +183,8 @@ private:
 
 	void exportAnimation(const QString &path, rustpile::AnimationExportMode mode);
 
-	ActionBuilder makeAction(const char *name, const QString &text);
+	ActionBuilder makeAction(const char *text, const char *name);
+	QToolBar *makeToolBar(const char *title, QWidget *parent = nullptr);
 	QAction *getAction(const QString &name);
 
 	//! Add a new entry to recent files list
@@ -194,6 +206,9 @@ private:
 	void updateSessionSettings();
 	void showSessionSettings();
 
+	void toggleChat(bool show);
+
+	void retranslateUi();
 	void updatePalette();
 
 	QSplitter *m_splitter;
@@ -221,8 +236,6 @@ private:
 	dialogs::SessionSettingsDialog *m_sessionSettings;
 	dialogs::ServerLogDialog *m_serverLogDialog;
 
-	drawingboard::CanvasScene *m_canvasscene;
-
 	QMenu *m_recentMenu;
 
 	QActionGroup *m_currentdoctools; // general tools that require no special permissions
@@ -246,8 +259,10 @@ private:
 	QElapsedTimer m_toolChangeTime; // how long the user has held down the tool change button
 	ShortcutDetector *m_tempToolSwitchShortcut;
 
-	Document *m_doc;
 	bool m_exitAfterSave;
+
+	Document * const m_doc;
+	drawingboard::CanvasScene * const m_canvasscene;
 };
 
 #endif

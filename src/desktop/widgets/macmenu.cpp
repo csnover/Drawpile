@@ -4,12 +4,16 @@
 #include "desktop/main.h"
 #include "desktop/widgets/macmenu.h"
 #include "desktop/mainwindow.h"
+#include "desktop/utils/actionbuilder.h"
 #include "desktop/utils/recentfiles.h"
 #include "desktop/dialogs/newdialog.h"
 #include "desktop/dialogs/hostdialog.h"
 #include "desktop/dialogs/joindialog.h"
+#include "libshared/util/qtcompat.h"
 
 #include <QAction>
+#include <QActionGroup>
+#include <QIcon>
 #include <QMessageBox>
 #include <QUrl>
 
@@ -21,96 +25,78 @@ MacMenu *MacMenu::instance()
 	return menu;
 }
 
-MacMenu::MacMenu() :
-	QMenuBar(nullptr)
+MacMenu::MacMenu()
+	: QMenuBar(nullptr)
 {
-	//
 	// File menu
-	//
-	QMenu *filemenu = addMenu(MainWindow::tr("&File"));
+	MainWindow::makeMenu(QT_TRANSLATE_NOOP("MainWindow", "&File"), this)
+		.objectName("filemenu")
+		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "&New"), "newdocument", this)
+			.shortcut(QKeySequence::New)
+			.onTriggered(this, &MacMenu::newDocument)
+		)
+		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "&Open..."), "opendocument", this)
+			.shortcut(QKeySequence::Open)
+			.onTriggered(this, &MacMenu::openDocument)
+		)
+		.submenu([=](MenuBuilder menu) {
+			_recent = menu
+				.title(QT_TRANSLATE_NOOP("MainWindow", "Open &Recent"))
+				.onTriggered(this, &MacMenu::openRecent);
+		})
+		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "&Quit"), "exitprogram", this)
+			.shortcut("Ctrl+Q")
+			.menuRole(QAction::QuitRole)
+			.onTriggered(this, &MacMenu::quitAll)
+		)
+		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "Prefere&nces"), "preferences", this)
+			.menuRole(QAction::PreferencesRole)
+			.onTriggered(&MainWindow::showSettings)
+		);
 
-	QAction *newdocument = makeAction(filemenu, "newdocument", MainWindow::tr("&New"), QKeySequence::New);
-	QAction *open = makeAction(filemenu, "opendocument", MainWindow::tr("&Open..."), QKeySequence::Open);
-
-	connect(newdocument, &QAction::triggered, this, &MacMenu::newDocument);
-	connect(open, &QAction::triggered, this, &MacMenu::openDocument);
-
-	_recent = filemenu->addMenu(MainWindow::tr("Open &Recent"));
-	connect(_recent, &QMenu::triggered, this, &MacMenu::openRecent);
-
-	// Relocated menu items
-	QAction *quit = makeAction(filemenu, "exitprogram", MainWindow::tr("&Quit"), QKeySequence("Ctrl+Q"));
-	quit->setMenuRole(QAction::QuitRole);
-	connect(quit, &QAction::triggered, this, &MacMenu::quitAll);
-
-	QAction *preferences = makeAction(filemenu, 0, MainWindow::tr("Prefere&nces"), QKeySequence());
-	preferences->setMenuRole(QAction::PreferencesRole);
-	connect(preferences, &QAction::triggered, &MainWindow::showSettings);
-
-	//
 	// Session menu
-	//
+	MainWindow::makeMenu(QT_TRANSLATE_NOOP("MainWindow", "&Session"), this)
+		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "&Host..."), "hostsession", this)
+			.disabled()
+		)
+		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "&Join..."), "joinsession", this)
+			.onTriggered(this, &MacMenu::joinSession)
+		);
 
-	QMenu *sessionmenu = addMenu(MainWindow::tr("&Session"));
-	QAction *host = makeAction(sessionmenu, "hostsession", MainWindow::tr("&Host..."), QKeySequence());
-	QAction *join = makeAction(sessionmenu, "joinsession", MainWindow::tr("&Join..."), QKeySequence());
-
-	host->setEnabled(false);
-	connect(join, &QAction::triggered, this, &MacMenu::joinSession);
-
-	//
 	// Window menu (Mac specific)
-	//
-	_windows = addMenu(MainWindow::tr("Window"));
-	connect(_windows, &QMenu::triggered, this, &MacMenu::winSelect);
-	connect(_windows, &QMenu::aboutToShow, this, &MacMenu::updateWinMenu);
+	_windowActions = new QActionGroup(this);
+	connect(_windowActions, &QActionGroup::triggered, this, &MacMenu::winSelect);
+	_windows = MainWindow::makeMenu(QT_TRANSLATE_NOOP("MainWindow", "&Window"), this)
+		.onAboutToShow(this, &MacMenu::updateWinMenu)
+		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "Minimize"), "minimize", this)
+			.shortcut("ctrl+m")
+			.onTriggered(this, &MacMenu::winMinimize)
+		)
+		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "Zoom"), "zoomwindow", this)
+			.onTriggered(this, &MacMenu::winZoom)
+		)
+		.separator();
 
-	QAction *minimize = makeAction(_windows, 0, tr("Minimize"), QKeySequence("ctrl+m"));
+	MainWindow::makeMenu(QT_TRANSLATE_NOOP("MainWindow", "&Help"), this)
+		.objectName("helpmenu")
+		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "&Homepage"), "dphomepage", this)
+			.onTriggered(&MainWindow::homepage)
+		)
+		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "&About Drawpile"), "dpabout", this)
+			.menuRole(QAction::AboutRole)
+			.onTriggered(&MainWindow::about)
+		)
+		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "About &Qt"), "aboutqt", this)
+			.menuRole(QAction::AboutQtRole)
+			.onTriggered(&QApplication::aboutQt)
+		);
 
-	_windows->addSeparator();
-
-	connect(minimize, &QAction::triggered, this, &MacMenu::winMinimize);
-
-	//
-	// Help menu
-	//
-	QMenu *helpmenu = addMenu(MainWindow::tr("&Help"));
-
-	QAction *homepage = makeAction(helpmenu, "dphomepage", MainWindow::tr("&Homepage"), QKeySequence());
-	QAction *about = makeAction(helpmenu, "dpabout", MainWindow::tr("&About Drawpile"), QKeySequence());
-	about->setMenuRole(QAction::AboutRole);
-	QAction *aboutqt = makeAction(helpmenu, "aboutqt", MainWindow::tr("About &Qt"), QKeySequence());
-	aboutqt->setMenuRole(QAction::AboutQtRole);
-
-	connect(homepage, &QAction::triggered, &MainWindow::homepage);
-	connect(about, &QAction::triggered, &MainWindow::about);
-	connect(aboutqt, &QAction::triggered, &QApplication::aboutQt);
-
-	//
-	// Initialize
-	//
 	updateRecentMenu();
 }
 
 void MacMenu::updateRecentMenu()
 {
 	RecentFiles::initMenu(_recent);
-}
-
-QAction *MacMenu::makeAction(QMenu *menu, const char *name, const QString &text, const QKeySequence &shortcut)
-{
-	QAction *act;
-	act = new QAction(text, this);
-
-	if(name)
-		act->setObjectName(name);
-
-	if(shortcut.isEmpty()==false)
-		act->setShortcut(shortcut);
-
-	menu->addAction(act);
-
-	return act;
 }
 
 void MacMenu::newDocument()
@@ -157,7 +143,8 @@ void MacMenu::joinSession()
 		}
 		dlg->deleteLater();
 	});
-	dlg->show();}
+	dlg->show();
+}
 
 /**
  * @brief Quit program, closing all main windows
@@ -189,11 +176,11 @@ void MacMenu::quitAll()
 
 	if(dirty>1) {
 		QMessageBox box;
-		box.setText(tr("You have %n images with unsaved changes. Do you want to review these changes before quitting?", "", dirty));
-		box.setInformativeText(tr("If you don't review your documents, all changes will be lost"));
-		box.addButton(tr("Review changes..."), QMessageBox::AcceptRole);
+		box.setText(MainWindow::tr("You have %n images with unsaved changes. Do you want to review these changes before quitting?", "", dirty));
+		box.setInformativeText(MainWindow::tr("If you don't review your documents, all changes will be lost"));
+		box.addButton(MainWindow::tr("Review changes..."), QMessageBox::AcceptRole);
 		box.addButton(QMessageBox::Cancel);
-		box.addButton(tr("Discard changes"), QMessageBox::DestructiveRole);
+		box.addButton(MainWindow::tr("Discard changes"), QMessageBox::DestructiveRole);
 
 		int r = box.exec();
 
@@ -231,9 +218,30 @@ void MacMenu::quitAll()
 
 void MacMenu::winMinimize()
 {
-	MainWindow *w = qobject_cast<MainWindow*>(qApp->activeWindow());
-	if(w)
+	if(auto *w = qobject_cast<MainWindow *>(qApp->activeWindow()))
 		w->showMinimized();
+}
+
+void MacMenu::winZoom()
+{
+	if(auto *w = qobject_cast<MainWindow *>(qApp->activeWindow())) {
+		if (w->isMaximized()) {
+			w->showNormal();
+		} else {
+			w->showMaximized();
+		}
+	}
+}
+
+void MacMenu::changeEvent(QEvent *event)
+{
+	QMenuBar::changeEvent(event);
+	switch (event->type()) {
+	case QEvent::LanguageChange:
+		retranslateUi();
+		break;
+	default: {}
+	}
 }
 
 static QString menuWinTitle(QString title)
@@ -247,20 +255,14 @@ void MacMenu::addWindow(MainWindow *win)
 	QAction *a = new QAction(menuWinTitle(win->windowTitle()), this);
 	a->setProperty("mainwin", QVariant::fromValue(win));
 	a->setCheckable(true);
-
 	_windows->addAction(a);
+	_windowActions->addAction(a);
 }
 
 void MacMenu::updateWindow(MainWindow *win)
 {
-	QListIterator<QAction*> i(_windows->actions());
-	i.toBack();
-	while(i.hasPrevious()) {
-		QAction *a = i.previous();
-		if(a->isSeparator())
-			break;
-
-		if(a->property("mainwin").value<MainWindow*>() == win) {
+	for (auto *a : _windowActions->actions()) {
+		if(a->property("mainwin").value<MainWindow *>() == win) {
 			a->setText(menuWinTitle(win->windowTitle()));
 			break;
 		}
@@ -269,30 +271,22 @@ void MacMenu::updateWindow(MainWindow *win)
 
 void MacMenu::removeWindow(MainWindow *win)
 {
-	QListIterator<QAction*> i(_windows->actions());
-	i.toBack();
-	QAction *delthis = nullptr;
-	while(i.hasPrevious()) {
-		QAction *a = i.previous();
-		if(a->isSeparator())
-			break;
-
-		if(a->property("mainwin").value<MainWindow*>() == win) {
-			delthis = a;
-			break;
+	for (auto *a : _windowActions->actions()) {
+		if (a->property("mainwin").value<MainWindow *>() == win) {
+			delete a;
+			return;
 		}
 	}
 
-	Q_ASSERT(delthis);
-	delete delthis;
+	Q_ASSERT_X(false, __func__, "could not find window");
 }
 
 void MacMenu::winSelect(QAction *a)
 {
-	QVariant mw = a->property("mainwin");
-	if(mw.isValid()) {
-		MainWindow *w = mw.value<MainWindow*>();
-		w->showNormal();
+	if (auto *w = a->property("mainwin").value<MainWindow *>()) {
+		if (w->isMinimized()) {
+			w->showNormal();
+		}
 		w->raise();
 		w->activateWindow();
 	}
@@ -300,18 +294,29 @@ void MacMenu::winSelect(QAction *a)
 
 void MacMenu::updateWinMenu()
 {
-	const MainWindow *top = qobject_cast<MainWindow*>(qApp->activeWindow());
-
-	QListIterator<QAction*> i(_windows->actions());
-	i.toBack();
-
-	while(i.hasPrevious()) {
-		QAction *a = i.previous();
-		if(a->isSeparator())
-			break;
-
+	const MainWindow *top = qobject_cast<MainWindow *>(qApp->activeWindow());
+	for (auto *a : _windowActions->actions()) {
 		// TODO show bullet if window has unsaved changes and diamond
 		// if minimized.
-		a->setChecked(a->property("mainwin").value<MainWindow*>() == top);
+		auto *win = a->property("mainwin").value<MainWindow *>();
+		auto text = menuWinTitle(win->windowTitle());
+		if (win == top) {
+			a->setChecked(true);
+			a->setText(text);
+		} else {
+			a->setChecked(false);
+			if (win->isMinimized()) {
+				a->setText("♦︎ " + text);
+			} else if (win->isWindowModified()) {
+				a->setText("• " + text);
+			} else {
+				a->setText(text);
+			}
+		}
 	}
+}
+
+void MacMenu::retranslateUi()
+{
+	MainWindow::retranslateMenuChildren(*this);
 }

@@ -4,6 +4,8 @@
 #ifndef CERTIFICATEVIEW_H
 #define CERTIFICATEVIEW_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDialog>
 
 class Ui_CertificateView;
@@ -11,16 +13,13 @@ class QSslCertificate;
 
 namespace dialogs {
 
-class CertificateView : public QDialog
+class CertificateView : public DynamicUiWidget<QDialog, Ui_CertificateView>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	CertificateView(const QString &hostname, const QSslCertificate &certificate, QWidget *parent = 0);
 	~CertificateView();
-
-private:
-	Ui_CertificateView *_ui;
-
 };
 
 }

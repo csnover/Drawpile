@@ -94,6 +94,6 @@ inline auto stringSlice(const QString &str, int position) {
 }
 #endif
 
-}
+} // namespace compat
 
 #endif

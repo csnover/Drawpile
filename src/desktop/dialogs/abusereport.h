@@ -4,15 +4,19 @@
 #ifndef ABUSEREPORTDIALOG_H
 #define ABUSEREPORTDIALOG_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDialog>
+#include <memory>
 
 class Ui_AbuseReportDialog;
 
 namespace dialogs {
 
-class AbuseReportDialog : public QDialog
+class AbuseReportDialog : public DynamicUiWidget<QDialog, Ui_AbuseReportDialog>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	explicit AbuseReportDialog(QWidget *parent=nullptr);
 	~AbuseReportDialog();
@@ -46,7 +50,6 @@ public:
 	QString message() const;
 
 private:
-	Ui_AbuseReportDialog *m_ui;
 	QString m_sessionId;
 	int m_userId;
 };

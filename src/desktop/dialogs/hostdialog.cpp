@@ -16,10 +16,8 @@
 namespace dialogs {
 
 HostDialog::HostDialog(QWidget *parent)
-	: QDialog(parent), m_ui(new Ui_HostDialog)
+	: DynamicUiWidget(parent)
 {
-	m_ui->setupUi(this);
-	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Host"));
 	m_ui->buttons->button(QDialogButtonBox::Ok)->setDefault(true);
 	m_ui->idAlias->setValidator(new SessionIdAliasValidator(this));
 
@@ -55,11 +53,16 @@ HostDialog::HostDialog(QWidget *parent)
 		m_ui->remotehost->insertItems(0, recentRemoteHosts);
 
 	updateListingPermissions();
+	retranslateUi();
 }
 
 HostDialog::~HostDialog()
+{}
+
+void HostDialog::retranslateUi()
 {
-	delete m_ui;
+	m_ui->retranslateUi(this);
+	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Host"));
 }
 
 void HostDialog::rememberSettings() const

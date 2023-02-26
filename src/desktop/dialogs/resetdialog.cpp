@@ -17,6 +17,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QApplication>
+#include <memory>
 
 namespace dialogs {
 
@@ -42,7 +43,7 @@ static void drawCheckerBackground(QImage &image)
 
 struct ResetDialog::Private
 {
-	Ui_ResetDialog *ui;
+	const std::unique_ptr<Ui_ResetDialog> ui;
 	rustpile::PaintEngine *paintEngine;
 	QPushButton *resetButton;
 	rustpile::SnapshotQueue *snapshots;
@@ -50,7 +51,9 @@ struct ResetDialog::Private
 	int selection;
 
 	Private(const canvas::PaintEngine *pe)
-		: ui(new Ui_ResetDialog), paintEngine(pe->engine()), selection(0)
+		: ui(new Ui_ResetDialog)
+		, paintEngine(pe->engine())
+		, selection(0)
 	{
 		snapshots = rustpile::paintengine_get_snapshots(pe->engine());
 		resetPoints.resize(rustpile::snapshots_count(snapshots));
@@ -59,7 +62,6 @@ struct ResetDialog::Private
 
 	~Private() {
 		rustpile::paintengine_release_snapshots(snapshots);
-		delete ui;
 	}
 
 	void updateSelection()
@@ -87,7 +89,8 @@ struct ResetDialog::Private
 };
 
 ResetDialog::ResetDialog(const canvas::PaintEngine *pe, QWidget *parent)
-	: QDialog(parent), d(new Private(pe))
+	: QDialog(parent)
+	, d(new Private(pe))
 {
 	d->ui->setupUi(this);
 
@@ -111,9 +114,7 @@ ResetDialog::ResetDialog(const canvas::PaintEngine *pe, QWidget *parent)
 }
 
 ResetDialog::~ResetDialog()
-{
-	delete d;
-}
+{}
 
 void ResetDialog::setCanReset(bool canReset)
 {

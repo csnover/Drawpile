@@ -5,6 +5,7 @@
 #define CHATWIDGET_H
 
 #include <QWidget>
+#include <memory>
 
 namespace net { class Envelope; }
 namespace canvas { class UserListModel; }
@@ -73,7 +74,7 @@ signals:
 
 private:
 	struct Private;
-	Private *d;
+	const std::unique_ptr<Private> d;
 };
 
 }

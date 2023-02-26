@@ -5,13 +5,20 @@
 #define DRAWPILEAPP_H
 
 #include <QApplication>
+#include <QList>
+#include <QString>
+
+class QTranslator;
 
 class DrawpileApp : public QApplication {
 Q_OBJECT
 public:
 	DrawpileApp(int & argc, char ** argv );
 
+	void initTranslations();
+
 	void setDarkTheme(bool dark);
+	void setLanguage(QString preferredLang = QString());
 	void notifySettingsChanged();
 
 	void openUrl(QUrl url);
@@ -24,6 +31,9 @@ signals:
 
 protected:
 	bool event(QEvent *e);
+
+	QList<QTranslator *> m_translators;
+	QString m_currentLang;
 };
 
 #endif

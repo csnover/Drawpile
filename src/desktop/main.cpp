@@ -165,43 +165,80 @@ void DrawpileApp::openBlankDocument()
 	win->newDocument(size, color);
 }
 
-static void initTranslations(const QLocale &locale)
+static QString langFromLocale(const QLocale &locale)
 {
 	const auto preferredLangs = locale.uiLanguages();
-	if(preferredLangs.size()==0)
-		return;
+	if(preferredLangs.isEmpty())
+		return QString();
 
 	// TODO we should work our way down the preferred language list
 	// until we find one a translation exists for.
-	QString preferredLang = preferredLangs.at(0);
+	QString preferredLang = preferredLangs.first();
 
 	// On Windows, the locale name is sometimes in the form "fi-FI"
 	// rather than "fi_FI" that Qt expects.
 	preferredLang.replace('-', '_');
+
+	return preferredLang;
+}
+
+void DrawpileApp::initTranslations()
+{
+	// Set override locale from settings, or use system locale if no override is set
+	QLocale locale = QLocale::c();
+	QString overrideLang = QSettings().value("settings/language").toString();
+	if(!overrideLang.isEmpty())
+		locale = QLocale(overrideLang);
+
+	if(locale == QLocale::c())
+		locale = QLocale::system();
+
+	setLanguage(langFromLocale(locale));
+}
+
+void DrawpileApp::setLanguage(QString preferredLang)
+{
+	if(preferredLang == m_currentLang)
+		return;
+
+	m_currentLang = preferredLang;
+
+	for (auto *translator : m_translators) {
+		removeTranslator(translator);
+	}
+	m_translators.clear();
+
+	if(preferredLang.isEmpty()) {
+		preferredLang = langFromLocale(QLocale::system());
+	}
 
 	// Special case: if english is preferred language, no translations are needed.
 	if(preferredLang == "en")
 		return;
 
 	// Qt's own translations
-	QTranslator *qtTranslator = new QTranslator;
-	if(!qtTranslator->load("qt_" + preferredLang, compat::libraryPath(QLibraryInfo::TranslationsPath)))
+	QTranslator *translator = new QTranslator(this);
+	if(translator->load("qt_" + preferredLang, compat::libraryPath(QLibraryInfo::TranslationsPath))) {
+		m_translators.push_back(translator);
+		installTranslator(translator);
+	} else {
 		qWarning("Qt translations not found");
-	qApp->installTranslator(qtTranslator);
+		delete translator;
+	}
 
 	for(auto &bundle : { "libclient_", "drawpile_" }) {
-		// Our translations
-		QTranslator *myTranslator = new QTranslator;
-
+		QTranslator *translator = new QTranslator(this);
 		for(const QString &datapath : utils::paths::dataPaths()) {
-			if(myTranslator->load(bundle + preferredLang, datapath + "/i18n"))
+			if(translator->load(bundle + preferredLang, datapath + "/i18n"))
 				break;
 		}
 
-		if(myTranslator->isEmpty())
-			delete myTranslator;
-		else
-			qApp->installTranslator(myTranslator);
+		if(translator->isEmpty()) {
+			delete translator;
+		} else {
+			m_translators.push_back(translator);
+			installTranslator(translator);
+		}
 	}
 }
 
@@ -300,16 +337,7 @@ static QStringList initApp(DrawpileApp &app)
 	}
 #endif
 
-	// Set override locale from settings, or use system locale if no override is set
-	QLocale locale = QLocale::c();
-	QString overrideLang = QSettings().value("settings/language").toString();
-	if(!overrideLang.isEmpty())
-		locale = QLocale(overrideLang);
-
-	if(locale == QLocale::c())
-		locale = QLocale::system();
-
-	initTranslations(locale);
+	app.initTranslations();
 
 	return parser.positionalArguments();
 }

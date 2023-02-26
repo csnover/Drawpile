@@ -24,11 +24,9 @@ static QStandardItem *sizeItem(const QString &title, const QVariant &userdata) {
 	return item;
 }
 
-VideoExportDialog::VideoExportDialog(QWidget *parent) :
-	QDialog(parent), m_ui(new Ui_VideoExport)
+VideoExportDialog::VideoExportDialog(QWidget *parent)
+	: DynamicUiWidget(parent)
 {
-	m_ui->setupUi(this);
-
 #ifdef Q_OS_MACOS
 	// Flat style doesn't look good on Mac
 	for(QGroupBox *box : findChildren<QGroupBox*>()) {
@@ -93,8 +91,14 @@ VideoExportDialog::~VideoExportDialog()
 	cfg.setValue("sizeChoice", m_ui->sizeChoice->currentIndex());
 	cfg.setValue("usecustomffmpeg", m_ui->ffmpegUseCustom->isChecked());
 	cfg.setValue("customffmpeg", m_ui->ffmpegCustom->toPlainText());
+}
 
-	delete m_ui;
+void VideoExportDialog::retranslateUi()
+{
+	m_ui->retranslateUi(this);
+	const auto *model = static_cast<QStandardItemModel *>(m_ui->sizeChoice->model());
+	model->item(0)->setText(tr("Original"));
+	model->item(1)->setText(tr("Custom:"));
 }
 
 void VideoExportDialog::updateFfmpegArgumentPreview()

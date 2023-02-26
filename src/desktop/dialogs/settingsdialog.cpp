@@ -65,11 +65,8 @@ namespace dialogs {
  * @param parent parent widget
  */
 SettingsDialog::SettingsDialog(QWidget *parent)
-	: QDialog(parent)
+	: DynamicUiWidget(parent)
 {
-	m_ui = new Ui_SettingsDialog;
-	m_ui->setupUi(this);
-
 	connect(m_ui->notificationVolume, &QSlider::valueChanged, [this](int val) {
 		if(val>0)
 			m_ui->volumeLabel->setText(QString::number(val) + "%");
@@ -80,6 +77,11 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 	// Get available languages
 	m_ui->languageBox->addItem(tr("Default"), QString());
 	m_ui->languageBox->addItem(QStringLiteral("English"), QStringLiteral("en"));
+	connect(m_ui->languageBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) {
+		const auto lang = m_ui->languageBox->currentData().toString();
+		static_cast<DrawpileApp *>(qApp)->setLanguage(lang);
+		retranslateUi();
+	});
 
 	const QLocale localeC = QLocale::c();
 	QStringList locales;
@@ -94,11 +96,6 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 			}
 		}
 	}
-
-	// Night mode support needs Qt 5.12 on macOS
-#ifdef Q_OS_MACOS
-	m_ui->formLayout_2->removeRow(m_ui->themeChoice);
-#endif
 
 	// Hide Windows specific stuff on other platforms
 #if !defined(Q_OS_WIN) || !defined(KIS_TABLET)
@@ -193,6 +190,9 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
 	// Settings saving
 	connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::rememberSettings);
+	connect(m_ui->buttonBox, &QDialogButtonBox::rejected, [] {
+		static_cast<DrawpileApp *>(qApp)->setLanguage(QSettings().value("settings/language").toString());
+	});
 	connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::saveCertTrustChanges);
 	connect(m_ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &SettingsDialog::resetSettings);
 	connect(m_ui->buttonBox->button(QDialogButtonBox::Reset), SIGNAL(clicked()), this, SLOT(resetSettings()));
@@ -202,8 +202,16 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 }
 
 SettingsDialog::~SettingsDialog()
+{}
+
+void SettingsDialog::retranslateUi()
 {
-	delete m_ui;
+	m_ui->retranslateUi(this);
+	m_ui->languageBox->setItemText(0, tr("Default"));
+	const auto lock = QSettings().value("pc/locked").toBool();
+	m_ui->nsfmLock->setText(lock ? tr("Unlock") : tr("Lock"));
+	update();
+	update();
 }
 
 void SettingsDialog::resetSettings()
@@ -252,9 +260,7 @@ void SettingsDialog::restoreSettings()
 		}
 	}
 
-#ifndef Q_OS_MACOS
 	m_ui->themeChoice->setCurrentIndex(cfg.value("theme", 0).toInt());
-#endif
 	m_ui->logfile->setChecked(cfg.value("logfile", true).toBool());
 	m_ui->autosaveInterval->setValue(cfg.value("autosave", 5000).toInt() / 1000);
 
@@ -388,9 +394,7 @@ void SettingsDialog::rememberSettings()
 
 	// Remember general settings
 	cfg.setValue("settings/language", m_ui->languageBox->currentData());
-#ifndef Q_OS_MACOS
 	cfg.setValue("settings/theme", m_ui->themeChoice->currentIndex());
-#endif
 	cfg.setValue("settings/logfile", m_ui->logfile->isChecked());
 	cfg.setValue("settings/autosave", m_ui->autosaveInterval->value() * 1000);
 	cfg.setValue("settings/brushcursor", m_ui->brushCursorBox->currentIndex());

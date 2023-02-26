@@ -23,23 +23,20 @@
 namespace dialogs {
 
 SessionSettingsDialog::SessionSettingsDialog(Document *doc, QWidget *parent)
-	: QDialog(parent),
-	m_ui(new Ui_SessionSettingsDialog),
-	m_doc(doc),
-	m_op(m_doc->canvas()->aclState()->amOperator())
+	: DynamicUiWidget(parent)
+	, m_doc(doc)
+	, m_op(m_doc->canvas()->aclState()->amOperator())
 {
 	Q_ASSERT(doc);
-	m_ui->setupUi(this);
 
-	initPermissionComboBoxes();
+	initPermissionComboBoxes(false);
 
 	connect(m_doc, &Document::canvasChanged, this, &SessionSettingsDialog::onCanvasChanged);
 
 	// Set up the settings page
-	m_saveTimer = new QTimer(this);
-	m_saveTimer->setSingleShot(true);
-	m_saveTimer->setInterval(1000);
-	connect(m_saveTimer, &QTimer::timeout, this, &SessionSettingsDialog::sendSessionConf);
+	m_saveTimer.setSingleShot(true);
+	m_saveTimer.setInterval(1000);
+	connect(&m_saveTimer, &QTimer::timeout, this, &SessionSettingsDialog::sendSessionConf);
 
 	connect(m_ui->title, &QLineEdit::textEdited, this, &SessionSettingsDialog::titleChanged);
 	connect(m_ui->maxUsers, &QSpinBox::editingFinished, this, &SessionSettingsDialog::maxUsersChanged);
@@ -67,7 +64,7 @@ SessionSettingsDialog::SessionSettingsDialog(Document *doc, QWidget *parent)
 	m_ui->deputies->setCurrentIndex(m_doc->isSessionDeputies() ? 1 : 0);
 	m_ui->maxUsers->setValue(m_doc->sessionMaxUserCount());
 	m_ui->autoresetThreshold->setValue(m_doc->sessionResetThreshold());
-	m_ui->baseResetThreshold->setText(QStringLiteral("+ %1 MB").arg(m_doc->baseResetThreshold()/(1024.0*1024.0), 0, 'f', 1));
+	m_ui->baseResetThreshold->setText(tr("+ %1 MB").arg(m_doc->baseResetThreshold()/(1024.0*1024.0), 0, 'f', 1));
 
 	connect(m_doc, &Document::sessionTitleChanged, m_ui->title, &QLineEdit::setText);
 	connect(m_doc, &Document::sessionPreserveChatChanged, m_ui->preserveChat, &QCheckBox::setChecked);
@@ -90,7 +87,7 @@ SessionSettingsDialog::SessionSettingsDialog(Document *doc, QWidget *parent)
 	connect(m_doc, &Document::sessionMaxUserCountChanged, m_ui->maxUsers, &QSpinBox::setValue);
 	connect(m_doc, &Document::sessionResetThresholdChanged, m_ui->autoresetThreshold, &QDoubleSpinBox::setValue);
 	connect(m_doc, &Document::baseResetThresholdChanged, this, [this](int threshold) {
-		m_ui->baseResetThreshold->setText(QStringLiteral("+ %1 MB").arg(threshold/(1024.0*1024.0), 0, 'f', 1));
+		m_ui->baseResetThreshold->setText(tr("+ %1 MB").arg(threshold/(1024.0*1024.0), 0, 'f', 1));
 	});
 
 	// Set up permissions tab
@@ -142,8 +139,15 @@ SessionSettingsDialog::SessionSettingsDialog(Document *doc, QWidget *parent)
 }
 
 SessionSettingsDialog::~SessionSettingsDialog()
+{}
+
+void SessionSettingsDialog::retranslateUi()
 {
-	delete m_ui;
+	m_ui->retranslateUi(this);
+	m_ui->baseResetThreshold->setText(tr("+ %1 MB").arg(m_doc->baseResetThreshold()/(1024.0*1024.0), 0, 'f', 1));
+	initPermissionComboBoxes(true);
+	updatePasswordLabel(m_ui->sessionPassword);
+	updatePasswordLabel(m_ui->opword);
 }
 
 void SessionSettingsDialog::showEvent(QShowEvent *event)
@@ -276,7 +280,7 @@ void SessionSettingsDialog::onFeatureTiersChanged(const rustpile::FeatureTiers &
 	m_ui->permTimeline->setCurrentIndex(int(features.timeline));
 }
 
-void SessionSettingsDialog::initPermissionComboBoxes()
+void SessionSettingsDialog::initPermissionComboBoxes(bool retranslate)
 {
 	// Note: these must match the rustpile::Tier enum
 	const QString items[] = {
@@ -288,18 +292,25 @@ void SessionSettingsDialog::initPermissionComboBoxes()
 
 	for(uint i=0;i<canvas::FeatureCount;++i) {
 		QComboBox *box = featureBox(canvas::Feature(i));
-		for(uint j=0;j<sizeof(items)/sizeof(QString);++j)
-			box->addItem(items[j]);
+		for(uint j=0;j<sizeof(items)/sizeof(items[0]);++j) {
+			if (retranslate) {
+				box->setItemText(j, items[j]);
+			} else {
+				box->addItem(items[j]);
+			}
+		}
 
-		box->setProperty("featureIdx", i);
-		connect(box, QOverload<int>::of(&QComboBox::activated), this, &SessionSettingsDialog::permissionChanged);
+		if (!retranslate) {
+			box->setProperty("featureIdx", i);
+			connect(box, QOverload<int>::of(&QComboBox::activated), this, &SessionSettingsDialog::permissionChanged);
+		}
 	}
 }
 
 void SessionSettingsDialog::permissionChanged()
 {
 	m_featureTiersChanged = true;
-	m_saveTimer->start();
+	m_saveTimer.start();
 }
 
 void SessionSettingsDialog::permissionPresetSelected(const QString &presetFile)
@@ -393,27 +404,27 @@ void SessionSettingsDialog::sendSessionConf()
 	}
 }
 
-void SessionSettingsDialog::changeSesionConf(const QString &key, const QJsonValue &value, bool now)
+void SessionSettingsDialog::changeSessionConf(const QString &key, const QJsonValue &value, bool now)
 {
 	m_sessionconf[key] = value;
 	if(now) {
-		m_saveTimer->stop();
+		m_saveTimer.stop();
 		sendSessionConf();
 	} else {
-		m_saveTimer->start();
+		m_saveTimer.start();
 	}
 }
 
-void SessionSettingsDialog::titleChanged(const QString &title) { changeSesionConf("title", title); }
-void SessionSettingsDialog::maxUsersChanged() { changeSesionConf("maxUserCount", m_ui->maxUsers->value()); }
-void SessionSettingsDialog::denyJoinsChanged(bool set) { changeSesionConf("closed", set); }
-void SessionSettingsDialog::authOnlyChanged(bool set) { changeSesionConf("authOnly", set); }
+void SessionSettingsDialog::titleChanged(const QString &title) { changeSessionConf("title", title); }
+void SessionSettingsDialog::maxUsersChanged() { changeSessionConf("maxUserCount", m_ui->maxUsers->value()); }
+void SessionSettingsDialog::denyJoinsChanged(bool set) { changeSessionConf("closed", set); }
+void SessionSettingsDialog::authOnlyChanged(bool set) { changeSessionConf("authOnly", set); }
 
-void SessionSettingsDialog::autoresetThresholdChanged() { changeSesionConf("resetThreshold", int(m_ui->autoresetThreshold->value()* 1024 * 1024)); }
-void SessionSettingsDialog::keepChatChanged(bool set) { changeSesionConf("preserveChat", set); }
-void SessionSettingsDialog::persistenceChanged(bool set) { changeSesionConf("persistent", set); }
-void SessionSettingsDialog::nsfmChanged(bool set) { changeSesionConf("nsfm", set); }
-void SessionSettingsDialog::deputiesChanged(int idx) { changeSesionConf("deputies", idx>0); }
+void SessionSettingsDialog::autoresetThresholdChanged() { changeSessionConf("resetThreshold", int(m_ui->autoresetThreshold->value()* 1024 * 1024)); }
+void SessionSettingsDialog::keepChatChanged(bool set) { changeSessionConf("preserveChat", set); }
+void SessionSettingsDialog::persistenceChanged(bool set) { changeSessionConf("persistent", set); }
+void SessionSettingsDialog::nsfmChanged(bool set) { changeSessionConf("nsfm", set); }
+void SessionSettingsDialog::deputiesChanged(int idx) { changeSessionConf("deputies", idx>0); }
 
 void SessionSettingsDialog::changePassword()
 {
@@ -433,7 +444,7 @@ void SessionSettingsDialog::changePassword()
 				&ok
 	);
 	if(ok)
-		changeSesionConf("password", newpass, true);
+		changeSessionConf("password", newpass, true);
 }
 
 void SessionSettingsDialog::changeOpword()
@@ -454,7 +465,7 @@ void SessionSettingsDialog::changeOpword()
 				&ok
 	);
 	if(ok)
-		changeSesionConf("opword", newpass, true);
+		changeSessionConf("opword", newpass, true);
 }
 
 }

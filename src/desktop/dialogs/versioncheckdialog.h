@@ -4,6 +4,7 @@
 #ifndef VERSIONCHECKDIALOG_H
 #define VERSIONCHECKDIALOG_H
 
+#include "desktop/utils/dynamicui.h"
 #include "libclient/utils/newversion.h"
 
 #include <QDialog>
@@ -13,9 +14,10 @@ class QPushButton;
 
 namespace dialogs {
 
-class VersionCheckDialog : public QDialog
+class VersionCheckDialog : public DynamicUiWidget<QDialog, Ui_VersionCheckDialog>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	explicit VersionCheckDialog(QWidget *parent=nullptr);
 	~VersionCheckDialog();
@@ -43,7 +45,6 @@ private slots:
 	void downloadNewVersion();
 
 private:
-	Ui_VersionCheckDialog *m_ui;
 	NewVersionCheck *m_newversion;
 	QPushButton *m_downloadButton;
 

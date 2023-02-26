@@ -37,11 +37,9 @@ static const int COMPACT_MODE_THRESHOLD = 300;
 static const int REFRESH_INTERVAL = 60;
 
 JoinDialog::JoinDialog(const QUrl &url, QWidget *parent)
-	: QDialog(parent), m_lastRefresh(0)
+	: DynamicUiWidget(parent)
+	, m_lastRefresh(0)
 {
-	m_ui = new Ui_JoinDialog;
-	m_ui->setupUi(this);
-	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Join"));
 	m_ui->buttons->button(QDialogButtonBox::Ok)->setDefault(true);
 
 	m_addServerButton = m_ui->buttons->addButton(tr("Add Server"), QDialogButtonBox::ActionRole);
@@ -141,6 +139,13 @@ JoinDialog::JoinDialog(const QUrl &url, QWidget *parent)
 	refreshTimer->start(1000 * (REFRESH_INTERVAL + 1));
 
 	refreshListing();
+	retranslateUi();
+}
+
+void JoinDialog::retranslateUi()
+{
+	m_ui->retranslateUi(this);
+	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Join"));
 }
 
 JoinDialog::~JoinDialog()
@@ -151,8 +156,6 @@ JoinDialog::~JoinDialog()
 	cfg.setValue("filterlocked", m_ui->showPassworded->isChecked());
 	cfg.setValue("filternsfw", m_ui->showNsfw->isChecked());
 	cfg.setValue("filterclosed", m_ui->showClosed->isChecked());
-
-	delete m_ui;
 }
 
 void JoinDialog::resizeEvent(QResizeEvent *event)

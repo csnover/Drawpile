@@ -4,6 +4,8 @@
 #ifndef RESIZEDIALOG_H
 #define RESIZEDIALOG_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDialog>
 
 class Ui_ResizeDialog;
@@ -18,9 +20,10 @@ struct ResizeVector {
 	}
 };
 
-class ResizeDialog : public QDialog
+class ResizeDialog : public DynamicUiWidget<QDialog, Ui_ResizeDialog>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	explicit ResizeDialog(const QSize &oldsize, QWidget *parent=nullptr);
 	~ResizeDialog();
@@ -33,7 +36,7 @@ public:
 	ResizeVector resizeVector() const;
 
 public slots:
-	void done(int r);
+	void done(int r) override;
 
 private slots:
 	void widthChanged(int);
@@ -42,11 +45,10 @@ private slots:
 	void reset();
 
 private:
-	Ui_ResizeDialog *m_ui;
-
 	QSize m_oldsize;
 	float m_aspectratio;
 	int m_lastchanged;
+	QPushButton *m_centerButton;
 };
 
 }

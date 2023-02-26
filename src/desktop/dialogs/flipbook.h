@@ -4,13 +4,14 @@
 #ifndef FLIPBOOK_H
 #define FLIPBOOK_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDialog>
 #include <QList>
 #include <QPixmap>
+#include <QTimer>
 
 class Ui_Flipbook;
-
-class QTimer;
 
 namespace canvas {
 	class PaintEngine;
@@ -18,9 +19,10 @@ namespace canvas {
 
 namespace dialogs {
 
-class Flipbook : public QDialog
+class Flipbook : public DynamicUiWidget<QDialog, Ui_Flipbook>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	explicit Flipbook(QWidget *parent=nullptr);
 	~Flipbook();
@@ -39,11 +41,9 @@ private slots:
 private:
 	void resetFrameCache();
 
-	Ui_Flipbook *m_ui;
-
 	canvas::PaintEngine *m_paintengine;
 	QList<QPixmap> m_frames;
-	QTimer *m_timer;
+	QTimer m_timer;
 	QRect m_crop;
 	int m_realFps;
 };

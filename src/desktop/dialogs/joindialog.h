@@ -4,6 +4,8 @@
 #ifndef JOINDIALOG_H
 #define JOINDIALOG_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDialog>
 
 class Ui_JoinDialog;
@@ -13,9 +15,10 @@ class SessionFilterProxyModel;
 
 namespace dialogs {
 
-class JoinDialog : public QDialog
+class JoinDialog : public DynamicUiWidget<QDialog, Ui_JoinDialog>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	explicit JoinDialog(const QUrl &defaultUrl, QWidget *parent=nullptr);
 	~JoinDialog();
@@ -51,7 +54,6 @@ private:
 
 	void addListServerUrl(const QUrl &url);
 
-	Ui_JoinDialog *m_ui;
 	QPushButton *m_addServerButton;
 	SessionFilterProxyModel *m_filteredSessions;
 	SessionListingModel *m_sessions;

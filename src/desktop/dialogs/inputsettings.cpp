@@ -11,18 +11,15 @@
 
 namespace dialogs {
 
-InputSettings::InputSettings(QWidget *parent) :
-	QDialog(parent),
-	m_presetModel(input::PresetModel::getSharedInstance()),
-	m_updateInProgress(false),
-	m_indexChangeInProgress(false)
+InputSettings::InputSettings(QWidget *parent)
+	: DynamicUiWidget(parent)
+	, m_presetModel(input::PresetModel::getSharedInstance())
+	, m_updateInProgress(false)
+	, m_indexChangeInProgress(false)
 {
-	m_ui = new Ui_InputSettings;
-	m_ui->setupUi(this);
-
 	m_presetmenu = new QMenu(this);
-	m_presetmenu->addAction(tr("New"), this, &InputSettings::addPreset);
-	m_presetmenu->addAction(tr("Duplicate"), this, &InputSettings::copyPreset);
+	m_newPresetAction = m_presetmenu->addAction(tr("New"), this, &InputSettings::addPreset);
+	m_duplicatePresetAction = m_presetmenu->addAction(tr("Duplicate"), this, &InputSettings::copyPreset);
 	m_removePresetAction = m_presetmenu->addAction(tr("Delete"), this, &InputSettings::removePreset);
 	m_ui->presetButton->setMenu(m_presetmenu);
 
@@ -46,12 +43,20 @@ InputSettings::InputSettings(QWidget *parent) :
 	connect(m_ui->closeButton, &QPushButton::pressed, this, &QDialog::reject);
 
 	onPresetCountChanged();
+	retranslateUi();
+}
+
+void InputSettings::retranslateUi()
+{
+	m_ui->retranslateUi(this);
+	m_newPresetAction->setText(tr("New"));
+	m_duplicatePresetAction->setText(tr("Duplicate"));
+	m_removePresetAction->setText(tr("Delete"));
 }
 
 InputSettings::~InputSettings()
 {
 	m_presetModel->saveSettings();
-	delete m_ui;
 }
 
 void InputSettings::setCurrentIndex(int index)

@@ -4,15 +4,18 @@
 #ifndef BRUSHPRESETPROPERTIES_H
 #define BRUSHPRESETPROPERTIES_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDialog>
 
 class Ui_BrushPresetProperties;
 
 namespace dialogs {
 
-class BrushPresetProperties : public QDialog
+class BrushPresetProperties : public DynamicUiWidget<QDialog, Ui_BrushPresetProperties>
 {
-Q_OBJECT
+	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	explicit BrushPresetProperties(int id, const QString &name, const QString &description,
 		const QPixmap &thumbnail, QWidget *parent = nullptr);
@@ -30,7 +33,6 @@ private slots:
 private:
 	int m_id;
 	QPixmap m_thumbnail;
-	Ui_BrushPresetProperties *m_ui;
 
 	void showThumbnail(const QPixmap &thumbnail);
 };

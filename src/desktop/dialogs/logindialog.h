@@ -5,6 +5,7 @@
 #define LOGINDIALOG_H
 
 #include <QDialog>
+#include <memory>
 
 class Ui_LoginDialog;
 
@@ -56,7 +57,7 @@ private slots:
 
 private:
 	struct Private;
-	Private *d;
+	const std::unique_ptr<Private> d;
 };
 
 }

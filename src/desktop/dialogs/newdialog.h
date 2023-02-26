@@ -4,6 +4,8 @@
 #ifndef NEWDIALOG_H
 #define NEWDIALOG_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDialog>
 
 class Ui_NewDialog;
@@ -15,11 +17,12 @@ namespace dialogs {
  * The "new drawing" dialog allows the user to set the width, height
  * and background color of a new image.
  */
-class NewDialog : public QDialog
+class NewDialog : public DynamicUiWidget<QDialog, Ui_NewDialog>
 {
-Q_OBJECT
+	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
-	NewDialog(QWidget *parent=0);
+	NewDialog(QWidget *parent=nullptr);
 	~NewDialog();
 
 	//! Set the width/height fields
@@ -29,13 +32,10 @@ public:
 	void setBackground(const QColor &color);
 
 public slots:
-	void done(int r);
+	void done(int r) override;
 
 signals:
 	void accepted(const QSize &size, const QColor &background);
-
-private:
-	Ui_NewDialog *_ui;
 };
 
 }

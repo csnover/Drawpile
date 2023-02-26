@@ -4,6 +4,7 @@
 #include "desktop/dialogs/flipbook.h"
 #include "libclient/canvas/paintengine.h"
 #include "libclient/utils/icon.h"
+#include "desktop/utils/dynamicui.h"
 #include "desktop/utils/qtguicompat.h"
 #include "rustpile/rustpile.h"
 
@@ -18,19 +19,16 @@
 namespace dialogs {
 
 Flipbook::Flipbook(QWidget *parent)
-	: QDialog(parent), m_ui(new Ui_Flipbook), m_paintengine(nullptr)
+	: DynamicUiWidget(parent)
+	, m_paintengine(nullptr)
 {
-	m_ui->setupUi(this);
-
-	m_timer = new QTimer(this);
-
 	connect(m_ui->rewindButton, &QToolButton::clicked, this, &Flipbook::rewind);
 	connect(m_ui->playButton, &QToolButton::clicked, this, &Flipbook::playPause);
 	connect(m_ui->layerIndex, QOverload<int>::of(&QSpinBox::valueChanged), this, &Flipbook::loadFrame);
 	connect(m_ui->loopStart, QOverload<int>::of(&QSpinBox::valueChanged), this, &Flipbook::updateRange);
 	connect(m_ui->loopEnd, QOverload<int>::of(&QSpinBox::valueChanged), this, &Flipbook::updateRange);
 	connect(m_ui->fps, QOverload<int>::of(&QSpinBox::valueChanged), this, &Flipbook::updateFps);
-	connect(m_timer, &QTimer::timeout, m_ui->layerIndex, &QSpinBox::stepUp);
+	connect(&m_timer, &QTimer::timeout, m_ui->layerIndex, &QSpinBox::stepUp);
 	connect(m_ui->view, &FlipbookView::cropped, this, &Flipbook::setCrop);
 	connect(m_ui->zoomButton, &QToolButton::clicked, this, &Flipbook::resetCrop);
 
@@ -62,8 +60,17 @@ Flipbook::~Flipbook()
 	cfg.setValue("fps", m_ui->fps->value());
 	cfg.setValue("window", geometry());
 	cfg.setValue("crop", m_crop);
+}
 
-	delete m_ui;
+void Flipbook::retranslateUi()
+{
+	if (m_paintengine) {
+		m_ui->timelineModeLabel->setText(
+			rustpile::paintengine_get_metadata_int(m_paintengine->engine(), rustpile::MetadataInt::UseTimeline)
+			? tr("Timeline: manual")
+			: tr("Timeline: automatic")
+		);
+	}
 }
 
 void Flipbook::updateRange()
@@ -79,20 +86,20 @@ void Flipbook::rewind()
 
 void Flipbook::playPause()
 {
-	if(m_timer->isActive()) {
-		m_timer->stop();
+	if(m_timer.isActive()) {
+		m_timer.stop();
 		m_ui->playButton->setIcon(icon::fromTheme("media-playback-start"));
 
 	} else {
-		m_timer->start(1000 / m_ui->fps->value());
+		m_timer.start(1000 / m_ui->fps->value());
 		m_ui->playButton->setIcon(icon::fromTheme("media-playback-pause"));
 	}
 }
 
 void Flipbook::updateFps(int newFps)
 {
-	if(m_timer->isActive()) {
-		m_timer->setInterval(1000 / newFps);
+	if(m_timer.isActive()) {
+		m_timer.setInterval(1000 / newFps);
 	}
 	QPalette pal = palette();
 	if(newFps != m_realFps)

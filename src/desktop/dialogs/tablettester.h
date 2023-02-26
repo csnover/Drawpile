@@ -4,22 +4,21 @@
 #ifndef TABLETTESTDIALOG_H
 #define TABLETTESTDIALOG_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDialog>
 
 class Ui_TabletTest;
 
 namespace dialogs {
 
-class TabletTestDialog : public QDialog
+class TabletTestDialog : public DynamicUiWidget<QDialog, Ui_TabletTest>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	TabletTestDialog(QWidget *parent=nullptr);
 	~TabletTestDialog();
-
-private:
-	Ui_TabletTest *m_ui;
-
 };
 
 }

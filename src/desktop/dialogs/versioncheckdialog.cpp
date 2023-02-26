@@ -18,9 +18,8 @@
 namespace dialogs {
 
 VersionCheckDialog::VersionCheckDialog(QWidget *parent)
-	: QDialog(parent), m_ui(new Ui_VersionCheckDialog)
+	: DynamicUiWidget(parent)
 {
-	m_ui->setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose);
 
 	m_downloadButton = m_ui->buttonBox->addButton(QString(), QDialogButtonBox::ActionRole);
@@ -34,8 +33,12 @@ VersionCheckDialog::VersionCheckDialog(QWidget *parent)
 }
 
 VersionCheckDialog::~VersionCheckDialog()
+{}
+
+void VersionCheckDialog::retranslateUi()
 {
-	delete m_ui;
+	m_ui->retranslateUi(this);
+	// TODO
 }
 
 void VersionCheckDialog::rememberSettings()
@@ -182,7 +185,6 @@ void VersionCheckDialog::downloadNewVersion()
 			m_ui->downloadLabel->setText(tr("Downloaded %1!").arg(m_downloadUrl.fileName()));
 			QDesktopServices::openUrl(QUrl::fromLocalFile(downloadDir.path()));
 			close();
-
 		} else {
 			m_ui->downloadLabel->setText(errorMessage);
 		}

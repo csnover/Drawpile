@@ -11,6 +11,7 @@
 #include "libclient/utils/icon.h"
 #include "libshared/util/paths.h"
 
+#include <QEvent>
 #include <QSettings>
 #include <QMessageBox>
 #include <QMenu>
@@ -81,8 +82,9 @@ struct ColorPaletteDock::Private {
 	}
 };
 
-ColorPaletteDock::ColorPaletteDock(const QString& title, QWidget *parent)
-	: QDockWidget(title, parent), d(new Private)
+ColorPaletteDock::ColorPaletteDock(QWidget *parent)
+	: QDockWidget(parent)
+	, d(new Private)
 {
 	auto *titlebar = new TitleWidget(this);
 	setTitleBarWidget(titlebar);
@@ -92,7 +94,6 @@ ColorPaletteDock::ColorPaletteDock(const QString& title, QWidget *parent)
 	titlebar->addCustomWidget(menuButton);
 
 	d->readonlyPalette = new widgets::GroupedToolButton;
-	d->readonlyPalette->setToolTip("Write protect");
 	d->readonlyPalette->setIcon(icon::fromTheme("object-locked"));
 	d->readonlyPalette->setCheckable(true);
 	titlebar->addCustomWidget(d->readonlyPalette);
@@ -152,6 +153,8 @@ ColorPaletteDock::ColorPaletteDock(const QString& title, QWidget *parent)
 		d->paletteChoiceBox->setCurrentIndex(lastPalette);
 	else
 		paletteChanged(0);
+
+	retranslateUi();
 }
 
 ColorPaletteDock::~ColorPaletteDock()
@@ -160,8 +163,23 @@ ColorPaletteDock::~ColorPaletteDock()
 
 	QSettings cfg;
 	cfg.setValue("history/lastpalette", d->paletteChoiceBox->currentIndex());
+}
 
-	delete d;
+void ColorPaletteDock::changeEvent(QEvent *event)
+{
+	QDockWidget::changeEvent(event);
+	switch (event->type()) {
+	case QEvent::LanguageChange:
+		retranslateUi();
+		break;
+	default: {}
+	}
+}
+
+void ColorPaletteDock::retranslateUi()
+{
+	setWindowTitle(tr("Palette"));
+	d->readonlyPalette->setToolTip(tr("Write protect"));
 }
 
 void ColorPaletteDock::paletteChanged(int index)

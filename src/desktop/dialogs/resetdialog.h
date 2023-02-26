@@ -5,6 +5,7 @@
 #define RESETSESSIONDIALOG_H
 
 #include <QDialog>
+#include <memory>
 
 namespace canvas {
 	class PaintEngine;
@@ -16,6 +17,7 @@ namespace net {
 
 namespace dialogs {
 
+// TODO: Retranslate UI
 class ResetDialog : public QDialog
 {
 	Q_OBJECT
@@ -37,7 +39,7 @@ private slots:
 
 private:
 	struct Private;
-	Private *d;
+	std::unique_ptr<Private> d;
 };
 
 }

@@ -4,6 +4,7 @@
 #ifndef LAYERPROPERTIES_H
 #define LAYERPROPERTIES_H
 
+#include "desktop/utils/dynamicui.h"
 #include "rustpile/rustpile.h"
 
 #include <QDialog>
@@ -21,9 +22,10 @@ namespace net {
 
 namespace dialogs {
 
-class LayerProperties : public QDialog
+class LayerProperties : public DynamicUiWidget<QDialog, Ui_LayerProperties>
 {
-Q_OBJECT
+	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	LayerProperties(canvas::CanvasModel &canvas, QPersistentModelIndex index, QWidget *parent = nullptr);
 	~LayerProperties();
@@ -47,7 +49,6 @@ private slots:
 private:
 	int searchBlendModeIndex(rustpile::Blendmode mode);
 
-	Ui_LayerProperties *m_ui;
 	canvas::CanvasModel &m_canvas;
 	QPersistentModelIndex m_item;
 	int m_layerId;

@@ -26,26 +26,25 @@ static const int BUTTON_WIDTH = 16;
 UserItemDelegate::UserItemDelegate(QObject *parent)
 	: QAbstractItemDelegate(parent), m_doc(nullptr)
 {
-	m_userMenu = new QMenu;
-	m_menuTitle = m_userMenu->addSection("User");
+	m_menuTitle = m_userMenu.addSection("User");
 
-	m_opAction = m_userMenu->addAction(tr("Operator"));
-	m_trustAction = m_userMenu->addAction(tr("Trusted"));
+	m_opAction = m_userMenu.addAction(tr("Operator"));
+	m_trustAction = m_userMenu.addAction(tr("Trusted"));
 
-	m_userMenu->addSeparator();
-	m_lockAction = m_userMenu->addAction(tr("Lock"));
-	m_muteAction = m_userMenu->addAction(tr("Mute"));
+	m_userMenu.addSeparator();
+	m_lockAction = m_userMenu.addAction(tr("Lock"));
+	m_muteAction = m_userMenu.addAction(tr("Mute"));
 
-	m_userMenu->addSeparator();
-	m_undoAction = m_userMenu->addAction(tr("Undo"));
-	m_redoAction = m_userMenu->addAction(tr("Redo"));
+	m_userMenu.addSeparator();
+	m_undoAction = m_userMenu.addAction(tr("Undo"));
+	m_redoAction = m_userMenu.addAction(tr("Redo"));
 
-	m_userMenu->addSeparator();
-	m_kickAction = m_userMenu->addAction(tr("Kick"));
-	m_banAction = m_userMenu->addAction(tr("Kick && Ban"));
+	m_userMenu.addSeparator();
+	m_kickAction = m_userMenu.addAction(tr("Kick"));
+	m_banAction = m_userMenu.addAction(tr("Kick && Ban"));
 
-	m_userMenu->addSeparator();
-	m_chatAction = m_userMenu->addAction(tr("Private Message"));
+	m_userMenu.addSeparator();
+	m_chatAction = m_userMenu.addAction(tr("Private Message"));
 
 	m_opAction->setCheckable(true);
 	m_trustAction->setCheckable(true);
@@ -64,11 +63,6 @@ UserItemDelegate::UserItemDelegate(QObject *parent)
 
 	m_lockIcon = icon::fromTheme("object-locked");
 	m_muteIcon = icon::fromTheme("irc-unvoice");
-}
-
-UserItemDelegate::~UserItemDelegate()
-{
-	delete m_userMenu;
 }
 
 QSize UserItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const
@@ -256,7 +250,7 @@ void UserItemDelegate::showContextMenu(const QModelIndex &index, const QPoint &p
 	// Can't chat with self
 	m_chatAction->setEnabled(!isSelf);
 
-	m_userMenu->popup(pos);
+	m_userMenu.popup(pos);
 }
 
 void UserItemDelegate::toggleOpMode(bool op)

@@ -13,12 +13,8 @@
 namespace dialogs {
 
 NewDialog::NewDialog(QWidget *parent)
-	: QDialog(parent)
+	: DynamicUiWidget(parent)
 {
-	_ui = new Ui_NewDialog;
-	_ui->setupUi(this);
-	_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Create"));
-
 	QSettings cfg;
 
 	QSize lastSize = cfg.value("history/newsize", QSize(800, 600)).toSize();
@@ -28,43 +24,45 @@ NewDialog::NewDialog(QWidget *parent)
 	QColor lastColor = cfg.value("history/newcolor").value<QColor>();
 	if(lastColor.isValid())
 		setBackground(lastColor);
+
+	retranslateUi();
 }
 
 NewDialog::~NewDialog()
+{}
+
+void NewDialog::retranslateUi()
 {
-	delete _ui;
+	m_ui->retranslateUi(this);
+	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Create"));
 }
 
 void NewDialog::setSize(const QSize &size)
 {
-	_ui->width->setValue(size.width());
-	_ui->height->setValue(size.height());
+	m_ui->width->setValue(size.width());
+	m_ui->height->setValue(size.height());
 
 }
 
 void NewDialog::setBackground(const QColor &color)
 {
-	_ui->background->setColor(color);
+	m_ui->background->setColor(color);
 }
 
 void NewDialog::done(int r)
 {
 	if(r == QDialog::Accepted) {
-		QSize size(_ui->width->value(), _ui->height->value());
+		QSize size(m_ui->width->value(), m_ui->height->value());
 
 		if(!utils::checkImageSize(size)) {
 			QMessageBox::information(this, tr("Error"), tr("Size is too large"));
 			return;
-
 		} else {
-
 			QSettings cfg;
 			cfg.setValue("history/newsize", size);
-			cfg.setValue("history/newcolor", _ui->background->color());
-			emit accepted(size, _ui->background->color());
-
+			cfg.setValue("history/newcolor", m_ui->background->color());
+			emit accepted(size, m_ui->background->color());
 		}
-
 	}
 
 	QDialog::done(r);

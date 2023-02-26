@@ -14,10 +14,25 @@
    <string>Preferences</string>
   </property>
   <layout class="QVBoxLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetFixedSize</enum>
+   </property>
    <item>
-    <layout class="QHBoxLayout" stretch="1,5">
+    <layout class="QHBoxLayout">
      <item>
       <widget class="QListWidget" name="pager">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QAbstractScrollArea::AdjustToContents</enum>
+       </property>
        <item>
         <property name="text">
          <string>User Interface</string>
@@ -97,7 +112,7 @@
           <widget class="QWidget" name="stackedWidgetPage1">
            <layout class="QFormLayout" name="formLayout_2">
             <property name="fieldGrowthPolicy">
-             <enum>QFormLayout::ExpandingFieldsGrow</enum>
+             <enum>QFormLayout::FieldsStayAtSizeHint</enum>
             </property>
             <item row="2" column="0">
              <widget class="QLabel">

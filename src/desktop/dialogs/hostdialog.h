@@ -4,15 +4,18 @@
 #ifndef HOSTDIALOG_H
 #define HOSTDIALOG_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDialog>
 
 class Ui_HostDialog;
 
 namespace dialogs {
 
-class HostDialog : public QDialog
+class HostDialog : public DynamicUiWidget<QDialog, Ui_HostDialog>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	explicit HostDialog(QWidget *parent=nullptr);
 	~HostDialog();
@@ -41,9 +44,6 @@ public:
 
 private slots:
 	void updateListingPermissions();
-
-private:
-	Ui_HostDialog *m_ui;
 };
 
 }

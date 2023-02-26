@@ -6,6 +6,10 @@
 
 #include <QMenuBar>
 
+class QAction;
+class QEvent;
+class QMenu;
+class QString;
 class MainWindow;
 
 class MacMenu : public QMenuBar
@@ -22,6 +26,8 @@ public:
 
 	QMenu *windowMenu() { return _windows; }
 
+	void changeEvent(QEvent *event) override;
+
 signals:
 
 public slots:
@@ -34,15 +40,17 @@ private slots:
 	void openRecent(QAction *action);
 
 	void winMinimize();
+	void winZoom();
 	void winSelect(QAction *a);
 	void updateWinMenu();
 
 private:
 	MacMenu();
-	QAction *makeAction(QMenu *menu, const char *name, const QString &text, const QKeySequence &shortcut);
+	void retranslateUi();
 
 	QMenu *_recent;
 	QMenu *_windows;
+	QActionGroup *_windowActions;
 };
 
 #endif // MACMENU_H

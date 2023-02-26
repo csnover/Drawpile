@@ -4,10 +4,12 @@
 #ifndef SESSIONSETTINGSDIALOG_H
 #define SESSIONSETTINGSDIALOG_H
 
+#include "desktop/utils/dynamicui.h"
 #include "libclient/canvas/acl.h"
 
 #include <QDialog>
 #include <QJsonObject>
+#include <QTimer>
 
 class QStringListModel;
 class QTimer;
@@ -21,9 +23,10 @@ namespace canvas { class CanvasModel; }
 
 namespace dialogs {
 
-class SessionSettingsDialog : public QDialog
+class SessionSettingsDialog : public DynamicUiWidget<QDialog, Ui_SessionSettingsDialog>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	SessionSettingsDialog(Document *doc, QWidget *parent=nullptr);
 	~SessionSettingsDialog();
@@ -66,7 +69,7 @@ private slots:
 	void changePassword();
 	void changeOpword();
 
-	void changeSesionConf(const QString &key, const QJsonValue &value, bool now=false);
+	void changeSessionConf(const QString &key, const QJsonValue &value, bool now=false);
 	void sendSessionConf();
 
 	void updatePasswordLabel(QLabel *label);
@@ -75,13 +78,12 @@ protected:
 	void showEvent(QShowEvent *event) override;
 
 private:
-	void initPermissionComboBoxes();
+	void initPermissionComboBoxes(bool retranslate);
 	void reloadSettings();
 	QComboBox *featureBox(canvas::Feature f);
 
-	Ui_SessionSettingsDialog *m_ui;
 	Document *m_doc;
-	QTimer *m_saveTimer;
+	QTimer m_saveTimer;
 
 	QJsonObject m_sessionconf;
 	bool m_featureTiersChanged = false;

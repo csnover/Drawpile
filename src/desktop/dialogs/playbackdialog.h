@@ -4,9 +4,12 @@
 #ifndef PLAYBACKDIALOG_H
 #define PLAYBACKDIALOG_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDialog>
 #include <QPointer>
 #include <QElapsedTimer>
+#include <QTimer>
 
 namespace canvas {
 	class CanvasModel;
@@ -23,9 +26,10 @@ class VideoExporter;
 
 namespace dialogs {
 
-class PlaybackDialog : public QDialog
+class PlaybackDialog : public DynamicUiWidget<QDialog, Ui_PlaybackDialog>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	explicit PlaybackDialog(canvas::CanvasModel *canvas, QWidget *parent=nullptr);
 	~PlaybackDialog();
@@ -39,8 +43,8 @@ signals:
 	void playbackToggled(bool play);
 
 protected:
-	void closeEvent(QCloseEvent *);
-	void keyPressEvent(QKeyEvent *);
+	void closeEvent(QCloseEvent *) override;
+	void keyPressEvent(QKeyEvent *) override;
 
 private slots:
 	void onPlaybackAt(qint64 pos, qint32 interval);
@@ -56,12 +60,11 @@ private slots:
 	void exportFrame(int count=1);
 
 private:
-	Ui_PlaybackDialog *m_ui;
 	canvas::PaintEngine *m_paintengine;
 	rustpile::RecordingIndex *m_index;
 	QPointer<VideoExporter> m_exporter;
 
-	QTimer *m_autoStepTimer;
+	QTimer m_autoStepTimer;
 	QElapsedTimer m_lastInterval;
 	float m_speedFactor;
 

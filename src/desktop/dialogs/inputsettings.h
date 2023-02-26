@@ -4,6 +4,7 @@
 #ifndef InputSettings_H
 #define InputSettings_H
 
+#include "desktop/utils/dynamicui.h"
 #include "libclient/canvas/pressure.h"
 
 #include <QDialog>
@@ -18,15 +19,15 @@ namespace input {
 
 namespace dialogs {
 
-class InputSettings : public QDialog
+class InputSettings : public DynamicUiWidget<QDialog, Ui_InputSettings>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	explicit InputSettings(QWidget *parent=nullptr);
 	~InputSettings();
 
 	void setCurrentPreset(const QString &id);
-	const input::Preset *currentPreset() const;
 
 signals:
 	void currentIndexChanged(int index);
@@ -44,17 +45,16 @@ private slots:
 	void onPresetCountChanged();
 
 private:
-	input::Preset *mutableCurrentPreset();
-
 	void applyPresetToUi(const input::Preset &preset);
 	void applyUiToPreset();
 	void updateModeUi(PressureMapping::Mode mode);
 
-	Ui_InputSettings *m_ui;
 	input::PresetModel *m_presetModel;
 	bool m_updateInProgress;
 	bool m_indexChangeInProgress;
 	QMenu *m_presetmenu;
+	QAction *m_newPresetAction;
+	QAction *m_duplicatePresetAction;
 	QAction *m_removePresetAction;
 };
 

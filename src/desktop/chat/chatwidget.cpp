@@ -169,9 +169,7 @@ ChatWidget::ChatWidget(QWidget *parent)
 }
 
 ChatWidget::~ChatWidget()
-{
-	delete d;
-}
+{}
 
 void ChatWidget::setAttached(bool isAttached)
 {

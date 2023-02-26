@@ -5,8 +5,7 @@
 #define USERITEMDELEGATE_H
 
 #include <QAbstractItemDelegate>
-
-class QMenu;
+#include <QMenu>
 
 class Document;
 
@@ -21,7 +20,6 @@ class UserItemDelegate : public QAbstractItemDelegate
 	Q_OBJECT
 public:
 	UserItemDelegate(QObject *parent=nullptr);
-	~UserItemDelegate();
 
 	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 	QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
@@ -47,7 +45,7 @@ private slots:
 private:
 	void showContextMenu(const QModelIndex &index, const QPoint &pos);
 
-	QMenu *m_userMenu;
+	QMenu m_userMenu;
 
 	Document *m_doc;
 

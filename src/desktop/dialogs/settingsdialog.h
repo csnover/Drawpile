@@ -4,6 +4,8 @@
 #ifndef SETTINGSDIALOG_H
 #define SETTINGSDIALOG_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDialog>
 #include <QSslCertificate>
 #include <QMap>
@@ -19,9 +21,10 @@ namespace color_widgets { class ColorWheel; }
 
 namespace dialogs {
 
-class SettingsDialog : public QDialog
+class SettingsDialog : public DynamicUiWidget<QDialog, Ui_SettingsDialog>
 {
-Q_OBJECT
+	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	SettingsDialog(QWidget *parent=nullptr);
 	~SettingsDialog();
@@ -55,8 +58,6 @@ private:
 	void restoreSettings();
 	void setParentalControlsLocked(bool lock);
 	void rememberPcLevel();
-
-	Ui_SettingsDialog *m_ui;
 
 	QStringList m_removeCerts;
 	QStringList m_trustCerts;

@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/dialogs/avatarimport.h"
+#include "desktop/utils/dynamicui.h"
 #include "libclient/utils/avatarlistmodel.h"
 
 #include "ui_avatarimport.h"
@@ -12,12 +13,14 @@
 
 namespace dialogs {
 
+DP_DYNAMIC_DEFAULT_IMPL(AvatarImport)
+
 AvatarImport::AvatarImport(const QImage &source, QWidget *parent)
-	: QDialog(parent), m_ui(new Ui_AvatarImport), m_originalImage(source)
+	: DynamicUiWidget(parent)
+	, m_originalImage(source)
 {
 	const int maxSize = qMin(source.width(), source.height());
 
-	m_ui->setupUi(this);
 	m_ui->resizer->setImage(source);
 	m_ui->resizer->setOriginalSize(source.size());
 	m_ui->resizer->setTargetSize(QSize { maxSize, maxSize });
@@ -31,9 +34,7 @@ AvatarImport::AvatarImport(const QImage &source, QWidget *parent)
 }
 
 AvatarImport::~AvatarImport()
-{
-	delete m_ui;
-}
+{}
 
 QImage AvatarImport::croppedAvatar() const
 {

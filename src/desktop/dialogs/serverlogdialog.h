@@ -4,6 +4,8 @@
 #ifndef SERVERLOGDIALOG_H
 #define SERVERLOGDIALOG_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDialog>
 
 class Ui_ServerLogDialog;
@@ -22,9 +24,10 @@ namespace net {
 
 namespace dialogs {
 
-class ServerLogDialog : public QDialog
+class ServerLogDialog : public DynamicUiWidget<QDialog, Ui_ServerLogDialog>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	ServerLogDialog(QWidget *parent=nullptr);
 	~ServerLogDialog();
@@ -53,7 +56,6 @@ private slots:
 	void redoSelected();
 
 private:
-	Ui_ServerLogDialog *m_ui;
 	QSortFilterProxyModel *m_eventlogProxy;
 
 	QSortFilterProxyModel *m_userlistProxy;
