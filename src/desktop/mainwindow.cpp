@@ -430,10 +430,6 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	updateLockWidget();
 	setRecorderStatus(false);
 
-#ifdef Q_OS_MACOS
-	MacMenu::instance()->addWindow(this);
-#endif
-
 	// Show self
 	updateTitle();
 	utils::showWindow(this);
@@ -450,10 +446,6 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 
 MainWindow::~MainWindow()
 {
-#ifdef Q_OS_MACOS
-	MacMenu::instance()->removeWindow(this);
-#endif
-
 	// Clear this out first so there will be no weird signals emitted
 	// while the document is being torn down.
 	m_view->setScene(nullptr);
@@ -597,10 +589,6 @@ void MainWindow::updateTitle()
 		setWindowTitle(QStringLiteral("%1[*]").arg(name));
 	else
 		setWindowTitle(QStringLiteral("%1[*] - %2").arg(name, m_doc->sessionTitle()));
-
-#ifdef Q_OS_MACOS
-	MacMenu::instance()->updateWindow(this);
-#endif
 }
 
 void MainWindow::setDrawingToolsEnabled(bool enable)

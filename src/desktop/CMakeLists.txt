@@ -266,8 +266,6 @@ target_sources(drawpile PRIVATE
 	widgets/kis_slider_spin_box.h
 	widgets/KisAngleGauge.cpp
 	widgets/KisAngleGauge.h
-	widgets/macmenu.cpp
-	widgets/macmenu.h
 	widgets/mypaintinput.cpp
 	widgets/mypaintinput.h
 	widgets/netstatus.cpp
@@ -349,8 +347,8 @@ elseif(APPLE)
 		icons/drawpile.iconset/icon_512x512@2x.png
 		utils/macui.h
 		utils/macui.mm
-		widgets/macmenu.cpp
 		widgets/macmenu.h
+		widgets/macmenu.mm
 	)
 	target_link_libraries(drawpile PRIVATE
 		"-framework Cocoa"

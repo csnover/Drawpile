@@ -15,10 +15,6 @@ public:
 
 	void updateRecentMenu();
 
-	void addWindow(MainWindow *win);
-	void removeWindow(MainWindow *win);
-	void updateWindow(MainWindow *win);
-
 	QMenu *windowMenu() { return _windows; }
 
 signals:
@@ -31,10 +27,6 @@ public slots:
 
 private slots:
 	void openRecent(QAction *action);
-
-	void winMinimize();
-	void winSelect(QAction *a);
-	void updateWinMenu();
 
 private:
 	MacMenu();
