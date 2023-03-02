@@ -17,6 +17,8 @@
 #include <QMessageBox>
 #include <QUrl>
 
+#import <Cocoa/Cocoa.h>
+
 MacMenu *MacMenu::instance()
 {
 	static MacMenu *menu;
@@ -64,18 +66,11 @@ MacMenu::MacMenu()
 		);
 
 	// Window menu (Mac specific)
-	_windowActions = new QActionGroup(this);
-	connect(_windowActions, &QActionGroup::triggered, this, &MacMenu::winSelect);
-	_windows = MainWindow::makeMenu(QT_TRANSLATE_NOOP("MainWindow", "&Window"), this)
-		.onAboutToShow(this, &MacMenu::updateWinMenu)
-		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "Minimize"), "minimize", this)
-			.shortcut("ctrl+m")
-			.onTriggered(this, &MacMenu::winMinimize)
-		)
-		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "Zoom"), "zoomwindow", this)
-			.onTriggered(this, &MacMenu::winZoom)
-		)
-		.separator();
+	_windows = MainWindow::makeMenu(QT_TRANSLATE_NOOP("MainWindow", "&Window"), this);
+	auto *nativeMenu = _windows->toNSMenu();
+	[nativeMenu addItemWithTitle:@"Minimize" action:@selector(performMiniaturize:) keyEquivalent:@"m"];
+	[nativeMenu addItemWithTitle:@"Zoom" action:@selector(performZoom:) keyEquivalent:@""];
+	[[NSApplication sharedApplication] setWindowsMenu:nativeMenu];
 
 	MainWindow::makeMenu(QT_TRANSLATE_NOOP("MainWindow", "&Help"), this)
 		.objectName("helpmenu")
@@ -216,23 +211,6 @@ void MacMenu::quitAll()
 	}
 }
 
-void MacMenu::winMinimize()
-{
-	if(auto *w = qobject_cast<MainWindow *>(qApp->activeWindow()))
-		w->showMinimized();
-}
-
-void MacMenu::winZoom()
-{
-	if(auto *w = qobject_cast<MainWindow *>(qApp->activeWindow())) {
-		if (w->isMaximized()) {
-			w->showNormal();
-		} else {
-			w->showMaximized();
-		}
-	}
-}
-
 void MacMenu::changeEvent(QEvent *event)
 {
 	QMenuBar::changeEvent(event);
@@ -241,78 +219,6 @@ void MacMenu::changeEvent(QEvent *event)
 		retranslateUi();
 		break;
 	default: {}
-	}
-}
-
-static QString menuWinTitle(QString title)
-{
-	title.replace(QStringLiteral("[*]"), QString());
-	return title.trimmed();
-}
-
-void MacMenu::addWindow(MainWindow *win)
-{
-	QAction *a = new QAction(menuWinTitle(win->windowTitle()), this);
-	a->setProperty("mainwin", QVariant::fromValue(win));
-	a->setCheckable(true);
-	_windows->addAction(a);
-	_windowActions->addAction(a);
-}
-
-void MacMenu::updateWindow(MainWindow *win)
-{
-	for (auto *a : _windowActions->actions()) {
-		if(a->property("mainwin").value<MainWindow *>() == win) {
-			a->setText(menuWinTitle(win->windowTitle()));
-			break;
-		}
-	}
-}
-
-void MacMenu::removeWindow(MainWindow *win)
-{
-	for (auto *a : _windowActions->actions()) {
-		if (a->property("mainwin").value<MainWindow *>() == win) {
-			delete a;
-			return;
-		}
-	}
-
-	Q_ASSERT_X(false, __func__, "could not find window");
-}
-
-void MacMenu::winSelect(QAction *a)
-{
-	if (auto *w = a->property("mainwin").value<MainWindow *>()) {
-		if (w->isMinimized()) {
-			w->showNormal();
-		}
-		w->raise();
-		w->activateWindow();
-	}
-}
-
-void MacMenu::updateWinMenu()
-{
-	const MainWindow *top = qobject_cast<MainWindow *>(qApp->activeWindow());
-	for (auto *a : _windowActions->actions()) {
-		// TODO show bullet if window has unsaved changes and diamond
-		// if minimized.
-		auto *win = a->property("mainwin").value<MainWindow *>();
-		auto text = menuWinTitle(win->windowTitle());
-		if (win == top) {
-			a->setChecked(true);
-			a->setText(text);
-		} else {
-			a->setChecked(false);
-			if (win->isMinimized()) {
-				a->setText("♦︎ " + text);
-			} else if (win->isWindowModified()) {
-				a->setText("• " + text);
-			} else {
-				a->setText(text);
-			}
-		}
 	}
 }
 

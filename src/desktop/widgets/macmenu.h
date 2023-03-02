@@ -20,10 +20,6 @@ public:
 
 	void updateRecentMenu();
 
-	void addWindow(MainWindow *win);
-	void removeWindow(MainWindow *win);
-	void updateWindow(MainWindow *win);
-
 	QMenu *windowMenu() { return _windows; }
 
 	void changeEvent(QEvent *event) override;
@@ -38,11 +34,6 @@ public slots:
 
 private slots:
 	void openRecent(QAction *action);
-
-	void winMinimize();
-	void winZoom();
-	void winSelect(QAction *a);
-	void updateWinMenu();
 
 private:
 	MacMenu();

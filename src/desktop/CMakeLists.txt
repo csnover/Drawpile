@@ -223,8 +223,11 @@ add_executable(drawpile MACOSX_BUNDLE
 # https://gitlab.kitware.com/cmake/cmake/-/issues/19813
 if(APPLE)
 	target_sources(drawpile PRIVATE
-		widgets/macmenu.cpp
 		widgets/macmenu.h
+		widgets/macmenu.mm
+	)
+	target_link_libraries(drawpile
+		"-framework Cocoa"
 	)
 endif()
 
