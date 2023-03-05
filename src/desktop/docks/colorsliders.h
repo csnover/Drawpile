@@ -5,6 +5,7 @@
 #define COLORSLIDERDOCK_H
 
 #include <QDockWidget>
+#include <memory>
 
 namespace color_widgets {
 	class ColorPalette;
@@ -33,7 +34,7 @@ signals:
 
 private:
 	struct Private;
-	Private *d;
+	const std::unique_ptr<Private> d;
 };
 
 }

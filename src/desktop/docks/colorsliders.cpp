@@ -34,7 +34,8 @@ struct ColorSliderDock::Private {
 };
 
 ColorSliderDock::ColorSliderDock(const QString& title, QWidget *parent)
-	: QDockWidget(title, parent), d(new Private)
+	: QDockWidget(title, parent)
+	, d(new Private)
 {
 	// Create title bar widget
 	auto *titlebar = new TitleWidget(this);
@@ -144,9 +145,7 @@ ColorSliderDock::ColorSliderDock(const QString& title, QWidget *parent)
 }
 
 ColorSliderDock::~ColorSliderDock()
-{
-	delete d;
-}
+{}
 
 void ColorSliderDock::setColor(const QColor& color)
 {

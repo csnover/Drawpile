@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // SPDX-FileCopyrightText: Calle Laakkonen
 
+#include "desktop/utils/actionbuilder.h"
 #include "desktop/dialogs/inputsettings.h"
 #include "libclient/canvas/inputpresetmodel.h"
 
@@ -11,16 +12,30 @@
 
 namespace dialogs {
 
+DP_DYNAMIC_DEFAULT_IMPL(InputSettings)
+
 InputSettings::InputSettings(QWidget *parent)
 	: DynamicUiWidget(parent)
 	, m_presetModel(input::PresetModel::getSharedInstance())
 	, m_updateInProgress(false)
 	, m_indexChangeInProgress(false)
 {
-	m_presetmenu = new QMenu(this);
-	m_newPresetAction = m_presetmenu->addAction(tr("New"), this, &InputSettings::addPreset);
-	m_duplicatePresetAction = m_presetmenu->addAction(tr("Duplicate"), this, &InputSettings::copyPreset);
-	m_removePresetAction = m_presetmenu->addAction(tr("Delete"), this, &InputSettings::removePreset);
+	m_presetmenu = MenuBuilder(this, tr)
+		.action([=](ActionBuilder action) {
+			m_newPresetAction = action
+				.text(QT_TR_NOOP("New"))
+				.onTriggered(this, &InputSettings::addPreset);
+		})
+		.action([=](ActionBuilder action) {
+			m_duplicatePresetAction = action
+				.text(QT_TR_NOOP("Duplicate"))
+				.onTriggered(this, &InputSettings::copyPreset);
+		})
+		.action([=](ActionBuilder action) {
+			m_removePresetAction = action
+				.text(QT_TR_NOOP("Delete"))
+				.onTriggered(this, &InputSettings::removePreset);
+		});
 	m_ui->presetButton->setMenu(m_presetmenu);
 
 	m_ui->preset->setModel(m_presetModel);
@@ -44,14 +59,6 @@ InputSettings::InputSettings(QWidget *parent)
 
 	onPresetCountChanged();
 	retranslateUi();
-}
-
-void InputSettings::retranslateUi()
-{
-	m_ui->retranslateUi(this);
-	m_newPresetAction->setText(tr("New"));
-	m_duplicatePresetAction->setText(tr("Duplicate"));
-	m_removePresetAction->setText(tr("Delete"));
 }
 
 InputSettings::~InputSettings()
@@ -169,10 +176,10 @@ void InputSettings::updateModeUi(PressureMapping::Mode mode)
 	const char *curveParam;
 	switch(mode) {
 	case PressureMapping::DISTANCE:
-		curveParam = "Curve distance";
+		curveParam = QT_TR_NOOP("Curve distance");
 		break;
 	case PressureMapping::VELOCITY:
-		curveParam = "Velocity range";
+		curveParam = QT_TR_NOOP("Velocity range");
 		break;
 	case PressureMapping::STYLUS:
 	default:
@@ -181,8 +188,7 @@ void InputSettings::updateModeUi(PressureMapping::Mode mode)
 	}
 	m_ui->curveParam->setVisible(curveParam != nullptr);
 #if QT_CONFIG(tooltip)
-	m_ui->curveParam->setToolTip(QCoreApplication::translate(
-			"InputSettings", curveParam, nullptr));
+	AUTO_TR(m_ui->curveParam, setToolTip, curveParam);
 #endif
 }
 

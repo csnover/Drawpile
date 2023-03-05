@@ -4,6 +4,8 @@
 #ifndef COLORSPINNERDOCK_H
 #define COLORSPINNERDOCK_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDockWidget>
 #include <memory>
 
@@ -15,8 +17,9 @@ namespace color_widgets {
 
 namespace docks {
 
-class ColorSpinnerDock : public QDockWidget {
+class ColorSpinnerDock : public Dynamic<QDockWidget> {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	ColorSpinnerDock(QWidget *parent);
 	~ColorSpinnerDock();
@@ -28,15 +31,10 @@ public slots:
 signals:
 	void colorSelected(const QColor& color);
 
-protected:
-	virtual void changeEvent(QEvent *event) override;
-
 private slots:
 	void updateSettings();
 
 private:
-	void retranslateUi();
-
 	struct Private;
 	std::unique_ptr<Private> d;
 };

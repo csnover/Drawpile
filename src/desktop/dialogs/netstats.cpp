@@ -6,41 +6,58 @@
 
 namespace dialogs {
 
-static QString formatKb(int bytes)
+DP_DYNAMIC_DEFAULT_IMPL(NetStats)
+
+NetStats::NetStats(QWidget *parent)
+	: DynamicUiWidget(parent)
 {
-	if(bytes < 1024)
-		return QStringLiteral("%1 b").arg(bytes);
-	else if(bytes < 1024*1024)
-		return QStringLiteral("%1 Kb").arg(bytes/1024);
-	else
-		return QStringLiteral("%1 Mb").arg(bytes/float(1024*1024), 0, 'f', 1);
+	m_recvLabelText = makeTranslator(this, [=](int bytes) {
+		m_ui->recvLabel->setText(formatKb(bytes));
+	}, 0);
+
+	m_sentLabelText = makeTranslator(this, [=](int bytes) {
+		m_ui->sentLabel->setText(formatKb(bytes));
+	}, 0);
+
+	m_lagLabelText = makeTranslator(this, [=](int lag) {
+		m_ui->lagLabel->setText(
+			lag == -1
+			? tr("not connected")
+			: tr("%1ms").arg(lag)
+		);
+	}, -1);
 }
 
-NetStats::NetStats(QWidget *parent) :
-	QDialog(parent), _ui(new Ui_NetStats)
-{
-	_ui->setupUi(this);
-	setDisconnected();
-}
+NetStats::~NetStats() {}
 
 void NetStats::setRecvBytes(int bytes)
 {
-	_ui->recvLabel->setText(formatKb(bytes));
+	m_recvLabelText.args(bytes);
 }
 
 void NetStats::setSentBytes(int bytes)
 {
-	_ui->sentLabel->setText(formatKb(bytes));
+	m_sentLabelText.args(bytes);
 }
 
 void NetStats::setCurrentLag(int lag)
 {
-	_ui->lagLabel->setText(QStringLiteral("%1 ms").arg(lag));
+	m_lagLabelText.args(lag);
 }
 
 void NetStats::setDisconnected()
 {
-	_ui->lagLabel->setText(tr("not connected"));
+	m_lagLabelText.args(-1);
+}
+
+QString NetStats::formatKb(int bytes)
+{
+	if(bytes < 1024)
+		return tr("%1b").arg(bytes);
+	else if(bytes < 1024*1024)
+		return tr("%1KiB").arg(bytes / 1024);
+	else
+		return tr("%1MiB").arg(float(bytes) / (1024*1024), 0, 'f', 1);
 }
 
 }

@@ -46,6 +46,7 @@ private:
 	QTimer m_timer;
 	QRect m_crop;
 	int m_realFps;
+	Translator<bool> m_timelineModeLabelText;
 };
 
 }

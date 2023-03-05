@@ -2,10 +2,11 @@
 // SPDX-FileCopyrightText: Calle Laakkonen, M.K.A.
 
 #include "desktop/docks/navigator.h"
+#include "desktop/docks/titlewidget.h"
+#include "desktop/utils/dynamicui.h"
 #include "libclient/canvas/canvasmodel.h"
 #include "libclient/canvas/paintengine.h"
 #include "libclient/canvas/userlist.h"
-#include "desktop/docks/titlewidget.h"
 #include "libclient/utils/icon.h"
 
 #include <QMouseEvent>
@@ -297,8 +298,9 @@ void NavigatorView::onCursorMove(uint8_t userId, uint16_t layer, int x, int y)
  * Construct the navigator dock widget.
  */
 Navigator::Navigator(QWidget *parent)
-	: QDockWidget(tr("Navigator"), parent), m_updating(false)
+	: QDockWidget(parent), m_updating(false)
 {
+	AUTO_TR(this, setWindowTitle, tr("Navigator"));
 	setObjectName("navigatordock");
 
 	auto *titlebar = new TitleWidget(this);

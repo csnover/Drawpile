@@ -4,28 +4,21 @@
 #ifndef DP_ACTIONBUILDER_H
 #define DP_ACTIONBUILDER_H
 
-#include <QAction>
-#include <QMenu>
-#include <QString>
+#include "desktop/utils/dynamicui.h"
 #include "libclient/utils/icon.h"
 #include "libclient/utils/customshortcutmodel.h"
 
-using Translator = QString(*)(const char *, const char *, int);
+#include <QAction>
+#include <QDebug>
+#include <QMenu>
+#include <QString>
 
 /**
  * @brief A helper class for configuring QActions
  */
 class ActionBuilder {
 public:
-	static constexpr auto *statusTipTranslationKey()
-	{
-		return "statusTipTranslationKey";
-	}
-
-	static constexpr auto *translationKey()
-	{
-		return "translationKey";
-	}
+	using Translator = QString(*)(const char *, const char *, int);
 
 	explicit ActionBuilder(QAction *action, Translator translator)
 		: m_action(action)
@@ -38,6 +31,11 @@ public:
 		: m_action(new QAction(parent))
 		, tr(translator)
 	{}
+
+	QAction *operator*()
+	{
+		return m_action;
+	}
 
 	operator QAction*()
 	{
@@ -70,6 +68,12 @@ public:
 		m_action->setCheckable(true);
 		m_action->setChecked(true);
 		m_action->setProperty("defaultValue", true);
+		return *this;
+	}
+
+	ActionBuilder &data(const QVariant &var)
+	{
+		m_action->setData(var);
 		return *this;
 	}
 
@@ -153,6 +157,12 @@ public:
 		return *this;
 	}
 
+	ActionBuilder &separator(bool b)
+	{
+		m_action->setSeparator(b);
+		return *this;
+	}
+
 	ActionBuilder &shortcut(const QString &key)
 	{
 		return shortcut(QKeySequence(key));
@@ -167,27 +177,52 @@ public:
 		return *this;
 	}
 
-	ActionBuilder &statusTip(const char *tip)
+	ActionBuilder &statusTip(const char *tip, const char *disambiguation = nullptr, int n = -1)
 	{
-		m_action->setStatusTip(tr(tip, nullptr, -1));
-		m_action->setProperty(statusTipTranslationKey(), QVariant::fromValue(tip));
+		makeTranslator(m_action, [=, tr=tr, m_action=m_action] {
+			m_action->setStatusTip(tr(tip, disambiguation, n));
+		});
 		return *this;
 	}
 
-	ActionBuilder &text(const char *name)
+	ActionBuilder &text(const char *name, const char *disambiguation = nullptr, int n = -1)
 	{
-		m_action->setText(tr(name, nullptr, -1));
-		m_action->setProperty(translationKey(), QVariant::fromValue(name));
+		makeTranslator(m_action, [=, tr=tr, m_action=m_action] {
+			m_action->setText(tr(name, disambiguation, n));
+		});
+		return *this;
+	}
+
+	template <typename Fn>
+	typename std::enable_if_t<!std::is_convertible<Fn, const char *>::value, ActionBuilder &>
+	text(Fn fn)
+	{
+		makeTranslator(m_action, [m_action=m_action, fn=std::move(fn)] {
+			m_action->setText(fn());
+		});
 		return *this;
 	}
 
 private:
+	struct TrFn {
+		Translator tr;
+		const char *name;
+		const char *disambiguation;
+		int n;
+
+		QString operator()() {
+			return tr(name, disambiguation, n);
+		}
+	};
+
 	QAction *m_action;
 	Translator tr;
 };
 
 class MenuBuilder {
 public:
+	using Translator = QString(*)(const char *, const char *, int);
+
 	explicit MenuBuilder(QMenu *menu, Translator translator)
 		: m_menu(menu)
 		, tr(translator)
@@ -210,6 +245,24 @@ public:
 	MenuBuilder &action(QAction *action)
 	{
 		m_menu->addAction(action);
+		return *this;
+	}
+
+	template <typename Fn>
+	typename std::enable_if_t<!std::is_convertible<Fn, QAction *>::value, MenuBuilder &>
+	action(Fn fn)
+	{
+		QAction *unused;
+		return action(unused, fn);
+	}
+
+	template <typename Fn>
+	MenuBuilder &action(QAction *&var, Fn fn)
+	{
+		auto *action = new QAction(m_menu);
+		fn(ActionBuilder(action, tr));
+		m_menu->addAction(action);
+		var = action;
 		return *this;
 	}
 
@@ -280,15 +333,27 @@ public:
 		return *this;
 	}
 
-	MenuBuilder &title(const char *title)
+	MenuBuilder &title(const char *title, const char *disambiguation = nullptr, int n = -1)
 	{
 		auto *action = m_menu->menuAction();
-		action->setText(tr(title, nullptr, -1));
-		action->setProperty(ActionBuilder::translationKey(), QVariant::fromValue(title));
+		makeTranslator(action, [=, tr=tr] {
+			action->setText(tr(title, disambiguation, n));
+		});
 		return *this;
 	}
 
 private:
+	struct TrFn {
+		Translator tr;
+		const char *name;
+		const char *disambiguation;
+		int n;
+
+		QString operator()() {
+			return tr(name, disambiguation, n);
+		}
+	};
+
 	QMenu *m_menu;
 	Translator tr;
 };

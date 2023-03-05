@@ -272,7 +272,7 @@
     </message>
 </context>
 <context>
-    <name>BrushPalette</name>
+    <name>docks::BrushPalette</name>
     <message>
         <location filename="../docks/brushpalettedock.cpp" line="80"/>
         <source>Brushes</source>
@@ -334,7 +334,7 @@
     <message>
         <location filename="../docks/brushpalettedock.cpp" line="115"/>
         <source>Import MyPaint Brushes...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DEImport</translation>
     </message>
     <message>
         <location filename="../docks/brushpalettedock.cpp" line="119"/>
@@ -1333,11 +1333,6 @@ to 64x64 pixels.</source>
 </context>
 <context>
     <name>MacMenu</name>
-    <message>
-        <location filename="../widgets/macmenu.cpp" line="84"/>
-        <source>Minimize</source>
-        <translation>Minimieren</translation>
-    </message>
     <message numerus="yes">
         <location filename="../widgets/macmenu.cpp" line="208"/>
         <source>You have %n images with unsaved changes. Do you want to review these changes before quitting?</source>
@@ -1364,6 +1359,11 @@ to 64x64 pixels.</source>
 </context>
 <context>
     <name>MainWindow</name>
+    <message>
+        <location filename="../widgets/macmenu.cpp" line="84"/>
+        <source>Minimize</source>
+        <translation>Minimieren</translation>
+    </message>
     <message>
         <location filename="../mainwindow.cpp" line="587"/>
         <location filename="../mainwindow.cpp" line="1470"/>
@@ -3986,11 +3986,11 @@ Simplify the canvas and reset manually before space runs out.</source>
     </message>
 </context>
 <context>
-    <name>ToolSettings</name>
+    <name>docks::ToolSettings</name>
     <message>
         <location filename="../docks/toolsettingsdock.cpp" line="184"/>
         <source>Tool</source>
-        <translation type="unfinished"></translation>
+        <translation>DETool</translation>
     </message>
 </context>
 <context>

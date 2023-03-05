@@ -83,7 +83,7 @@ struct ColorPaletteDock::Private {
 };
 
 ColorPaletteDock::ColorPaletteDock(QWidget *parent)
-	: QDockWidget(parent)
+	: Dynamic(parent)
 	, d(new Private)
 {
 	auto *titlebar = new TitleWidget(this);
@@ -163,17 +163,6 @@ ColorPaletteDock::~ColorPaletteDock()
 
 	QSettings cfg;
 	cfg.setValue("history/lastpalette", d->paletteChoiceBox->currentIndex());
-}
-
-void ColorPaletteDock::changeEvent(QEvent *event)
-{
-	QDockWidget::changeEvent(event);
-	switch (event->type()) {
-	case QEvent::LanguageChange:
-		retranslateUi();
-		break;
-	default: {}
-	}
 }
 
 void ColorPaletteDock::retranslateUi()

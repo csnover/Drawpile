@@ -18,7 +18,7 @@ struct ColorSpinnerDock::Private {
 };
 
 ColorSpinnerDock::ColorSpinnerDock(QWidget *parent)
-	: QDockWidget(parent)
+	: Dynamic(parent)
 	, d(new Private)
 {
 	// Create title bar widget
@@ -56,17 +56,6 @@ ColorSpinnerDock::~ColorSpinnerDock()
 void ColorSpinnerDock::retranslateUi()
 {
 	setWindowTitle(tr("Color Wheel"));
-}
-
-void ColorSpinnerDock::changeEvent(QEvent *event)
-{
-	QDockWidget::changeEvent(event);
-	switch (event->type()) {
-	case QEvent::LanguageChange:
-		retranslateUi();
-		break;
-	default: {}
-	}
 }
 
 void ColorSpinnerDock::setColor(const QColor& color)

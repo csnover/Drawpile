@@ -41,9 +41,12 @@ JoinDialog::JoinDialog(const QUrl &url, QWidget *parent)
 	, m_lastRefresh(0)
 {
 	m_ui->buttons->button(QDialogButtonBox::Ok)->setDefault(true);
+	AUTO_TR(m_ui->buttons->button(QDialogButtonBox::Ok), setText, tr("Join"));
 
-	m_addServerButton = m_ui->buttons->addButton(tr("Add Server"), QDialogButtonBox::ActionRole);
+	m_addServerButton = new QPushButton(m_ui->buttons);
+	AUTO_TR(m_addServerButton, setText, tr("Add Server"));
 	m_addServerButton->setIcon(icon::fromTheme("list-add"));
+	m_ui->buttons->addButton(m_addServerButton, QDialogButtonBox::ActionRole);
 	connect(m_addServerButton, &QPushButton::clicked, this, &JoinDialog::addListServer);
 
 	connect(m_ui->address, &QComboBox::editTextChanged, this, &JoinDialog::addressChanged);
@@ -145,7 +148,6 @@ JoinDialog::JoinDialog(const QUrl &url, QWidget *parent)
 void JoinDialog::retranslateUi()
 {
 	m_ui->retranslateUi(this);
-	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Join"));
 }
 
 JoinDialog::~JoinDialog()

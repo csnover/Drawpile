@@ -12,6 +12,7 @@ namespace dialogs {
 namespace {
 	QString first(const QStringList &sl)
 	{
+		// TODO: i18n
 		if(sl.isEmpty())
 			return QStringLiteral("(not set)");
 		return sl.at(0);
@@ -23,7 +24,7 @@ DP_DYNAMIC_DEFAULT_IMPL(CertificateView)
 CertificateView::CertificateView(const QString &hostname, const QSslCertificate &certificate, QWidget *parent)
 	: DynamicUiWidget(parent)
 {
-	setWindowTitle(tr("SSL Certificate for %1").arg(hostname));
+	AUTO_TR(this, setWindowTitle, tr("SSL Certificate for %1").arg(hostname));
 
 	m_ui->cn_label->setText(first(certificate.subjectInfo(QSslCertificate::CommonName)));
 	m_ui->org_label->setText(first(certificate.subjectInfo(QSslCertificate::Organization)));

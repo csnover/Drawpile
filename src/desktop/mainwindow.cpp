@@ -180,7 +180,7 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	mainwinlayout->addWidget(m_viewStatusBar);
 
 #ifdef Q_OS_MACOS
-	updatePalette();
+	recolorUi();
 #endif
 
 	// Create status indicator widgets
@@ -416,8 +416,9 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	connect(hbfilter, &HotBorderEventFilter::hotBorder, this, &MainWindow::hotBorderMenubar);
 #endif
 
-	// Show self
-	updateTitle();
+	makeTranslator(this, [=] {
+		updateTitle();
+	});
 	show();
 
 	setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
@@ -569,20 +570,6 @@ void MainWindow::updateTitle()
 		setWindowTitle(QStringLiteral("%1[*] - %2").arg(name, m_doc->sessionTitle()));
 }
 
-void MainWindow::changeEvent(QEvent *event)
-{
-	QMainWindow::changeEvent(event);
-	switch (event->type()) {
-	case QEvent::LanguageChange:
-		retranslateUi();
-		break;
-	case QEvent::PaletteChange:
-		updatePalette();
-		break;
-	default: {}
-	}
-}
-
 void MainWindow::toggleChat(bool show)
 {
 	QList<int> sizes;
@@ -606,33 +593,7 @@ void MainWindow::toggleChat(bool show)
 	m_splitter->setSizes(sizes);
 }
 
-void MainWindow::retranslateUi()
-{
-	retranslateMenuChildren(*this);
-	updateTitle();
-}
-
-void MainWindow::retranslateMenuChildren(QObject &parent)
-{
-	for (auto *action : parent.findChildren<QAction *>()) {
-		const auto key = action->property(ActionBuilder::translationKey());
-		if (key.canConvert<const char *>()) {
-			action->setText(tr(key.value<const char *>()));
-		}
-		const auto statusKey = action->property(ActionBuilder::statusTipTranslationKey());
-		if (statusKey.canConvert<const char *>()) {
-			action->setStatusTip(tr(statusKey.value<const char *>()));
-		}
-	}
-	for (auto *toolBar : parent.findChildren<QToolBar *>()) {
-		const auto key = toolBar->property(ActionBuilder::translationKey());
-		if (key.canConvert<const char *>()) {
-			toolBar->setWindowTitle(tr(key.value<const char *>()));
-		}
-	}
-}
-
-void MainWindow::updatePalette()
+void MainWindow::recolorUi()
 {
 #ifdef Q_OS_MACOS
 	// The "native" style status bar is wrong because Qt uses the same gradient
@@ -2297,8 +2258,8 @@ QToolBar *MainWindow::makeToolBar(const char *title, QWidget *parent)
 		parent = this;
 	}
 
-	QToolBar *t = new QToolBar(tr(title), parent);
-	t->setProperty(ActionBuilder::translationKey(), QVariant::fromValue(title));
+	QToolBar *t = new QToolBar(parent);
+	AUTO_TR(t, setWindowTitle, tr(title));
 	return t;
 }
 
@@ -3080,15 +3041,16 @@ void MainWindow::setupActions()
 	// Brush slot shortcuts
 	m_brushSlots = new QActionGroup(this);
 	for(int i=0;i<6;++i) {
-		// TODO: retranslated i18n
-		QAction *q = new QAction(tr("Brush slot #%1").arg(i+1), this);
-		q->setAutoRepeat(false);
-		q->setObjectName(QString("quicktoolslot-%1").arg(i));
-		q->setShortcut(QKeySequence(QString::number(i+1)));
-		q->setProperty("toolslotidx", i);
-		CustomShortcutModel::registerCustomizableAction(q->objectName(), q->text(), q->shortcut());
-		m_brushSlots->addAction(q);
-		addAction(q);
+		ActionBuilder(this, tr)
+			.text([i=i+1] {
+				return tr("Brush slot #%1").arg(i);
+			})
+			.autoRepeat(false)
+			.objectName(QStringLiteral("quicktoolslot-%1").arg(i))
+			.shortcut(QString::number(i + 1))
+			.property("toolslotidx", i)
+			.addTo(m_brushSlots)
+			.addTo(this);
 	}
 	connect(m_brushSlots, &QActionGroup::triggered, [=](QAction *a) {
 		m_dockToolSettings->setToolSlot(a->property("toolslotidx").toInt());

@@ -3,7 +3,6 @@
 
 #include "desktop/docks/toolsettingsdock.h"
 #include "desktop/docks/titlewidget.h"
-
 #include "desktop/toolwidgets/brushsettings.h"
 #include "desktop/toolwidgets/colorpickersettings.h"
 #include "desktop/toolwidgets/selectionsettings.h"
@@ -12,6 +11,7 @@
 #include "desktop/toolwidgets/lasersettings.h"
 #include "desktop/toolwidgets/zoomsettings.h"
 #include "desktop/toolwidgets/inspectorsettings.h"
+#include "desktop/utils/dynamicui.h"
 
 #include "libclient/tools/toolproperties.h"
 
@@ -19,7 +19,7 @@
 #include <QtColorWidgets/color_palette.hpp>
 
 #include <QStackedWidget>
-#include <QApplication>
+#include <QCoreApplication>
 #include <QSettings>
 #include <QLabel>
 
@@ -36,6 +36,9 @@ struct ToolPage {
 };
 
 struct ToolSettings::Private {
+	Q_DECLARE_TR_FUNCTIONS(ToolSettings)
+
+public:
 	ToolPage pages[tools::Tool::_LASTTOOL];
 	QVector<QSharedPointer<tools::ToolSettings>> toolSettings;
 	tools::ToolController *ctrl;
@@ -74,85 +77,85 @@ struct ToolSettings::Private {
 				brush,
 				"freehand",
 				icon::fromTheme("draw-brush"),
-				QApplication::tr("Freehand")
+				tr("Freehand")
 			};
 		pages[tools::Tool::ERASER] = {
 				brush,
 				"eraser",
 			icon::fromTheme("draw-eraser"),
-				QApplication::tr("Eraser")
+				tr("Eraser")
 			};
 		pages[tools::Tool::LINE] = {
 				brush,
 				"line",
 				icon::fromTheme("draw-line"),
-				QApplication::tr("Line")
+				tr("Line")
 			};
 		pages[tools::Tool::RECTANGLE] = {
 				brush,
 				"rectangle",
 				icon::fromTheme("draw-rectangle"),
-				QApplication::tr("Rectangle")
+				tr("Rectangle")
 			};
 		pages[tools::Tool::ELLIPSE] = {
 				brush,
 				"ellipse",
 				icon::fromTheme("draw-ellipse"),
-				QApplication::tr("Ellipse")
+				tr("Ellipse")
 			};
 		pages[tools::Tool::BEZIER] = {
 				brush,
 				"bezier",
 				icon::fromTheme("draw-bezier-curves"),
-				QApplication::tr("Bezier Curve")
+				tr("Bezier Curve")
 			};
 		pages[tools::Tool::FLOODFILL] = {
 				QSharedPointer<tools::ToolSettings>(new tools::FillSettings(ctrl)),
 				"fill",
 				icon::fromTheme("fill-color"),
-				QApplication::tr("Flood Fill")
+				tr("Flood Fill")
 			};
 		pages[tools::Tool::ANNOTATION] = {
 				QSharedPointer<tools::ToolSettings>(new tools::AnnotationSettings(ctrl)),
 				"annotation",
 				icon::fromTheme("draw-text"),
-				QApplication::tr("Annotation")
+				tr("Annotation")
 			};
 		pages[tools::Tool::PICKER] = {
 				QSharedPointer<tools::ToolSettings>(new tools::ColorPickerSettings(ctrl)),
 				"picker",
 				icon::fromTheme("color-picker"),
-				QApplication::tr("Color Picker")
+				tr("Color Picker")
 			};
 		pages[tools::Tool::LASERPOINTER] = {
 				QSharedPointer<tools::ToolSettings>(new tools::LaserPointerSettings(ctrl)),
 				"laser",
 				icon::fromTheme("cursor-arrow"),
-				QApplication::tr("Laser Pointer")
+				tr("Laser Pointer")
 			};
 		pages[tools::Tool::SELECTION] = {
 				sel,
 				"selection",
 				icon::fromTheme("select-rectangular"),
-				QApplication::tr("Selection (Rectangular)")
+				tr("Selection (Rectangular)")
 			};
 		pages[tools::Tool::POLYGONSELECTION] = {
 				sel,
 				"selection",
 				icon::fromTheme("edit-select-lasso"),
-				QApplication::tr("Selection (Free-Form)")
+				tr("Selection (Free-Form)")
 			};
 		pages[tools::Tool::ZOOM] = {
 				QSharedPointer<tools::ToolSettings>(new tools::ZoomSettings(ctrl)),
 				"zoom",
 				icon::fromTheme("zoom-select"),
-				QApplication::tr("Zoom")
+				tr("Zoom")
 			};
 		pages[tools::Tool::INSPECTOR] = {
 				QSharedPointer<tools::ToolSettings>(new tools::InspectorSettings(ctrl)),
 				"inspector",
 				icon::fromTheme("help-whatsthis"),
-				QApplication::tr("Inspector")
+				tr("Inspector")
 			};
 
 		for(int i=0;i<tools::Tool::_LASTTOOL;++i) {
@@ -163,9 +166,10 @@ struct ToolSettings::Private {
 };
 
 ToolSettings::ToolSettings(tools::ToolController *ctrl, QWidget *parent)
-	: QDockWidget(parent), d(new Private(ctrl))
+	: QDockWidget(parent)
+	, d(new Private(ctrl))
 {
-	setWindowTitle(tr("Tool"));
+	AUTO_TR(this, setWindowTitle, QT_TR_NOOP("Tool"));
 
 	auto titleWidget = new TitleWidget(this);
 	setTitleBarWidget(titleWidget);
@@ -195,9 +199,7 @@ ToolSettings::ToolSettings(tools::ToolController *ctrl, QWidget *parent)
 }
 
 ToolSettings::~ToolSettings()
-{
-	delete d;
-}
+{}
 
 void ToolSettings::readSettings()
 {

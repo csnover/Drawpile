@@ -210,19 +210,3 @@ void MacMenu::quitAll()
 		}
 	}
 }
-
-void MacMenu::changeEvent(QEvent *event)
-{
-	QMenuBar::changeEvent(event);
-	switch (event->type()) {
-	case QEvent::LanguageChange:
-		retranslateUi();
-		break;
-	default: {}
-	}
-}
-
-void MacMenu::retranslateUi()
-{
-	MainWindow::retranslateMenuChildren(*this);
-}

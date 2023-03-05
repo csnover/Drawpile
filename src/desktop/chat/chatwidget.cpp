@@ -4,12 +4,12 @@
 #include "desktop/chat/chatlineedit.h"
 #include "desktop/chat/chatwidgetpinnedarea.h"
 #include "desktop/chat/chatwidget.h"
+#include "desktop/notifications.h"
+#include "desktop/utils/dynamicui.h"
 #include "libclient/utils/html.h"
 #include "libclient/utils/funstuff.h"
-#include "desktop/notifications.h"
 #include "libclient/net/envelopebuilder.h"
 #include "libclient/net/envelope.h"
-
 #include "libclient/canvas/userlist.h"
 #include "rustpile/rustpile.h"
 
@@ -46,7 +46,7 @@ struct Chat {
 				"color: #eff0f1;"
 				"margin: 1px 0 1px 0"
 			"}"
-		    ".alert { background: #da4453 }"
+			".alert { background: #da4453 }"
 			".shout { background: #34292c }"
 			".shout .tab { background: #da4453 }"
 			".action { font-style: italic }"
@@ -56,7 +56,7 @@ struct Chat {
 			".op { color: #f47750 }"
 			".mod { color: #ed1515 }"
 			".timestamp { color: #8d8d8d }"
-		    ".alert .timestamp { color: #eff0f1 }"
+			".alert .timestamp { color: #eff0f1 }"
 			"a:link { color: #1d99f3 }"
 		);
 	}
@@ -75,6 +75,7 @@ struct ChatWidget::Private {
 	ChatWidget * const chatbox;
 	QTextBrowser *view = nullptr;
 	ChatLineEdit *myline = nullptr;
+	Translator<bool> mylinePlaceholder;
 	ChatWidgetPinnedArea *pinned = nullptr;
 	QTabBar *tabs = nullptr;
 
@@ -112,7 +113,8 @@ struct ChatWidget::Private {
 };
 
 ChatWidget::ChatWidget(QWidget *parent)
-	: QWidget(parent), d(new Private(this))
+	: QWidget(parent)
+	, d(new Private(this))
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
 
@@ -121,7 +123,9 @@ ChatWidget::ChatWidget(QWidget *parent)
 
 	d->tabs = new QTabBar(this);
 	d->tabs->addTab(QString());
-	d->tabs->setTabText(0, tr("Public"));
+	makeTranslator(d->tabs, [=] {
+		d->tabs->setTabText(0, tr("Public"));
+	});
 	d->tabs->setAutoHide(true);
 	d->tabs->setDocumentMode(true);
 	d->tabs->setTabsClosable(true);
@@ -154,6 +158,12 @@ ChatWidget::ChatWidget(QWidget *parent)
 	layout->addWidget(d->view, 1);
 
 	d->myline = new ChatLineEdit(this);
+	d->mylinePlaceholder = makeTranslator(d->myline, [=](bool preserve) {
+		d->myline->setPlaceholderText(preserve
+			? tr("Chat (recorded)...")
+			: tr("Chat...")
+		);
+	}, false);
 	layout->addWidget(d->myline);
 
 	setLayout(layout);
@@ -180,17 +190,14 @@ void ChatWidget::Private::updatePreserveModeUi()
 {
 	const bool preserve = preserveChat && currentChat == 0;
 
-	QString placeholder, color;
+	QString color;
 	if(preserve) {
-		placeholder = tr("Chat (recorded)...");
 		color = "#da4453";
 	} else {
-		placeholder = tr("Chat...");
 		color = "#1d99f3";
 	}
 
-	// Set placeholder text and window style based on the mode
-	myline->setPlaceholderText(placeholder);
+	mylinePlaceholder.args(preserve);
 
 	chatbox->setStyleSheet(
 		QStringLiteral(
@@ -737,7 +744,7 @@ void ChatWidget::chatTabClosed(int index)
 
 void ChatWidget::showChatContextMenu(const QPoint &pos)
 {
-	auto menu = std::unique_ptr<QMenu>(d->view->createStandardContextMenu());
+	auto menu = std::unique_ptr<QMenu>(d->view->createStandardContextMenu(pos));
 
 	menu->addSeparator();
 

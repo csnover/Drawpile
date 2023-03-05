@@ -8,6 +8,7 @@
 #include "libclient/net/servercmd.h"
 #include "libclient/net/envelopebuilder.h"
 #include "libclient/document.h"
+#include "desktop/utils/actionbuilder.h"
 #include "desktop/utils/qtguicompat.h"
 
 #include <QPainter>
@@ -26,40 +27,55 @@ static const int BUTTON_WIDTH = 16;
 UserItemDelegate::UserItemDelegate(QObject *parent)
 	: QAbstractItemDelegate(parent), m_doc(nullptr)
 {
-	m_menuTitle = m_userMenu.addSection("User");
-
-	m_opAction = m_userMenu.addAction(tr("Operator"));
-	m_trustAction = m_userMenu.addAction(tr("Trusted"));
-
-	m_userMenu.addSeparator();
-	m_lockAction = m_userMenu.addAction(tr("Lock"));
-	m_muteAction = m_userMenu.addAction(tr("Mute"));
-
-	m_userMenu.addSeparator();
-	m_undoAction = m_userMenu.addAction(tr("Undo"));
-	m_redoAction = m_userMenu.addAction(tr("Redo"));
-
-	m_userMenu.addSeparator();
-	m_kickAction = m_userMenu.addAction(tr("Kick"));
-	m_banAction = m_userMenu.addAction(tr("Kick && Ban"));
-
-	m_userMenu.addSeparator();
-	m_chatAction = m_userMenu.addAction(tr("Private Message"));
-
-	m_opAction->setCheckable(true);
-	m_trustAction->setCheckable(true);
-	m_lockAction->setCheckable(true);
-	m_muteAction->setCheckable(true);
-
-	connect(m_opAction, &QAction::triggered, this, &UserItemDelegate::toggleOpMode);
-	connect(m_trustAction, &QAction::triggered, this, &UserItemDelegate::toggleTrusted);
-	connect(m_lockAction, &QAction::triggered, this, &UserItemDelegate::toggleLock);
-	connect(m_muteAction, &QAction::triggered, this, &UserItemDelegate::toggleMute);
-	connect(m_kickAction, &QAction::triggered, this, &UserItemDelegate::kickUser);
-	connect(m_banAction, &QAction::triggered, this, &UserItemDelegate::banUser);
-	connect(m_chatAction, &QAction::triggered, this, &UserItemDelegate::pmUser);
-	connect(m_undoAction, &QAction::triggered, this, &UserItemDelegate::undoByUser);
-	connect(m_redoAction, &QAction::triggered, this, &UserItemDelegate::redoByUser);
+	MenuBuilder(&m_userMenu, tr)
+		.action([=](ActionBuilder action) {
+			m_menuTitle = action.text(QT_TR_NOOP("User"))
+				.separator(true);
+		})
+		.action([=](ActionBuilder action) {
+			m_opAction = action.text(QT_TR_NOOP("Operator"))
+				.checkable()
+				.onTriggered(this, &UserItemDelegate::toggleOpMode);
+		})
+		.action([=](ActionBuilder action) {
+			m_trustAction = action.text(QT_TR_NOOP("Trusted"))
+				.checkable()
+				.onTriggered(this, &UserItemDelegate::toggleTrusted);
+		})
+		.separator()
+		.action([=](ActionBuilder action) {
+			m_lockAction = action.text(QT_TR_NOOP("Lock"))
+				.checkable()
+				.onTriggered(this, &UserItemDelegate::toggleLock);
+		})
+		.action([=](ActionBuilder action) {
+			m_muteAction = action.text(QT_TR_NOOP("Mute"))
+				.checkable()
+				.onTriggered(this, &UserItemDelegate::toggleMute);
+		})
+		.separator()
+		.action([=](ActionBuilder action) {
+			m_undoAction = action.text(QT_TR_NOOP("Undo"))
+				.onTriggered(this, &UserItemDelegate::undoByUser);
+		})
+		.action([=](ActionBuilder action) {
+			m_redoAction = action.text(QT_TR_NOOP("Redo"))
+				.onTriggered(this, &UserItemDelegate::redoByUser);
+		})
+		.separator()
+		.action([=](ActionBuilder action) {
+			m_kickAction = action.text(QT_TR_NOOP("Kick"))
+				.onTriggered(this, &UserItemDelegate::kickUser);
+		})
+		.action([=](ActionBuilder action) {
+			m_banAction = action.text(QT_TR_NOOP("Kick && Ban"))
+				.onTriggered(this, &UserItemDelegate::banUser);
+		})
+		.separator()
+		.action([=](ActionBuilder action) {
+			m_chatAction = action.text(QT_TR_NOOP("Private Message"))
+				.onTriggered(this, &UserItemDelegate::pmUser);
+		});
 
 	m_lockIcon = icon::fromTheme("object-locked");
 	m_muteIcon = icon::fromTheme("irc-unvoice");
@@ -168,10 +184,7 @@ void UserItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 		);
 
 	painter->setPen(Qt::NoPen);
-	//if((option.state & QStyle::State_MouseOver))
-		painter->setBrush(option.palette.color(QPalette::WindowText));
-	//else
-		//painter->setBrush(option.palette.color(QPalette::AlternateBase));
+	painter->setBrush(option.palette.color(QPalette::WindowText));
 
 	const int buttonSize = buttonRect.height()/7;
 	for(int i=0;i<3;++i) {

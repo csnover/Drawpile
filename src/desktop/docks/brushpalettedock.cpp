@@ -6,6 +6,8 @@
 #include "desktop/dialogs/brushpresetproperties.h"
 #include "desktop/widgets/groupedtoolbutton.h"
 #include "desktop/toolwidgets/brushsettings.h"
+#include "desktop/utils/actionbuilder.h"
+#include "desktop/utils/dynamicui.h"
 #include "libclient/brushes/brushpresetmodel.h"
 #include "libclient/brushes/brush.h"
 #include "libclient/utils/icon.h"
@@ -62,7 +64,7 @@ BrushPalette::BrushPalette(QWidget *parent)
 	d->presetProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 	d->presetProxyModel->setFilterRole(brushes::BrushPresetModel::FilterRole);
 
-	setWindowTitle(tr("Brushes"));
+	AUTO_TR(this, setWindowTitle, tr("Brushes"));
 
 	TitleWidget *titleWidget = new TitleWidget(this);
 	setTitleBarWidget(titleWidget);
@@ -84,30 +86,78 @@ BrushPalette::BrushPalette(QWidget *parent)
 	titleWidget->addCustomWidget(d->menuButton);
 	titleWidget->addSpace(4);
 
-	d->menu = new QMenu(this);
-	d->newTagAction = d->menu->addAction(tr("New Tag"));
-	d->editTagAction = d->menu->addAction(tr("Edit Tag"));
-	d->deleteTagAction = d->menu->addAction(tr("Delete Tag"));
-	d->menu->addSeparator();
-	d->newBrushAction = d->menu->addAction(icon::fromTheme("list-add"), tr("New Brush"));
-	d->duplicateBrushAction = d->menu->addAction(icon::fromTheme("edit-copy"), tr("Duplicate Brush"));
-	d->overwriteBrushAction = d->menu->addAction(icon::fromTheme("document-save"), tr("Overwrite Brush"));
-	d->editBrushAction = d->menu->addAction(icon::fromTheme("configure"), tr("Edit Brush"));
-	d->deleteBrushAction = d->menu->addAction(icon::fromTheme("list-remove"), tr("Delete Brush"));
-	d->assignmentMenu = d->menu->addMenu(tr("Brush Tags"));
-	d->iconSizeMenu = d->menu->addMenu(tr("Icon Size"));
-	d->menu->addSeparator();
-	d->importMyPaintBrushesAction = d->menu->addAction(tr("Import MyPaint Brushes..."));
-	d->menuButton->setMenu(d->menu);
-
-	for(int dimension = 16; dimension <= 128; dimension += 16) {
-		QAction *sizeAction = d->iconSizeMenu->addAction(tr("%1x%1").arg(dimension));
-		sizeAction->setCheckable(true);
-		sizeAction->setData(dimension);
-		connect(sizeAction, &QAction::triggered, [=](){
-			d->presetModel->setIconDimension(dimension);
+	d->menu = MenuBuilder(this, tr)
+		.action([=](ActionBuilder action) {
+			d->newTagAction = action
+				.text(QT_TR_NOOP("New Tag"))
+				.onTriggered(this, &BrushPalette::newTag);
+		})
+		.action([=](ActionBuilder action) {
+			d->editTagAction = action
+				.text(QT_TR_NOOP("Edit Tag"))
+				.onTriggered(this, &BrushPalette::editCurrentTag);
+		})
+		.action([=](ActionBuilder action) {
+			d->deleteTagAction = action
+				.text(QT_TR_NOOP("Delete Tag"))
+				.onTriggered(this, &BrushPalette::deleteCurrentTag);
+		})
+		.separator()
+		.action([=](ActionBuilder action) {
+			d->newBrushAction = action
+				.text(QT_TR_NOOP("New Brush"))
+				.icon("list-add")
+				.onTriggered(this, &BrushPalette::newPreset);
+		})
+		.action([=](ActionBuilder action) {
+			d->duplicateBrushAction = action
+				.text(QT_TR_NOOP("Duplicate Brush"))
+				.icon("edit-copy")
+				.onTriggered(this, &BrushPalette::duplicateCurrentPreset);
+		})
+		.action([=](ActionBuilder action) {
+			d->overwriteBrushAction = action
+				.text(QT_TR_NOOP("Overwrite Brush"))
+				.icon("document-save")
+				.onTriggered(this, &BrushPalette::overwriteCurrentPreset);
+		})
+		.action([=](ActionBuilder action) {
+			d->editBrushAction = action
+				.text(QT_TR_NOOP("Edit Brush"))
+				.icon("configure")
+				.onTriggered(this, &BrushPalette::editCurrentPreset);
+		})
+		.action([=](ActionBuilder action) {
+			d->deleteBrushAction = action
+				.text(QT_TR_NOOP("Delete Brush"))
+				.icon("list-remove")
+				.onTriggered(this, &BrushPalette::deleteCurrentPreset);
+		})
+		.submenu([=](MenuBuilder menu) {
+			d->assignmentMenu = menu.title(QT_TR_NOOP("Brush Tags"));
+		})
+		.submenu([=](MenuBuilder menu) {
+			d->iconSizeMenu = menu.title(QT_TR_NOOP("Icon Size"));
+			for (auto dimension = 16; dimension <= 128; dimension += 16) {
+				menu.action([=](ActionBuilder action) {
+					action
+						.checkable()
+						.data(dimension)
+						.onTriggered([=] {
+							d->presetModel->setIconDimension(dimension);
+						});
+					auto *a = *action;
+					AUTO_TR(a, setText, tr("%1×%1").arg(dimension));
+				});
+			}
+		})
+		.separator()
+		.action([=](ActionBuilder action) {
+			d->importMyPaintBrushesAction = action
+				.text(QT_TR_NOOP("Import MyPaint Brushes..."))
+				.onTriggered(this, &BrushPalette::importMyPaintBrushes);
 		});
-	}
+	d->menuButton->setMenu(d->menu);
 
 	d->presetListView = new QListView(this);
 	d->presetListView->setUniformItemSizes(true);
@@ -127,15 +177,6 @@ BrushPalette::BrushPalette(QWidget *parent)
 		d->presetProxyModel, &QSortFilterProxyModel::setFilterFixedString);
 	connect(d->presetListView->selectionModel(), &QItemSelectionModel::currentChanged,
 		this, &BrushPalette::presetSelectionChanged);
-	connect(d->newTagAction, &QAction::triggered, this, &BrushPalette::newTag);
-	connect(d->editTagAction, &QAction::triggered, this, &BrushPalette::editCurrentTag);
-	connect(d->deleteTagAction, &QAction::triggered, this, &BrushPalette::deleteCurrentTag);
-	connect(d->newBrushAction, &QAction::triggered, this, &BrushPalette::newPreset);
-	connect(d->duplicateBrushAction, &QAction::triggered, this, &BrushPalette::duplicateCurrentPreset);
-	connect(d->overwriteBrushAction, &QAction::triggered, this, &BrushPalette::overwriteCurrentPreset);
-	connect(d->editBrushAction, &QAction::triggered, this, &BrushPalette::editCurrentPreset);
-	connect(d->deleteBrushAction, &QAction::triggered, this, &BrushPalette::deleteCurrentPreset);
-	connect(d->importMyPaintBrushesAction, &QAction::triggered, this, &BrushPalette::importMyPaintBrushes);
 	connect(d->presetListView, &QAbstractItemView::clicked, this, &BrushPalette::applyToBrushSettings);
 	connect(d->presetListView, &QAbstractItemView::doubleClicked, this, &BrushPalette::editCurrentPreset);
 	connect(d->presetListView, &QWidget::customContextMenuRequested, this, &BrushPalette::showPresetContextMenu);
@@ -150,9 +191,7 @@ BrushPalette::BrushPalette(QWidget *parent)
 }
 
 BrushPalette::~BrushPalette()
-{
-	delete d;
-}
+{}
 
 void BrushPalette::connectBrushSettings(tools::ToolSettings *toolSettings)
 {

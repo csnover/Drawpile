@@ -7,6 +7,7 @@
 #include "libclient/tools/tool.h"
 
 #include <QDockWidget>
+#include <memory>
 
 class QStackedWidget;
 
@@ -27,7 +28,7 @@ namespace docks {
  */
 class ToolSettings : public QDockWidget
 {
-Q_OBJECT
+	Q_OBJECT
 public:
 	ToolSettings(tools::ToolController *ctrl, QWidget *parent=nullptr);
 	~ToolSettings();
@@ -98,7 +99,7 @@ private:
 	void selectTool(tools::Tool::Type tool);
 
 	struct Private;
-	Private *d;
+	const std::unique_ptr<Private> d;
 };
 
 }

@@ -7,6 +7,7 @@
 #include "libclient/tools/tool.h"
 
 #include <QDockWidget>
+#include <memory>
 
 namespace tools {
 	class ToolProperties;
@@ -22,7 +23,7 @@ namespace docks {
  */
 class BrushPalette : public QDockWidget
 {
-Q_OBJECT
+	Q_OBJECT
 public:
 	BrushPalette(QWidget *parent=nullptr);
 	~BrushPalette();
@@ -49,7 +50,7 @@ private slots:
 
 private:
 	struct Private;
-	Private *d;
+	std::unique_ptr<Private> d;
 
 	void changeTagAssignment(int tagId, bool assigned);
 

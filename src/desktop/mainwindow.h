@@ -70,12 +70,9 @@ class MainWindow : public QMainWindow {
 public:
 	static ActionBuilder makeAction(const char *text, const char *name, QObject *parent);
 	static MenuBuilder makeMenu(const char *title, QWidget *parent);
-	static void retranslateMenuChildren(QObject &object);
 
 	MainWindow(bool restoreWindowPosition=true);
 	~MainWindow();
-
-	MainWindow *loadRecording(const QString &path);
 
 	//! Host a session using the settings from the given dialog
 	void hostSession(dialogs::HostDialog *dlg);
@@ -171,9 +168,10 @@ private slots:
 	void onCanvasSaved(const QString &errorMessage);
 
 protected:
-	void changeEvent(QEvent *event) override;
 	void closeEvent(QCloseEvent *event) override;
 	bool event(QEvent *event) override;
+
+	void recolorUi();
 
 private:
 	MainWindow *replaceableWindow();
@@ -207,9 +205,6 @@ private:
 	void showSessionSettings();
 
 	void toggleChat(bool show);
-
-	void retranslateUi();
-	void updatePalette();
 
 	QSplitter *m_splitter;
 

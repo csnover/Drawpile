@@ -4,6 +4,8 @@
 #ifndef VIEWSTATUS_H
 #define VIEWSTATUS_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QWidget>
 
 class QComboBox;
@@ -14,9 +16,10 @@ namespace widgets {
 class GroupedToolButton;
 class KisAngleGauge;
 
-class ViewStatus : public QWidget
+class ViewStatus : public Dynamic<QWidget>
 {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	ViewStatus(QWidget *parent=nullptr);
 
@@ -30,16 +33,13 @@ signals:
 	void zoomChanged(qreal newZoom);
 	void angleChanged(qreal newAngle);
 
-protected:
-	void changeEvent(QEvent *event) override;
-
 private slots:
 	void zoomBoxChanged(const QString &text);
 	void zoomSliderChanged(int value);
 	void angleBoxChanged(const QString &text);
 
 private:
-	void updatePalette();
+	virtual void recolorUi() override;
 
 	QSlider *m_zoomSlider;
 	QComboBox *m_zoomBox;

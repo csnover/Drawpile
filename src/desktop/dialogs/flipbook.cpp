@@ -18,6 +18,8 @@
 
 namespace dialogs {
 
+DP_DYNAMIC_DEFAULT_IMPL(Flipbook)
+
 Flipbook::Flipbook(QWidget *parent)
 	: DynamicUiWidget(parent)
 	, m_paintengine(nullptr)
@@ -49,6 +51,13 @@ Flipbook::Flipbook(QWidget *parent)
 
 	// Autoplay
 	m_ui->playButton->click();
+
+	m_timelineModeLabelText = makeTranslator(m_ui->timelineModeLabel, [=](bool useTimeline) {
+		m_ui->timelineModeLabel->setText(useTimeline
+			? tr("Timeline: manual")
+			: tr("Timeline: automatic")
+		);
+	}, false);
 }
 
 Flipbook::~Flipbook()
@@ -60,17 +69,6 @@ Flipbook::~Flipbook()
 	cfg.setValue("fps", m_ui->fps->value());
 	cfg.setValue("window", geometry());
 	cfg.setValue("crop", m_crop);
-}
-
-void Flipbook::retranslateUi()
-{
-	if (m_paintengine) {
-		m_ui->timelineModeLabel->setText(
-			rustpile::paintengine_get_metadata_int(m_paintengine->engine(), rustpile::MetadataInt::UseTimeline)
-			? tr("Timeline: manual")
-			: tr("Timeline: automatic")
-		);
-	}
 }
 
 void Flipbook::updateRange()
@@ -131,11 +129,10 @@ void Flipbook::setPaintEngine(canvas::PaintEngine *pe)
 
 	m_realFps = rustpile::paintengine_get_metadata_int(pe->engine(), rustpile::MetadataInt::Framerate);
 
-	m_ui->timelineModeLabel->setText(
-		rustpile::paintengine_get_metadata_int(pe->engine(), rustpile::MetadataInt::UseTimeline)
-		? tr("Timeline: manual")
-		: tr("Timeline: automatic")
-	);
+	m_timelineModeLabelText.args(rustpile::paintengine_get_metadata_int(
+		m_paintengine->engine(),
+		rustpile::MetadataInt::UseTimeline
+	));
 
 	updateFps(m_ui->fps->value());
 	resetFrameCache();

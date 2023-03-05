@@ -22,8 +22,6 @@ public:
 
 	QMenu *windowMenu() { return _windows; }
 
-	void changeEvent(QEvent *event) override;
-
 signals:
 
 public slots:
@@ -37,7 +35,6 @@ private slots:
 
 private:
 	MacMenu();
-	void retranslateUi();
 
 	QMenu *_recent;
 	QMenu *_windows;

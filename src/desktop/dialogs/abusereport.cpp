@@ -10,23 +10,19 @@
 
 namespace dialogs {
 
+DP_DYNAMIC_DEFAULT_IMPL(AbuseReportDialog)
+
 AbuseReportDialog::AbuseReportDialog(QWidget *parent)
 	: DynamicUiWidget(parent)
 	, m_sessionId(QString())
 	, m_userId(0)
 {
 	new MandatoryFields(this, m_ui->buttons->button(QDialogButtonBox::Ok));
-	retranslateUi();
+	AUTO_TR(m_ui->buttons->button(QDialogButtonBox::Ok), setText, tr("Report"));
 }
 
 AbuseReportDialog::~AbuseReportDialog()
 {}
-
-void AbuseReportDialog::retranslateUi()
-{
-	m_ui->retranslateUi(this);
-	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Report"));
-}
 
 void AbuseReportDialog::setSessionInfo(const QString &id, const QString &alias, const QString &title)
 {

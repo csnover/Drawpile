@@ -4,6 +4,8 @@
 #ifndef COLORPALETTEDOCK_H
 #define COLORPALETTEDOCK_H
 
+#include "desktop/utils/dynamicui.h"
+
 #include <QDockWidget>
 
 namespace color_widgets {
@@ -12,8 +14,9 @@ namespace color_widgets {
 
 namespace docks {
 
-class ColorPaletteDock : public QDockWidget {
+class ColorPaletteDock : public Dynamic<QDockWidget> {
 	Q_OBJECT
+	DP_DYNAMIC_UI
 public:
 	ColorPaletteDock(QWidget *parent);
 	~ColorPaletteDock();
@@ -23,9 +26,6 @@ public slots:
 
 signals:
 	void colorSelected(const QColor& color);
-
-protected:
-	virtual void changeEvent(QEvent *event) override;
 
 private slots:
 	void paletteChanged(int index);
@@ -43,8 +43,6 @@ private slots:
 	void paletteRightClicked(int index);
 
 private:
-	void retranslateUi();
-
 	struct Private;
 	std::unique_ptr<Private> d;
 };

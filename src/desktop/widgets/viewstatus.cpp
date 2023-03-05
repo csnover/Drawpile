@@ -17,7 +17,8 @@
 namespace widgets {
 
 ViewStatus::ViewStatus(QWidget *parent)
-	: QWidget(parent), m_updating(false)
+	: Dynamic(parent)
+	, m_updating(false)
 {
 	setMinimumHeight(22);
 	QHBoxLayout *layout = new QHBoxLayout(this);
@@ -63,7 +64,6 @@ ViewStatus::ViewStatus(QWidget *parent)
 	m_angleBox->setFixedWidth(m_angleBox->fontMetrics().boundingRect("9999-O--").width());
 	m_angleBox->setFrame(false);
 	m_angleBox->setEditable(true);
-	m_angleBox->setToolTip(tr("Canvas Rotation"));
 
 	m_angleBox->addItems({
 		QStringLiteral("-135°"),
@@ -134,10 +134,15 @@ ViewStatus::ViewStatus(QWidget *parent)
 	layout->addWidget(m_zoomSlider);
 	layout->addWidget(m_zoomBox);
 
-	updatePalette();
+	recolorUi();
 }
 
-void ViewStatus::updatePalette()
+void ViewStatus::retranslateUi()
+{
+	m_angleBox->setToolTip(tr("Canvas Rotation"));
+}
+
+void ViewStatus::recolorUi()
 {
 #ifndef Q_OS_MACOS
 	auto boxPalette = palette();
@@ -214,13 +219,6 @@ void ViewStatus::angleBoxChanged(const QString &text)
 	const int number = num.toInt(&ok);
 	if(ok)
 		emit angleChanged(number);
-}
-
-void ViewStatus::changeEvent(QEvent *event)
-{
-	QWidget::changeEvent(event);
-	if(event->type() == QEvent::PaletteChange)
-		updatePalette();
 }
 
 }

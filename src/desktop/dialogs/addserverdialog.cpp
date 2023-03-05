@@ -11,13 +11,14 @@
 namespace dialogs {
 
 AddServerDialog::AddServerDialog(QWidget *parent)
-	 : QMessageBox(
-		   QMessageBox::Icon::NoIcon,
-		   AddServerDialog::tr("Add Server"),
-		   QString(),
-		   QMessageBox::Cancel,
-		   parent),
-	   m_servers(nullptr)
+	: QMessageBox(
+		QMessageBox::Icon::NoIcon,
+		tr("Add Server"),
+		QString(),
+		QMessageBox::Cancel,
+		parent
+	)
+	, m_servers(nullptr)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 }
