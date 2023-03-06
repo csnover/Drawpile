@@ -71,6 +71,8 @@ private:
 	qint32 m_intervalAfterExport;
 	bool m_autoplay;
 	bool m_awaiting;
+
+	Translator<qreal> m_speedLabelText;
 };
 
 }

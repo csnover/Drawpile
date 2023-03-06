@@ -24,23 +24,18 @@ static QStandardItem *sizeItem(const QString &title, const QVariant &userdata) {
 	return item;
 }
 
+DP_DYNAMIC_DEFAULT_IMPL(VideoExportDialog)
+
 VideoExportDialog::VideoExportDialog(QWidget *parent)
 	: DynamicUiWidget(parent)
 {
-#ifdef Q_OS_MACOS
-	// Flat style doesn't look good on Mac
-	for(QGroupBox *box : findChildren<QGroupBox*>()) {
-		box->setFlat(false);
-	}
-#endif
-
 	QStandardItemModel *sizes = new QStandardItemModel(this);
 	sizes->appendRow(sizeItem(tr("Original"), QVariant(false)));
-	sizes->appendRow(sizeItem(tr("Custom:"), QVariant(true)));
 	sizes->appendRow(sizeItem("360p", QSize(480, 360)));
 	sizes->appendRow(sizeItem("480p", QSize(640, 480)));
 	sizes->appendRow(sizeItem("720p", QSize(1280, 720)));
 	sizes->appendRow(sizeItem("1080p", QSize(1920, 1080)));
+	sizes->appendRow(sizeItem(tr("Custom"), QVariant(true)));
 	m_ui->sizeChoice->setModel(sizes);
 
 	// make sure currentIndexChanged gets called if saved setting was something other than Custom
@@ -91,14 +86,6 @@ VideoExportDialog::~VideoExportDialog()
 	cfg.setValue("sizeChoice", m_ui->sizeChoice->currentIndex());
 	cfg.setValue("usecustomffmpeg", m_ui->ffmpegUseCustom->isChecked());
 	cfg.setValue("customffmpeg", m_ui->ffmpegCustom->toPlainText());
-}
-
-void VideoExportDialog::retranslateUi()
-{
-	m_ui->retranslateUi(this);
-	const auto *model = static_cast<QStandardItemModel *>(m_ui->sizeChoice->model());
-	model->item(0)->setText(tr("Original"));
-	model->item(1)->setText(tr("Custom:"));
 }
 
 void VideoExportDialog::updateFfmpegArgumentPreview()
@@ -175,11 +162,13 @@ VideoExporter *VideoExportDialog::getImageSeriesExporter()
 
 VideoExporter *VideoExportDialog::getFfmpegExporter()
 {
+	// TODO: i18n
 	const QString outfile = QFileDialog::getSaveFileName(
 		this,
 		tr("Export video"),
 		QSettings().value("window/lastpath").toString(),
-		"MKV (*.mkv);;WebM (*.webm);;AVI (*.avi);;All files (*)"
+		QString("MKV (*.mkv);;WebM (*.webm);;AVI (*.avi);;") +
+		QFileDialog::tr("All Files (*)")
 	);
 	if(outfile.isEmpty())
 		return nullptr;

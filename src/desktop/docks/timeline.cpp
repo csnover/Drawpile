@@ -4,6 +4,7 @@
 #include "desktop/docks/timeline.h"
 #include "desktop/docks/titlewidget.h"
 #include "libclient/canvas/timelinemodel.h"
+#include "desktop/utils/dynamicui.h"
 #include "desktop/widgets/timelinewidget.h"
 #include "libclient/net/envelopebuilder.h"
 #include "rustpile/rustpile.h"
@@ -15,8 +16,10 @@
 namespace docks {
 
 Timeline::Timeline(QWidget *parent)
-	: QDockWidget(tr("Timeline"), parent)
+	: QDockWidget(parent)
 {
+	AUTO_TR(this, setWindowTitle, tr("Timeline"));
+
 	m_widget = new widgets::TimelineWidget(this);
 	connect(m_widget, &widgets::TimelineWidget::timelineEditCommand, this, &Timeline::timelineEditCommand);
 	connect(m_widget, &widgets::TimelineWidget::selectFrameRequest, this, &Timeline::setCurrentFrame);
@@ -27,13 +30,19 @@ Timeline::Timeline(QWidget *parent)
 	auto *titlebar = new TitleWidget(this);
 	setTitleBarWidget(titlebar);
 
-	m_useTimeline = new QCheckBox(tr("Use manual timeline"));
+	m_useTimeline = new QCheckBox;
+	AUTO_TR(m_useTimeline, setText, tr("Use manual timeline"));
 	connect(m_useTimeline, &QCheckBox::clicked, this, &Timeline::onUseTimelineClicked);
 
 	titlebar->addCustomWidget(m_useTimeline);
 	titlebar->addStretch();
 
-	titlebar->addCustomWidget(new QLabel(tr("Frame:")));
+	{
+		auto *label = new QLabel;
+		AUTO_TR(label, setText, tr("Frame:"));
+		titlebar->addCustomWidget(label);
+	}
+
 	m_currentFrame = new QSpinBox;
 	m_currentFrame->setWrapping(true);
 	m_currentFrame->setMinimum(1);
@@ -42,7 +51,12 @@ Timeline::Timeline(QWidget *parent)
 	titlebar->addCustomWidget(m_currentFrame);
 
 	titlebar->addSpace(12);
-	titlebar->addCustomWidget(new QLabel(tr("FPS:")));
+
+	{
+		auto *label = new QLabel;
+		AUTO_TR(label, setText, tr("FPS:"));
+		titlebar->addCustomWidget(label);
+	}
 
 	m_fps = new QSpinBox;
 	m_fps->setMinimum(1);

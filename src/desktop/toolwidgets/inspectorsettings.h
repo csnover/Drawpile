@@ -6,6 +6,8 @@
 
 #include "desktop/toolwidgets/toolsettings.h"
 
+#include <memory>
+
 class Ui_InspectorSettings;
 
 namespace canvas {
@@ -39,7 +41,7 @@ protected:
 	QWidget *createUiWidget(QWidget *parent) override;
 
 private:
-	Ui_InspectorSettings *m_ui;
+	std::unique_ptr<Ui_InspectorSettings> m_ui;
 	canvas::UserListModel *m_userlist;
 };
 

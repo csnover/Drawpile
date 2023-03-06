@@ -11,6 +11,8 @@
 #include "libclient/net/envelopebuilder.h"
 #include "libclient/utils/icon.h"
 #include "desktop/widgets/groupedtoolbutton.h"
+#include "desktop/utils/actionbuilder.h"
+#include "desktop/utils/dynamicui.h"
 #include "desktop/utils/qtguicompat.h"
 
 #include "ui_textsettings.h"
@@ -27,21 +29,25 @@ static const char *HALIGN_PROP = "HALIGN";
 static const char *VALIGN_PROP = "VALIGN";
 
 AnnotationSettings::AnnotationSettings(ToolController *ctrl, QObject *parent)
-	: ToolSettings(ctrl, parent), m_ui(nullptr), m_headerWidget(nullptr),
-	  m_selectionId(0), m_noupdate(false)
+	: ToolSettings(ctrl, parent)
+	, m_ui(nullptr)
+	, m_headerWidget(nullptr)
+	, m_selectionId(0)
+	, m_noupdate(false)
 {
 }
 
 AnnotationSettings::~AnnotationSettings()
-{
-	delete m_ui;
-}
+{}
 
 QWidget *AnnotationSettings::createUiWidget(QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
-	m_ui = new Ui_TextSettings;
+	m_ui.reset(new Ui_TextSettings);
 	m_ui->setupUi(widget);
+	makeTranslator(widget, [=] {
+		m_ui->retranslateUi(widget);
+	});
 
 	// Set up the header widget
 	m_headerWidget = new QWidget(parent);
@@ -50,19 +56,31 @@ QWidget *AnnotationSettings::createUiWidget(QWidget *parent)
 	headerLayout->setContentsMargins(0, 0, 0, 0);
 	m_headerWidget->setLayout(headerLayout);
 
-	m_protectedAction = new QAction(icon::fromTheme("object-locked"), tr("Protect"), this);
-	m_protectedAction->setCheckable(true);
+	m_editActions = new QActionGroup(this);
+	m_editActions->setExclusive(false);
+
+	m_protectedAction = ActionBuilder(this, tr)
+		.icon("object-locked")
+		.text(QT_TR_NOOP("Protect"))
+		.checkable()
+		.addTo(m_editActions);
 	auto *protectedButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupLeft, m_headerWidget);
 	protectedButton->setDefaultAction(m_protectedAction);
 	headerLayout->addWidget(protectedButton);
 
 	auto *mergeButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupCenter, m_headerWidget);
-	QAction *mergeAction = new QAction(icon::fromTheme("arrow-down-double"), tr("Merge"), this);
+	QAction *mergeAction = ActionBuilder(this, tr)
+		.icon("arrow-down-double")
+		.text(QT_TR_NOOP("Merge"))
+		.addTo(m_editActions);
 	mergeButton->setDefaultAction(mergeAction);
 	headerLayout->addWidget(mergeButton);
 
 	auto *deleteButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupRight, m_headerWidget);
-	QAction *deleteAction = new QAction(icon::fromTheme("list-remove"), tr("Delete"), this);
+	QAction *deleteAction = ActionBuilder(this, tr)
+		.icon("list-remove")
+		.text(QT_TR_NOOP("Delete"))
+		.addTo(m_editActions);
 	deleteButton->setDefaultAction(deleteAction);
 	headerLayout->addWidget(deleteButton);
 
@@ -72,34 +90,58 @@ QWidget *AnnotationSettings::createUiWidget(QWidget *parent)
 	m_creatorLabel->setAlignment(Qt::AlignRight);
 	headerLayout->addWidget(m_creatorLabel);
 
-	m_editActions = new QActionGroup(this);
-	m_editActions->addAction(mergeAction);
-	m_editActions->addAction(deleteAction);
-	m_editActions->addAction(m_protectedAction);
-	m_editActions->setExclusive(false);
-
 	// Set up the dock
 	m_updatetimer = new QTimer(this);
 	m_updatetimer->setInterval(500);
 	m_updatetimer->setSingleShot(true);
 
 	// Horizontal alignment options
-	QMenu *halignMenu = new QMenu;
-	halignMenu->addAction(icon::fromTheme("format-justify-left"), tr("Left"))->setProperty(HALIGN_PROP, Qt::AlignLeft);
-	halignMenu->addAction(icon::fromTheme("format-justify-center"), tr("Center"))->setProperty(HALIGN_PROP, Qt::AlignCenter);
-	halignMenu->addAction(icon::fromTheme("format-justify-fill"), tr("Justify"))->setProperty(HALIGN_PROP, Qt::AlignJustify);
-	halignMenu->addAction(icon::fromTheme("format-justify-right"), tr("Right"))->setProperty(HALIGN_PROP, Qt::AlignRight);
+	QMenu *halignMenu = MenuBuilder(m_ui->halign, tr)
+		.action([=](ActionBuilder action) {
+			action.icon("format-justify-left")
+				.text(QT_TR_NOOP("Left"))
+				.property(HALIGN_PROP, Qt::AlignLeft);
+		})
+		.action([=](ActionBuilder action) {
+			action.icon("format-justify-center")
+				.text(QT_TR_NOOP("Center"))
+				.property(HALIGN_PROP, Qt::AlignCenter);
+		})
+		.action([=](ActionBuilder action) {
+			action.icon("format-justify-fill")
+				.text(QT_TR_NOOP("Justify"))
+				.property(HALIGN_PROP, Qt::AlignJustify);
+		})
+		.action([=](ActionBuilder action) {
+			action.icon("format-justify-right")
+				.text(QT_TR_NOOP("Right"))
+				.property(HALIGN_PROP, Qt::AlignRight);
+		})
+		.onTriggered(this, &AnnotationSettings::changeAlignment);
+
 	m_ui->halign->setIcon(halignMenu->actions().constFirst()->icon());
-	connect(halignMenu, &QMenu::triggered, this, &AnnotationSettings::changeAlignment);
 	m_ui->halign->setMenu(halignMenu);
 
 	// Vertical alignment options
-	QMenu *valignMenu = new QMenu;
-	valignMenu->addAction(icon::fromTheme("format-align-vertical-top"), tr("Top"))->setProperty(VALIGN_PROP, 0);
-	valignMenu->addAction(icon::fromTheme("format-align-vertical-center"), tr("Center"))->setProperty(VALIGN_PROP, rustpile::AnnotationEditMessage_FLAGS_VALIGN_CENTER);
-	valignMenu->addAction(icon::fromTheme("format-align-vertical-bottom"), tr("Bottom"))->setProperty(VALIGN_PROP, rustpile::AnnotationEditMessage_FLAGS_VALIGN_BOTTOM);
+	QMenu *valignMenu = MenuBuilder(m_ui->valign, tr)
+		.action([=](ActionBuilder action) {
+			action.icon("format-align-vertical-top")
+				.text(QT_TR_NOOP("Top"))
+				.property(VALIGN_PROP, 0);
+		})
+		.action([=](ActionBuilder action) {
+			action.icon("format-align-vertical-center")
+				.text(QT_TR_NOOP("Center"))
+				.property(VALIGN_PROP, rustpile::AnnotationEditMessage_FLAGS_VALIGN_CENTER);
+		})
+		.action([=](ActionBuilder action) {
+			action.icon("format-align-vertical-bottom")
+				.text(QT_TR_NOOP("Bottom"))
+				.property(VALIGN_PROP, rustpile::AnnotationEditMessage_FLAGS_VALIGN_BOTTOM);
+		})
+		.onTriggered(this, &AnnotationSettings::changeAlignment);
+
 	m_ui->valign->setIcon(valignMenu->actions().constFirst()->icon());
-	connect(valignMenu, &QMenu::triggered, this, &AnnotationSettings::changeAlignment);
 	m_ui->valign->setMenu(valignMenu);
 
 	// Editor events
@@ -279,7 +321,7 @@ void AnnotationSettings::updateFontIfUniform()
 
 void AnnotationSettings::resetContentFont(bool resetFamily, bool resetSize, bool resetColor)
 {
-	if(!(resetFamily|resetSize|resetColor))
+	if(!resetFamily && !resetSize && !resetColor)
 		return;
 
 	QTextCursor cursor(m_ui->content->document());
@@ -300,7 +342,6 @@ void AnnotationSettings::resetContentFont(bool resetFamily, bool resetSize, bool
 
 void AnnotationSettings::setSelectionId(uint16_t id)
 {
-
 	m_noupdate = true;
 	setUiEnabled(id>0);
 

@@ -3,6 +3,7 @@
 
 #include "desktop/docks/navigator.h"
 #include "desktop/docks/titlewidget.h"
+#include "desktop/utils/actionbuilder.h"
 #include "desktop/utils/dynamicui.h"
 #include "libclient/canvas/canvasmodel.h"
 #include "libclient/canvas/paintengine.h"
@@ -191,9 +192,14 @@ void NavigatorView::paintEvent(QPaintEvent *)
 	if(!m_model)
 		return;
 
+	const auto canvasSize = m_model->size();
+	if (canvasSize.isEmpty())
+		return;
+
 	// Draw downscaled canvas
 	if(m_cache.isNull())
 		return;
+
 	const QSize s = m_cache.size().scaled(size(), Qt::KeepAspectRatio);
 	const QRect canvasRect {
 		width()/2 - s.width()/2,
@@ -212,7 +218,6 @@ void NavigatorView::paintEvent(QPaintEvent *)
 	painter.setPen(pen);
 	painter.setCompositionMode(QPainter::RasterOp_SourceXorDestination);
 
-	const auto canvasSize = m_model->size();
 	const qreal xscale = s.width() / qreal(canvasSize.width());
 	const qreal yscale = s.height() / qreal(canvasSize.height());
 	painter.translate(canvasRect.topLeft());
@@ -328,33 +333,34 @@ Navigator::Navigator(QWidget *parent)
 	connect(m_resetZoomButton, &QToolButton::clicked, this, [this]() { emit zoomChanged(100.0); });
 	connect(m_zoomSlider, &QSlider::valueChanged, this, &Navigator::updateZoom);
 
-	QAction *showCursorsAction = new QAction(tr("Show Cursors"), m_view);
-	showCursorsAction->setCheckable(true);
-	m_view->addAction(showCursorsAction);
-
-	QAction *realtimeUpdateAction = new QAction(tr("Realtime Update"), m_view);
-	realtimeUpdateAction->setCheckable(true);
-	m_view->addAction(realtimeUpdateAction);
-
-	m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
-
 	QSettings cfg;
 	cfg.beginGroup("navigator");
 
-	showCursorsAction->setChecked(cfg.value("showcursors", true).toBool());
-	m_view->setShowCursors(showCursorsAction->isChecked());
+	auto showCursors = cfg.value("showcursors", true).toBool();
+	ActionBuilder(m_view, tr)
+		.text(QT_TR_NOOP("Show Cursors"))
+		.checkable()
+		.checked(showCursors)
+		.onTriggered([=](bool show) {
+			QSettings().setValue("navigator/showcursors", show);
+			m_view->setShowCursors(show);
+		})
+		.addTo(m_view);
+	m_view->setShowCursors(showCursors);
 
-	realtimeUpdateAction->setChecked(cfg.value("realtime", false).toBool());
-	m_view->setRealtimeUpdate(realtimeUpdateAction->isChecked());
+	bool realtimeUpdate = cfg.value("realtime", false).toBool();
+	ActionBuilder(m_view, tr)
+		.text(QT_TR_NOOP("Realtime Update"))
+		.checkable()
+		.checked(realtimeUpdate)
+		.onTriggered([=](bool realtime) {
+			QSettings().setValue("navigator/realtime", realtime);
+			m_view->setRealtimeUpdate(realtime);
+		})
+		.addTo(m_view);
+	m_view->setRealtimeUpdate(realtimeUpdate);
 
-	connect(showCursorsAction, &QAction::triggered, this, [this](bool show) {
-		QSettings().setValue("navigator/showcursors", show);
-		m_view->setShowCursors(show);
-	});
-	connect(realtimeUpdateAction, &QAction::triggered, this, [this](bool realtime) {
-		QSettings().setValue("navigator/realtime", realtime);
-		m_view->setRealtimeUpdate(realtime);
-	});
+	m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
 }
 
 Navigator::~Navigator()

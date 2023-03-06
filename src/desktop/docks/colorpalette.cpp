@@ -7,6 +7,8 @@
 
 #include "desktop/docks/colorpalette.h"
 #include "desktop/docks/titlewidget.h"
+#include "desktop/utils/actionbuilder.h"
+#include "desktop/utils/dynamicui.h"
 #include "desktop/widgets/groupedtoolbutton.h"
 #include "libclient/utils/icon.h"
 #include "libshared/util/paths.h"
@@ -83,57 +85,58 @@ struct ColorPaletteDock::Private {
 };
 
 ColorPaletteDock::ColorPaletteDock(QWidget *parent)
-	: Dynamic(parent)
+	: QDockWidget(parent)
 	, d(new Private)
 {
+	AUTO_TR(this, setWindowTitle, tr("Palette"));
+
 	auto *titlebar = new TitleWidget(this);
 	setTitleBarWidget(titlebar);
 
 	auto *menuButton = new widgets::GroupedToolButton;
 	menuButton->setIcon(icon::fromTheme("application-menu"));
+	menuButton->setPopupMode(QToolButton::InstantPopup);
+	menuButton->setStyleSheet("QToolButton::menu-indicator { image: none }");
+	menuButton->setMenu(MenuBuilder(this, tr)
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("New"))
+				.onTriggered(this, &ColorPaletteDock::addPalette);
+		})
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Duplicate"))
+				.onTriggered(this, &ColorPaletteDock::copyPalette);
+		})
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Delete"))
+				.onTriggered(this, &ColorPaletteDock::deletePalette);
+		})
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Rename"))
+				.onTriggered(this, &ColorPaletteDock::renamePalette);
+		})
+		.separator()
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Import..."))
+				.onTriggered(this, &ColorPaletteDock::importPalette);
+		})
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Export..."))
+				.onTriggered(this, &ColorPaletteDock::exportPalette);
+		})
+	);
 	titlebar->addCustomWidget(menuButton);
 
 	d->readonlyPalette = new widgets::GroupedToolButton;
+	AUTO_TR(d->readonlyPalette, setToolTip, tr("Write protect"));
 	d->readonlyPalette->setIcon(icon::fromTheme("object-locked"));
 	d->readonlyPalette->setCheckable(true);
-	titlebar->addCustomWidget(d->readonlyPalette);
-
-	d->paletteChoiceBox = new QComboBox;
-	d->paletteChoiceBox->setInsertPolicy(QComboBox::NoInsert); // we want to handle editingFinished signal ourselves
-	d->paletteChoiceBox->setModel(getSharedPaletteModel());
-	titlebar->addCustomWidget(d->paletteChoiceBox, true);
-
-	titlebar->addSpace(24);
-
-	d->paletteSwatch = new color_widgets::Swatch(this);
-	setWidget(d->paletteSwatch);
-
-	QMenu *paletteMenu = new QMenu(this);
-	paletteMenu->addAction(tr("New"), this, &ColorPaletteDock::addPalette);
-	paletteMenu->addAction(tr("Duplicate"), this, &ColorPaletteDock::copyPalette);
-	paletteMenu->addAction(tr("Delete"), this, &ColorPaletteDock::deletePalette);
-	paletteMenu->addAction(tr("Rename"), this, &ColorPaletteDock::renamePalette);
-
-	paletteMenu->addSeparator();
-	paletteMenu->addAction(tr("Import..."), this, &ColorPaletteDock::importPalette);
-	paletteMenu->addAction(tr("Export..."), this, &ColorPaletteDock::exportPalette);
-
-	menuButton->setMenu(paletteMenu);
-	menuButton->setPopupMode(QToolButton::InstantPopup);
-	menuButton->setStyleSheet("QToolButton::menu-indicator { image: none }");
-
-	d->palettePopupMenu = new QMenu(this);
-	d->palettePopupMenu->addAction(tr("Add"))->setProperty("menuIdx", 0);
-	d->palettePopupMenu->addAction(tr("Remove"))->setProperty("menuIdx", 1);
-	d->palettePopupMenu->addSeparator();
-	d->palettePopupMenu->addAction(tr("Less columns"))->setProperty("menuIdx", 2);;
-	d->palettePopupMenu->addAction(tr("More columns"))->setProperty("menuIdx", 3);
-
-	connect(d->paletteSwatch, &color_widgets::Swatch::clicked, this, &ColorPaletteDock::paletteClicked);
-	connect(d->paletteSwatch, &color_widgets::Swatch::doubleClicked, this, &ColorPaletteDock::paletteDoubleClicked);
-	connect(d->paletteSwatch, &color_widgets::Swatch::rightClicked, this, &ColorPaletteDock::paletteRightClicked);
-	connect(d->paletteChoiceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ColorPaletteDock::paletteChanged);
-	connect(d->readonlyPalette, &QToolButton::clicked, this, [this](bool checked) {
+	connect(d->readonlyPalette, &QToolButton::clicked, [=](bool checked) {
 		int idx = d->paletteChoiceBox->currentIndex();
 		if(idx >= 0) {
 			auto *pm = getSharedPaletteModel();
@@ -143,6 +146,40 @@ ColorPaletteDock::ColorPaletteDock(QWidget *parent)
 			setPaletteReadonly(checked);
 		}
 	});
+	titlebar->addCustomWidget(d->readonlyPalette);
+
+	d->paletteChoiceBox = new QComboBox;
+	d->paletteChoiceBox->setInsertPolicy(QComboBox::NoInsert); // we want to handle editingFinished signal ourselves
+	d->paletteChoiceBox->setModel(getSharedPaletteModel());
+	connect(d->paletteChoiceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ColorPaletteDock::paletteChanged);
+	titlebar->addCustomWidget(d->paletteChoiceBox, true);
+
+	titlebar->addSpace(24);
+
+	d->paletteSwatch = new color_widgets::Swatch(this);
+	setWidget(d->paletteSwatch);
+	connect(d->paletteSwatch, &color_widgets::Swatch::clicked, this, &ColorPaletteDock::paletteClicked);
+	connect(d->paletteSwatch, &color_widgets::Swatch::doubleClicked, this, &ColorPaletteDock::paletteDoubleClicked);
+	connect(d->paletteSwatch, &color_widgets::Swatch::rightClicked, this, &ColorPaletteDock::paletteRightClicked);
+
+	d->palettePopupMenu = MenuBuilder(this, tr)
+		.action([=](ActionBuilder action) {
+			action.text(QT_TR_NOOP("Add"))
+				.property("menuIdx", 0);
+		})
+		.action([=](ActionBuilder action) {
+			action.text(QT_TR_NOOP("Remove"))
+				.property("menuIdx", 1);
+		})
+		.separator()
+		.action([=](ActionBuilder action) {
+			action.text(QT_TR_NOOP("Fewer columns"))
+				.property("menuIdx", 2);
+		})
+		.action([=](ActionBuilder action) {
+			action.text(QT_TR_NOOP("More columns"))
+				.property("menuIdx", 3);
+		});
 
 	// Restore UI state
 	QSettings cfg;
@@ -153,8 +190,6 @@ ColorPaletteDock::ColorPaletteDock(QWidget *parent)
 		d->paletteChoiceBox->setCurrentIndex(lastPalette);
 	else
 		paletteChanged(0);
-
-	retranslateUi();
 }
 
 ColorPaletteDock::~ColorPaletteDock()
@@ -163,12 +198,6 @@ ColorPaletteDock::~ColorPaletteDock()
 
 	QSettings cfg;
 	cfg.setValue("history/lastpalette", d->paletteChoiceBox->currentIndex());
-}
-
-void ColorPaletteDock::retranslateUi()
-{
-	setWindowTitle(tr("Palette"));
-	d->readonlyPalette->setToolTip(tr("Write protect"));
 }
 
 void ColorPaletteDock::paletteChanged(int index)
@@ -192,7 +221,7 @@ void ColorPaletteDock::importPalette()
 		tr("Import palette"),
 		QString(),
 		tr("Palettes (%1)").arg("*.gpl") + ";;" +
-		tr("All files (*)")
+		QFileDialog::tr("All Files (*)")
 	);
 
 	if(!filename.isEmpty()) {

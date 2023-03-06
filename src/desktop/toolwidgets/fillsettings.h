@@ -6,6 +6,8 @@
 
 #include "desktop/toolwidgets/toolsettings.h"
 
+#include <memory>
+
 class Ui_FillSettings;
 
 namespace tools {
@@ -38,7 +40,7 @@ protected:
 	QWidget *createUiWidget(QWidget *parent) override;
 
 private:
-	Ui_FillSettings * _ui;
+	std::unique_ptr<Ui_FillSettings> _ui;
 	qreal m_quickAdjust1 = 0.0;
 };
 

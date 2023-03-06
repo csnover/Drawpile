@@ -7,6 +7,8 @@
 #include "desktop/toolwidgets/toolsettings.h"
 #include "libclient/tools/selection.h"
 
+#include <memory>
+
 class Ui_SelectionSettings;
 
 namespace canvas { class CanvasModel; }
@@ -63,7 +65,7 @@ private:
 	void updateSelectionMode(canvas::Selection::AdjustmentMode mode);
 	void cutSelection();
 
-	Ui_SelectionSettings *m_ui;
+	std::unique_ptr<Ui_SelectionSettings> m_ui;
 	widgets::CanvasView *m_view;
 };
 

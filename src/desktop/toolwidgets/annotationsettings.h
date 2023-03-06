@@ -6,6 +6,8 @@
 
 #include "desktop/toolwidgets/toolsettings.h"
 
+#include <memory>
+
 class Ui_TextSettings;
 class QTimer;
 class QAction;
@@ -25,7 +27,7 @@ namespace tools {
  * annotation objects rather than pixel data.
  */
 class AnnotationSettings : public ToolSettings {
-Q_OBJECT
+	Q_OBJECT
 public:
 	AnnotationSettings(ToolController *ctrl, QObject *parent=nullptr);
 	~AnnotationSettings();
@@ -79,7 +81,7 @@ private:
 	void resetContentFont(bool resetFamily, bool resetSize, bool resetColor);
 	void setUiEnabled(bool enabled);
 
-	Ui_TextSettings *m_ui;
+	std::unique_ptr<Ui_TextSettings> m_ui;
 	QWidget *m_headerWidget;
 	QActionGroup *m_editActions;
 	QAction *m_protectedAction;

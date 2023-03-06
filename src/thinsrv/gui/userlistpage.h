@@ -36,7 +36,7 @@ class UserListPageFactory : public PageFactory
 {
 public:
 	QString pageId() const override { return QStringLiteral("summary:users"); }
-	QString title() const override { return QApplication::tr("Users"); }
+	QString title() const override { return PageFactory::tr("Users"); }
 	UserListPage *makePage(Server *server) const override { return new UserListPage(server); }
 };
 

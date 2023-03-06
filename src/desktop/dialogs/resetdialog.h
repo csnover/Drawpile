@@ -17,7 +17,6 @@ namespace net {
 
 namespace dialogs {
 
-// TODO: Retranslate UI
 class ResetDialog : public QDialog
 {
 	Q_OBJECT

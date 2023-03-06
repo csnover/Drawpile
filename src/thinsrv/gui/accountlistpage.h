@@ -41,7 +41,7 @@ class AccountListPageFactory : public PageFactory
 {
 public:
 	QString pageId() const override { return QStringLiteral("accountlist"); }
-	QString title() const override { return QApplication::tr("Accounts"); }
+	QString title() const override { return PageFactory::tr("Accounts"); }
 
 	AccountListPage *makePage(Server *server) const override { return new AccountListPage(server); }
 };

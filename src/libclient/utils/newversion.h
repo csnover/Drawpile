@@ -124,7 +124,7 @@ public:
 	 *
 	 * If nothing newer is available, an empty vector is returned.
 	 */
-	QVector<Version> getNewer() const { return m_newer; }
+	const QVector<Version> &getNewer() const { return m_newer; }
 
 signals:
 	/**

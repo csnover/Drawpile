@@ -12,6 +12,8 @@
 
 namespace dialogs {
 
+DP_DYNAMIC_DEFAULT_IMPL(NewDialog)
+
 NewDialog::NewDialog(QWidget *parent)
 	: DynamicUiWidget(parent)
 {
@@ -25,17 +27,11 @@ NewDialog::NewDialog(QWidget *parent)
 	if(lastColor.isValid())
 		setBackground(lastColor);
 
-	retranslateUi();
+	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Create"));
 }
 
 NewDialog::~NewDialog()
 {}
-
-void NewDialog::retranslateUi()
-{
-	m_ui->retranslateUi(this);
-	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Create"));
-}
 
 void NewDialog::setSize(const QSize &size)
 {

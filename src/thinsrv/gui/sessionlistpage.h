@@ -37,7 +37,7 @@ class SessionListPageFactory : public PageFactory
 {
 public:
 	QString pageId() const override { return QStringLiteral("sessionlist"); }
-	QString title() const override { return QApplication::tr("Sessions"); }
+	QString title() const override { return PageFactory::tr("Sessions"); }
 
 	SessionListPage *makePage(Server *server) const override { return new SessionListPage(server); }
 };

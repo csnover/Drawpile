@@ -4,8 +4,6 @@
 #ifndef COLORPALETTEDOCK_H
 #define COLORPALETTEDOCK_H
 
-#include "desktop/utils/dynamicui.h"
-
 #include <QDockWidget>
 
 namespace color_widgets {
@@ -14,9 +12,8 @@ namespace color_widgets {
 
 namespace docks {
 
-class ColorPaletteDock : public Dynamic<QDockWidget> {
+class ColorPaletteDock : public QDockWidget {
 	Q_OBJECT
-	DP_DYNAMIC_UI
 public:
 	ColorPaletteDock(QWidget *parent);
 	~ColorPaletteDock();

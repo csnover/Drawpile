@@ -71,7 +71,7 @@ void AddServerDialog::showSuccess()
 			connect(filedownload, &networkaccess::FileDownload::finished, this, [filedownload, this](const QString &errorMessage) {
 				filedownload->deleteLater();
 				if(!errorMessage.isEmpty()) {
-					qWarning("Couldnt' fetch favicon: %s", qPrintable(errorMessage));
+					qWarning("Couldn't fetch favicon: %s", qPrintable(errorMessage));
 					return;
 				}
 

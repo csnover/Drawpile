@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/toolwidgets/colorpickersettings.h"
+#include "desktop/utils/dynamicui.h"
 #include "libclient/tools/toolcontroller.h"
 #include "libclient/tools/toolproperties.h"
 #include "libclient/tools/colorpicker.h"
@@ -44,7 +45,8 @@ QWidget *ColorPickerSettings::createUiWidget(QWidget *parent)
 	QHBoxLayout *sizelayout = new QHBoxLayout;
 	layout->addLayout(sizelayout);
 
-	QLabel *sizelbl = new QLabel(tr("Size:"), widget);
+	QLabel *sizelbl = new QLabel(widget);
+	AUTO_TR(sizelbl, setText, tr("Size:"));
 	sizelayout->addWidget(sizelbl);
 
 	QSlider *slider = new QSlider(widget);
@@ -60,7 +62,8 @@ QWidget *ColorPickerSettings::createUiWidget(QWidget *parent)
 	m_size->setMaximum(128);
 	slider->setMaximum(128);
 
-	m_layerpick = new QCheckBox(tr("Pick from current layer only"), widget);
+	m_layerpick = new QCheckBox(widget);
+	AUTO_TR(m_layerpick, setText, tr("Pick from current layer only"));
 	layout->addWidget(m_layerpick);
 
 	m_palettewidget = new color_widgets::Swatch(widget);

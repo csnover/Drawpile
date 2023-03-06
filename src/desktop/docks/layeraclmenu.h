@@ -7,8 +7,14 @@
 #include "rustpile/rustpile.h"
 
 #include <QMenu>
+#include <QVector>
 
 class QAbstractItemModel;
+class QAction;
+class QActionGroup;
+class QAbstractItemModel;
+class QShowEvent;
+class QWidget;
 
 namespace docks {
 

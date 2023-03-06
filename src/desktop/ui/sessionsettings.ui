@@ -62,7 +62,7 @@
                <string>No autoreset</string>
               </property>
               <property name="suffix">
-               <string> MB</string>
+               <string>MiB</string>
               </property>
               <property name="decimals">
                <number>1</number>
@@ -114,10 +114,10 @@
           <item row="4" column="1">
            <widget class="QCheckBox" name="nsfm">
             <property name="toolTip">
-             <string>This session contains material not suitable for minors</string>
+             <string>This session contains content that some people may want to avoid</string>
             </property>
             <property name="text">
-             <string>Age restricted content</string>
+             <string>Sensitive content</string>
             </property>
            </widget>
           </item>
@@ -246,7 +246,7 @@
        <item row="0" column="0">
         <widget class="QLabel">
          <property name="text">
-          <string>Cut, Paste &amp; Fill:</string>
+          <string>Cut, Paste &amp;&amp; Fill:</string>
          </property>
         </widget>
        </item>
@@ -256,7 +256,7 @@
        <item row="1" column="0">
         <widget class="QLabel">
          <property name="text">
-          <string>Selection Move &amp; Resize:</string>
+          <string>Selection Move &amp;&amp; Resize:</string>
          </property>
         </widget>
        </item>
@@ -316,7 +316,7 @@
        <item row="8" column="0">
         <widget class="QLabel">
          <property name="text">
-          <string>Laser Pointer</string>
+          <string>Laser Pointer:</string>
          </property>
         </widget>
        </item>
@@ -326,7 +326,7 @@
        <item row="9" column="0">
         <widget class="QLabel">
          <property name="text">
-          <string>Undo &amp; Redo:</string>
+          <string>Undo &amp;&amp; Redo:</string>
          </property>
         </widget>
        </item>
@@ -336,7 +336,7 @@
        <item row="10" column="0">
         <widget class="QLabel">
          <property name="text">
-          <string>Kick &amp; Ban:</string>
+          <string>Kick &amp;&amp; Ban:</string>
          </property>
         </widget>
        </item>

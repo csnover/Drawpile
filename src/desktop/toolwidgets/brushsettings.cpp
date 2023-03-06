@@ -7,11 +7,11 @@
 #include "libclient/tools/toolproperties.h"
 #include "libclient/brushes/brush.h"
 #include "desktop/dialogs/inputsettings.h"
+#include "desktop/utils/dynamicui.h"
 
 #include "libclient/canvas/inputpresetmodel.h"
 #include "libclient/canvas/blendmodes.h"
 #include "ui_brushdock.h"
-
 #include "rustpile/rustpile.h"
 
 #include <mypaint-brush-settings.h>
@@ -84,12 +84,16 @@ struct BrushSettings::Private {
 		}
 
 		eraseModes = new QStandardItemModel(0, 1, b);
-		auto erase1 = new QStandardItem(QApplication::tr("Erase"));
+		auto *erase1 = new QStandardItem;
 		erase1->setData(QVariant(int(rustpile::Blendmode::Erase)), Qt::UserRole);
-		eraseModes->appendRow(erase1);
-
-		auto erase2 = new QStandardItem(QApplication::tr("Color Erase"));
+		auto *erase2 = new QStandardItem;
 		erase2->setData(QVariant(int(rustpile::Blendmode::ColorErase)), Qt::UserRole);
+		makeTranslator(eraseModes, [=] {
+			erase1->setText(BrushSettings::tr("Erase"));
+			erase2->setText(BrushSettings::tr("Color Erase"));
+		});
+
+		eraseModes->appendRow(erase1);
 		eraseModes->appendRow(erase2);
 	}
 
@@ -136,14 +140,13 @@ static inline int logSize(int radiusLogarithmic, const rustpile::MyPaintSettings
 }
 
 BrushSettings::BrushSettings(ToolController *ctrl, QObject *parent)
-	: ToolSettings(ctrl, parent), d(new Private(this))
+	: ToolSettings(ctrl, parent)
+	, d(new Private(this))
 {
 }
 
 BrushSettings::~BrushSettings()
-{
-	delete d;
-}
+{}
 
 QWidget *BrushSettings::createUiWidget(QWidget *parent)
 {
@@ -178,6 +181,10 @@ QWidget *BrushSettings::createUiWidget(QWidget *parent)
 
 	QWidget *widget = new QWidget(parent);
 	d->ui.setupUi(widget);
+	makeTranslator(widget, [=] {
+		d->ui.retranslateUi(widget);
+	});
+
 	d->ui.inputPreset->setModel(d->presetModel);
 
 	connect(d->ui.configureInput, &QAbstractButton::clicked, [this, parent]() {

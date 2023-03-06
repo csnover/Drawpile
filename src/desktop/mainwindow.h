@@ -11,6 +11,7 @@
 #include <QPointer>
 #include <QVariant>
 
+#include "desktop/utils/dynamicui.h"
 #include "libclient/tools/tool.h"
 #include "libclient/canvas/acl.h"
 
@@ -70,6 +71,9 @@ class MainWindow : public QMainWindow {
 public:
 	static ActionBuilder makeAction(const char *text, const char *name, QObject *parent);
 	static MenuBuilder makeMenu(const char *title, QWidget *parent);
+
+	static void showErrorMessage(QWidget *parent, const QString& message, const QString& details=QString());
+	static void showJoinDialog(MainWindow *parent, const QUrl &defaultUrl=QUrl());
 
 	MainWindow(bool restoreWindowPosition=true);
 	~MainWindow();
@@ -258,6 +262,9 @@ private:
 
 	Document * const m_doc;
 	drawingboard::CanvasScene * const m_canvasscene;
+
+	Translator<QString, QString> m_windowTitle;
+	Translator<bool> m_recordAction;
 };
 
 #endif

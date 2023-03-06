@@ -4,6 +4,8 @@
 #ifndef PAGEFACTORY_H
 #define PAGEFACTORY_H
 
+#include <QCoreApplication>
+
 class QString;
 class QWidget;
 
@@ -14,6 +16,7 @@ class Server;
 
 class PageFactory
 {
+	Q_DECLARE_TR_FUNCTIONS(PageFactory)
 public:
 	PageFactory() = default;
 	virtual ~PageFactory() = default;

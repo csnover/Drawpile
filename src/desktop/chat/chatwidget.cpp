@@ -6,6 +6,7 @@
 #include "desktop/chat/chatwidget.h"
 #include "desktop/notifications.h"
 #include "desktop/utils/dynamicui.h"
+#include "desktop/utils/actionbuilder.h"
 #include "libclient/utils/html.h"
 #include "libclient/utils/funstuff.h"
 #include "libclient/net/envelopebuilder.h"
@@ -745,24 +746,30 @@ void ChatWidget::chatTabClosed(int index)
 void ChatWidget::showChatContextMenu(const QPoint &pos)
 {
 	auto menu = std::unique_ptr<QMenu>(d->view->createStandardContextMenu(pos));
-
-	menu->addSeparator();
-
-	menu->addAction(tr("Clear"), this, &ChatWidget::clear);
-
-	auto compact = menu->addAction(tr("Compact mode"), this, &ChatWidget::setCompactMode);
-	compact->setCheckable(true);
-	compact->setChecked(d->compactMode);
-
-	if(d->isAttached) {
-		menu->addAction(tr("Detach"), this, &ChatWidget::detachRequested);
-	} else {
-		QWidget *win = parentWidget();
-		while(win->parent() != nullptr)
-			win = win->parentWidget();
-
-		menu->addAction(tr("Attach"), win, &QWidget::close);
-	}
+	MenuBuilder(menu.get(), tr)
+		.separator()
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Clear"))
+				.onTriggered(this, &ChatWidget::clear);
+		})
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Compact mode"))
+				.onTriggered(this, &ChatWidget::setCompactMode)
+				.checked(d->compactMode);
+		})
+		.action([=](ActionBuilder action) {
+			if (d->isAttached) {
+				action
+					.text(QT_TR_NOOP("Detach"))
+					.onTriggered(this, &ChatWidget::detachRequested);
+			} else {
+				action
+					.text(QT_TR_NOOP("Attach"))
+					.onTriggered(window(), &QWidget::close);
+			}
+		});
 
 	menu->exec(d->view->mapToGlobal(pos));
 }

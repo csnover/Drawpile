@@ -78,7 +78,7 @@ protected:
 	void showEvent(QShowEvent *event) override;
 
 private:
-	void initPermissionComboBoxes(bool retranslate);
+	void initPermissionComboBoxes();
 	void reloadSettings();
 	QComboBox *featureBox(canvas::Feature f);
 
@@ -92,6 +92,8 @@ private:
 	bool m_isAuth = false;
 	bool m_canPersist = false;
 	bool m_canAutoreset = false;
+
+	Translator<double> m_baseResetThresholdText;
 };
 
 }

@@ -21,6 +21,7 @@
 #include <QSpinBox>
 #include <QtMath>
 
+#include "desktop/utils/actionbuilder.h"
 #include "desktop/widgets/kis_curve_widget.h"
 
 static constexpr auto MOUSE_AWAY_THRES = 15;
@@ -29,25 +30,30 @@ static constexpr auto POINT_AREA = 1E-4;
 #include "desktop/widgets/kis_curve_widget_p.h"
 
 KisCurveWidget::KisCurveWidget(QWidget *parent, Qt::WindowFlags f)
-		: QWidget(parent, f), d(new KisCurveWidget::Private(this))
+	: QWidget(parent, f)
+	, d(new KisCurveWidget::Private(this))
 {
 	setObjectName("KisCurveWidget");
 	d->m_grab_point_index = -1;
-	d->m_readOnlyMode   = false;
-	d->m_guideVisible   = false;
+	d->m_readOnlyMode = false;
+	d->m_guideVisible = false;
 	d->m_pixmapDirty = true;
-	d->m_pixmapCache = NULL;
 	d->setState(ST_NORMAL);
 
 	d->m_intIn = NULL;
 	d->m_intOut = NULL;
 
-	d->m_ctxmenu = new QMenu(this);
-	d->m_removeCurrentPointAction = d->m_ctxmenu->addAction(tr("Remove point"));
-	QAction *resetAction = d->m_ctxmenu->addAction(tr("Reset"));
-
-	connect(d->m_removeCurrentPointAction, &QAction::triggered, this, &KisCurveWidget::removeCurrentPoint);
-	connect(resetAction, &QAction::triggered, this, &KisCurveWidget::reset);
+	d->m_ctxmenu = MenuBuilder(this, tr)
+		.action([=](ActionBuilder action) {
+			d->m_removeCurrentPointAction = action
+				.text(QT_TR_NOOP("Remove point"))
+				.onTriggered(this, &KisCurveWidget::removeCurrentPoint);
+		})
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Reset"))
+				.onTriggered(this, &KisCurveWidget::reset);
+		});
 
 	setMouseTracking(true);
 	setAutoFillBackground(false);
@@ -60,10 +66,7 @@ KisCurveWidget::KisCurveWidget(QWidget *parent, Qt::WindowFlags f)
 }
 
 KisCurveWidget::~KisCurveWidget()
-{
-	delete d->m_pixmapCache;
-	delete d;
-}
+{}
 
 void KisCurveWidget::setupInOutControls(QSpinBox *in, QSpinBox *out, int min, int max)
 {
@@ -227,8 +230,8 @@ void KisCurveWidget::resizeEvent(QResizeEvent *e)
 
 void KisCurveWidget::paintEvent(QPaintEvent *)
 {
-	int    wWidth = width() - 1;
-	int    wHeight = height() - 1;
+	int wWidth = width() - 1;
+	int wHeight = height() - 1;
 
 	QPainter p(this);
 
@@ -240,9 +243,8 @@ void KisCurveWidget::paintEvent(QPaintEvent *)
 	//  draw background
 	if (!d->m_pix.isNull()) {
 		if (d->m_pixmapDirty || !d->m_pixmapCache) {
-			delete d->m_pixmapCache;
-			d->m_pixmapCache = new QPixmap(width(), height());
-			QPainter cachePainter(d->m_pixmapCache);
+			d->m_pixmapCache.reset(new QPixmap(width(), height()));
+			QPainter cachePainter(d->m_pixmapCache.get());
 
 			cachePainter.scale(1.0*width() / d->m_pix.width(), 1.0*height() / d->m_pix.height());
 			cachePainter.drawPixmap(0, 0, d->m_pix);

@@ -24,6 +24,8 @@
 
 namespace dialogs {
 
+DP_DYNAMIC_DEFAULT_IMPL(PlaybackDialog)
+
 PlaybackDialog::PlaybackDialog(canvas::CanvasModel *canvas, QWidget *parent)
 	: DynamicUiWidget(parent)
 	, m_paintengine(canvas->paintEngine())
@@ -33,11 +35,12 @@ PlaybackDialog::PlaybackDialog(canvas::CanvasModel *canvas, QWidget *parent)
 	, m_autoplay(false)
 	, m_awaiting(false)
 {
+	AUTO_TR(this, setWindowTitle, tr("Playback"));
 	setWindowFlags(Qt::Tool);
-	setMinimumSize(200, 80);
-	resize(420, 250);
 
-	m_ui->buildIndexProgress->hide();
+	m_speedLabelText = makeTranslator(m_ui->speedLabel, [=](qreal s) {
+		m_ui->speedLabel->setText(tr("%1×").arg(s, 0, 'f', 1));
+	}, 1.0);
 
 	connect(m_ui->buildIndexButton, &QAbstractButton::clicked, this, &PlaybackDialog::onBuildIndexClicked);
 	connect(m_ui->configureExportButton, &QAbstractButton::clicked, this, &PlaybackDialog::onVideoExportClicked);
@@ -54,7 +57,7 @@ PlaybackDialog::PlaybackDialog(canvas::CanvasModel *canvas, QWidget *parent)
 			s = 1.0 + ((speed-100) / 100.0) * 8.0;
 
 		m_speedFactor = 1.0 / s;
-		m_ui->speedLabel->setText(tr("× %1").arg(s, 0, 'f', 1));
+		m_speedLabelText.args(s);
 	});
 
 	// The paint engine's playback callback lets us know when the step/sequence
@@ -87,18 +90,10 @@ PlaybackDialog::PlaybackDialog(canvas::CanvasModel *canvas, QWidget *parent)
 	connect(m_ui->filmStrip, &widgets::Filmstrip::doubleClicked, this, &PlaybackDialog::jumpTo);
 
 	loadIndex();
-	retranslateUi();
 }
 
 PlaybackDialog::~PlaybackDialog()
 {}
-
-void PlaybackDialog::retranslateUi()
-{
-	m_ui->retranslateUi(this);
-	m_ui->speedLabel->setText(tr("× %1").arg(m_speedFactor / 1.0, 0, 'f', 1));
-	setWindowTitle(tr("Playback"));
-}
 
 /**
  * @brief The paint engine has finished rendering the sequence

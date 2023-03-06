@@ -26,8 +26,11 @@ border: 1px solid #3daee9;
 border-radius: 3px;
 padding: 6px;</string>
      </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
      <property name="text">
-      <string>A new Drawpile version that is not compatible with this one has been released.</string>
+      <string>You are running an outdated version of Drawpile. Some servers will be unavailable.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -43,8 +46,14 @@ border: 1px solid #3daee9;
 border-radius: 3px;
 padding: 6px;</string>
      </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::RichText</enum>
+     </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;You haven't added any servers yet. You can find some at &lt;a href=&quot;https://drawpile.net/communities/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;drawpile.net/communities&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;You can try adding one now by entering pub.drawpile.net in the address box and clicking &lt;span style=&quot; font-style:italic;&quot;&gt;Add Server&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string><![CDATA[<p>You haven’t added any servers yet. Find some at <a href="https://drawpile.net/communities/">drawpile.net/communities</a>, or try pub.drawpile.net.</p>]]></string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -134,8 +143,11 @@ padding: 6px;</string>
    </item>
    <item>
     <widget class="QLabel">
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
      <property name="text">
-      <string>Enter a host address, session URL or room code to join a session:</string>
+      <string>Enter a host address, session URL, or room code to join a session:</string>
      </property>
     </widget>
    </item>

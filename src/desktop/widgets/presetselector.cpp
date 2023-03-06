@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // SPDX-FileCopyrightText: Calle Laakkonen
 
+#include "desktop/utils/dynamicui.h"
 #include "desktop/widgets/presetselector.h"
 #include "libshared/util/paths.h"
 
@@ -26,7 +27,7 @@ PresetSelector::PresetSelector(QWidget *parent)
 
 	m_presetBox = new QComboBox(this);
 	m_presetBox->setEditable(true);
-	m_presetBox->lineEdit()->setPlaceholderText(tr("Presets"));
+	AUTO_TR(m_presetBox->lineEdit(), setPlaceholderText, tr("Presets"));
 	m_presetBox->setModel(m_presets);
 	m_presetBox->setValidator(new QRegularExpressionValidator(
 		QRegularExpression("^[^/\\\\]+$"),
@@ -34,13 +35,16 @@ PresetSelector::PresetSelector(QWidget *parent)
 		));
 	layout->addWidget(m_presetBox, 1);
 
-	m_loadButton = new QPushButton(tr("Load"), this);
+	m_loadButton = new QPushButton(this);
+	AUTO_TR(m_loadButton, setText, tr("Load"));
 	layout->addWidget(m_loadButton);
 
-	m_saveButton = new QPushButton(tr("Save"), this);
+	m_saveButton = new QPushButton(this);
+	AUTO_TR(m_saveButton, setText, tr("Save"));
 	layout->addWidget(m_saveButton);
 
-	m_deleteButton = new QPushButton(tr("Delete"), this);
+	m_deleteButton = new QPushButton(this);
+	AUTO_TR(m_deleteButton, setText, tr("Delete"));
 	layout->addWidget(m_deleteButton);
 
 	setPresetFolder("presets");

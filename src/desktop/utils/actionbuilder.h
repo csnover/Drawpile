@@ -39,8 +39,6 @@ public:
 
 	operator QAction*()
 	{
-		// If an action is tagged as "remembered", it should be checkable as well
-		Q_ASSERT(m_action->isCheckable() || !m_action->property("remembered").toBool());
 		return m_action;
 	}
 
@@ -63,10 +61,10 @@ public:
 		return *this;
 	}
 
-	ActionBuilder &checked()
+	ActionBuilder &checked(bool checked = true)
 	{
 		m_action->setCheckable(true);
-		m_action->setChecked(true);
+		m_action->setChecked(checked);
 		m_action->setProperty("defaultValue", true);
 		return *this;
 	}
@@ -153,6 +151,7 @@ public:
 		// Tag this (checkable) action so that its state will be
 		// saved and loaded.
 		Q_ASSERT(!m_action->objectName().isEmpty());
+		m_action->setCheckable(true);
 		m_action->setProperty("remembered", true);
 		return *this;
 	}
@@ -200,6 +199,12 @@ public:
 		makeTranslator(m_action, [m_action=m_action, fn=std::move(fn)] {
 			m_action->setText(fn());
 		});
+		return *this;
+	}
+
+	ActionBuilder &visible(bool v)
+	{
+		m_action->setVisible(v);
 		return *this;
 	}
 

@@ -10,6 +10,7 @@
 
 class Ui_CertificateView;
 class QSslCertificate;
+class QString;
 
 namespace dialogs {
 

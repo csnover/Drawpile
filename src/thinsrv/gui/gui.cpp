@@ -40,7 +40,7 @@ bool startServer()
 	auto threadInitFunc = [dbFile, &errorMessage, &server, &mutex]() {
 		Database *db = new Database;
 		if(!db->openFile(dbFile)) {
-			errorMessage = QApplication::tr("Couldn't open database");
+			errorMessage = MainWindow::tr("Couldn't open database");
 			mutex.unlock();
 			return;
 		}
@@ -65,7 +65,7 @@ bool startServer()
 	qDebug() << "Server thread initialized";
 
 	if(!errorMessage.isEmpty()) {
-		QMessageBox::critical(nullptr, QApplication::tr("Drawpile Server"), errorMessage);
+		QMessageBox::critical(nullptr, MainWindow::tr("Drawpile Server"), errorMessage);
 		return false;
 	}
 
@@ -75,7 +75,7 @@ bool startServer()
 	LocalServer *localServer = new LocalServer(server);
 
 	QObject::connect(localServer, &LocalServer::serverError, [](const QString &error) {
-		QMessageBox::warning(nullptr, QApplication::tr("Drawpile Server"), error);
+		QMessageBox::warning(nullptr, MainWindow::tr("Drawpile Server"), error);
 	});
 
 	// Create the system tray menu
@@ -106,7 +106,7 @@ bool startRemote(const QString &address)
 {
 	QUrl url(address);
 	if(!url.isValid()) {
-		QMessageBox::critical(nullptr, QApplication::tr("Drawpile Server"), QApplication::tr("Invalid URL"));
+		QMessageBox::critical(nullptr, MainWindow::tr("Drawpile Server"), MainWindow::tr("Invalid URL"));
 		return false;
 	}
 

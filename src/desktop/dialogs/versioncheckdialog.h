@@ -45,12 +45,22 @@ private slots:
 	void downloadNewVersion();
 
 private:
+	enum class DownloadState {
+		Downloading,
+		Downloaded,
+		Error
+	};
+
 	NewVersionCheck *m_newversion;
 	QPushButton *m_downloadButton;
 
 	QUrl m_downloadUrl;
 	QByteArray m_downloadSha256;
 	int m_downloadSize;
+
+	Translator<const QVector<NewVersionCheck::Version> *> m_textBrowserHtml;
+	Translator<QString, int> m_downloadButtonText;
+	Translator<DownloadState, QString> m_downloadLabelText;
 };
 
 }

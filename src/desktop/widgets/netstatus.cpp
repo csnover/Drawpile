@@ -5,6 +5,7 @@
 #include "desktop/widgets/popupmessage.h"
 #include "desktop/dialogs/certificateview.h"
 #include "desktop/dialogs/netstats.h"
+#include "desktop/utils/actionbuilder.h"
 #include "libclient/utils/icon.h"
 #include "libshared/util/whatismyip.h"
 
@@ -23,7 +24,11 @@
 namespace widgets {
 
 NetStatus::NetStatus(QWidget *parent)
-	: QWidget(parent), m_state(NotConnected), _sentbytes(0), _recvbytes(0), _lag(0)
+	: QWidget(parent)
+	, m_state(NotConnected)
+	, _sentbytes(0)
+	, _recvbytes(0)
+	, _lag(0)
 {
 	setMinimumHeight(16+2);
 
@@ -50,46 +55,71 @@ NetStatus::NetStatus(QWidget *parent)
 	m_label->setCursor(Qt::IBeamCursor);
 	m_label->setContextMenuPolicy(Qt::ActionsContextMenu);
 	layout->addWidget(m_label);
+	m_labelText = makeTranslator(m_label, [=] {
+		QString txt;
+		switch(m_state) {
+		case NotConnected: txt = tr("not connected"); break;
+		case Connecting:
+			if(m_hideServer)
+				txt = tr("Connecting...");
+			else
+				txt = tr("Connecting to %1...").arg(fullAddress());
+			break;
+		case LoggedIn:
+			if(m_hideServer)
+				txt = tr("Connected");
+			else if(m_roomcode.isEmpty())
+				txt = tr("Host: %1").arg(fullAddress());
+			else
+				txt = tr("Room: %1").arg(m_roomcode);
+			break;
+		case Disconnecting: txt = tr("Logging out..."); break;
+		}
+		m_label->setText(txt);
+	});
 
 	// Action to copy address to clipboard
-	_copyaction = new QAction(tr("Copy address to clipboard"), this);
-	_copyaction->setEnabled(false);
-	m_label->addAction(_copyaction);
-	connect(_copyaction,SIGNAL(triggered()),this,SLOT(copyAddress()));
+	_copyaction = ActionBuilder(this, tr)
+		.text(QT_TR_NOOP("Copy address to clipboard"))
+		.disabled()
+		.onTriggered(this, &NetStatus::copyAddress)
+		.addTo(m_label);
 
 	// Action to copy the full session URL to clipboard
-	_urlaction = new QAction(tr("Copy session URL to clipboard"), this);
-	_urlaction->setEnabled(false);
-	m_label->addAction(_urlaction);
-	connect(_urlaction, SIGNAL(triggered()), this, SLOT(copyUrl()));
+	_urlaction = ActionBuilder(this, tr)
+		.text(QT_TR_NOOP("Copy session URL to clipboard"))
+		.disabled()
+		.onTriggered(this, &NetStatus::copyUrl)
+		.addTo(m_label);
 
 	// Discover local IP address
-	_discoverIp = new QAction(tr("Get externally visible IP address"), this);
-	_discoverIp->setVisible(false);
-	m_label->addAction(_discoverIp);
-	connect(_discoverIp, SIGNAL(triggered()), this, SLOT(discoverAddress()));
-	connect(WhatIsMyIp::instance(), SIGNAL(myAddressIs(QString)), this, SLOT(externalIpDiscovered(QString)));
+	_discoverIp = ActionBuilder(this, tr)
+		.text(QT_TR_NOOP("Get externally visible IP address"))
+		.visible(false)
+		.onTriggered(this, &NetStatus::discoverAddress)
+		.addTo(m_label);
+
+	connect(WhatIsMyIp::instance(), &WhatIsMyIp::myAddressIs, this, &NetStatus::externalIpDiscovered);
 
 	// Option to hide the server address
 	// (useful when livestreaming)
-	QAction *hideServerAction = new QAction(tr("Hide address"), this);
-	hideServerAction->setCheckable(true);
-	hideServerAction->setChecked(m_hideServer);
-	connect(hideServerAction, &QAction::triggered, this, [this](bool hide) {
-		QSettings().setValue("settings/hideServerIp", hide);
-		m_hideServer = hide;
-		updateLabel();
-	});
-	m_label->addAction(hideServerAction);
+	ActionBuilder(this, tr)
+		.text(QT_TR_NOOP("Hide address"))
+		.checked(m_hideServer)
+		.onTriggered([=](bool hide) {
+			QSettings().setValue("settings/hideServerIp", hide);
+			m_hideServer = hide;
+			updateLabel();
+		})
+		.addTo(m_label);
 
 	// Show network statistics
-	QAction *sep = new QAction(this);
-	sep->setSeparator(true);
-	m_label->addAction(sep);
+	ActionBuilder(this, tr).separator(true).addTo(m_label);
 
-	QAction *showNetStats = new QAction(tr("Statistics"), this);
-	m_label->addAction(showNetStats);
-	connect(showNetStats, SIGNAL(triggered()), this, SLOT(showNetStats()));
+	ActionBuilder(this, tr)
+		.text(QT_TR_NOOP("Statistics"))
+		.onTriggered(this, &NetStatus::showNetStats)
+		.addTo(m_label);
 
 	// Security level icon
 	m_security = new QLabel(QString(), this);
@@ -98,10 +128,40 @@ NetStatus::NetStatus(QWidget *parent)
 	layout->addWidget(m_security);
 
 	m_security->setContextMenuPolicy(Qt::ActionsContextMenu);
+	m_securityState = makeTranslator(m_security, [=](net::Server::Security level) {
+		QString iconname;
+		QString tooltip;
+		switch(level) {
+		case net::Server::NO_SECURITY: break;
+		case net::Server::NEW_HOST:
+			iconname = "security-medium";
+			tooltip = tr("A previously unvisited host");
+			break;
 
-	QAction *showcert = new QAction(tr("Show certificate"), this);
-	m_security->addAction(showcert);
-	connect(showcert, SIGNAL(triggered()), this, SLOT(showCertificate()));
+		case net::Server::KNOWN_HOST:
+			iconname = "security-medium";
+			tooltip = tr("Host certificate has not changed since the last visit");
+			break;
+
+		case net::Server::TRUSTED_HOST:
+			iconname = "security-high";
+			tooltip = tr("This is a trusted host");
+			break;
+		}
+
+		if(iconname.isEmpty()) {
+			m_security->hide();
+		} else {
+			m_security->setPixmap(icon::fromTheme(iconname).pixmap(16, 16));
+			m_security->setToolTip(tooltip);
+			m_security->show();
+		}
+	}, net::Server::NO_SECURITY);
+
+	ActionBuilder(this, tr)
+		.text(QT_TR_NOOP("Show certificate"))
+		.onTriggered(this, &NetStatus::showCertificate)
+		.addTo(m_security);
 
 	// Popup label
 	m_popup = new PopupMessage(this);
@@ -161,34 +221,7 @@ void NetStatus::setRoomcode(const QString &roomcode)
 
 void NetStatus::setSecurityLevel(net::Server::Security level, const QSslCertificate &certificate)
 {
-	QString iconname;
-	QString tooltip;
-	switch(level) {
-	case net::Server::NO_SECURITY: break;
-	case net::Server::NEW_HOST:
-		iconname = "security-medium";
-		tooltip = tr("A previously unvisited host");
-		break;
-
-	case net::Server::KNOWN_HOST:
-		iconname = "security-medium";
-		tooltip = tr("Host certificate has not changed since the last visit");
-		break;
-
-	case net::Server::TRUSTED_HOST:
-		iconname = "security-high";
-		tooltip = tr("This is a trusted host");
-		break;
-	}
-
-	if(iconname.isEmpty()) {
-		m_security->hide();
-	} else {
-		m_security->setPixmap(icon::fromTheme(iconname).pixmap(16, 16));
-		m_security->setToolTip(tooltip);
-		m_security->show();
-	}
-
+	m_securityState.args(level);
 	m_certificate.reset(new QSslCertificate(certificate));
 }
 
@@ -341,26 +374,7 @@ void NetStatus::message(const QString &msg)
 
 void NetStatus::updateLabel()
 {
-	QString txt;
-	switch(m_state) {
-	case NotConnected: txt = tr("not connected"); break;
-	case Connecting:
-		if(m_hideServer)
-			txt = tr("Connecting...");
-		else
-			txt = tr("Connecting to %1...").arg(fullAddress());
-		break;
-	case LoggedIn:
-		if(m_hideServer)
-			txt = tr("Connected");
-		else if(m_roomcode.isEmpty())
-			txt = tr("Host: %1").arg(fullAddress());
-		else
-			txt = tr("Room: %1").arg(m_roomcode);
-		break;
-	case Disconnecting: txt = tr("Logging out..."); break;
-	}
-	m_label->setText(txt);
+	m_labelText.trigger();
 }
 
 void NetStatus::showCertificate()

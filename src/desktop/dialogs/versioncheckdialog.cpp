@@ -17,6 +17,8 @@
 
 namespace dialogs {
 
+DP_DYNAMIC_DEFAULT_IMPL(VersionCheckDialog)
+
 VersionCheckDialog::VersionCheckDialog(QWidget *parent)
 	: DynamicUiWidget(parent)
 {
@@ -24,22 +26,55 @@ VersionCheckDialog::VersionCheckDialog(QWidget *parent)
 
 	m_downloadButton = m_ui->buttonBox->addButton(QString(), QDialogButtonBox::ActionRole);
 	m_downloadButton->hide();
+	m_downloadButtonText = makeTranslator(m_downloadButton, [=](QString version, int downloadSize) {
+		m_downloadButton->setText(tr("Download %1 (%2)")
+			.arg(version)
+			.arg(tr("%1MiB").arg(downloadSize / (1024.0 * 1024.0), 0, 'f', 2))
+		);
+	}, QString(), 0);
 
 	connect(m_downloadButton, &QPushButton::clicked, this, &VersionCheckDialog::downloadNewVersion);
 
 	m_ui->checkForUpdates->setChecked(QSettings().value("versioncheck/enabled", true).toBool());
 
 	connect(this, &VersionCheckDialog::finished, this, &VersionCheckDialog::rememberSettings);
+
+	m_downloadLabelText = makeTranslator(m_ui->downloadLabel, [=](DownloadState state, QString arg) {
+		switch (state) {
+		case DownloadState::Downloading:
+			m_ui->downloadLabel->setText(tr("Downloading %1...").arg(arg));
+			break;
+		case DownloadState::Downloaded:
+			m_ui->downloadLabel->setText(tr("Downloaded %1!").arg(arg));
+			break;
+		case DownloadState::Error:
+			m_ui->downloadLabel->setText(arg);
+			break;
+		}
+	}, DownloadState::Downloading, QString());
+
+	m_textBrowserHtml = makeTranslator(m_ui->textBrowser, [=](const QVector<NewVersionCheck::Version> *versions) {
+		if(!versions || versions->isEmpty()) {
+			m_ui->textBrowser->setHtml(QStringLiteral("<h1>%1</h1><p>%2</p>")
+				.arg(tr("You're up to date!"), tr("No new versions found."))
+			);
+		} else {
+			QString content = QStringLiteral("<h1>%1</h1>")
+				.arg(tr("A new version of Drawpile is available!"));
+
+			for(const auto &version : *versions) {
+				content += QStringLiteral("<h2><a href=\"%1\">%2</a></h2>")
+					.arg(version.announcementUrl, tr("Version %1").arg(version.version));
+				content += version.description;
+			}
+
+			m_ui->textBrowser->setHtml(content);
+		}
+	}, static_cast<const QVector<NewVersionCheck::Version> *>(nullptr));
 }
 
 VersionCheckDialog::~VersionCheckDialog()
 {}
-
-void VersionCheckDialog::retranslateUi()
-{
-	m_ui->retranslateUi(this);
-	// TODO
-}
 
 void VersionCheckDialog::rememberSettings()
 {
@@ -102,22 +137,8 @@ void VersionCheckDialog::versionChecked(bool isNew, const QString &errorMessage)
 
 void VersionCheckDialog::setNewVersions(const QVector<NewVersionCheck::Version> &versions)
 {
-	if(versions.isEmpty()) {
-		m_ui->textBrowser->setHtml(QStringLiteral("<h1>%1</h1><p>%2</p>")
-			.arg(tr("You're up to date!"), tr("No new versions found."))
-		);
-	} else {
-		QString content = QStringLiteral("<h1>%1</h1>")
-			.arg(tr("A new version of Drawpile is available!"));
-
-		for(const auto &version : versions) {
-			content += QStringLiteral("<h2><a href=\"%1\">%2</a></h2>")
-				.arg(version.announcementUrl, tr("Version %1").arg(version.version));
-			content += version.description;
-		}
-
-		m_ui->textBrowser->setHtml(content);
-
+	m_textBrowserHtml.args(&versions);
+	if (!versions.isEmpty()) {
 		const auto latest = versions.first();
 		if(!latest.downloadUrl.isEmpty()) {
 			m_downloadUrl = latest.downloadUrl;
@@ -125,15 +146,12 @@ void VersionCheckDialog::setNewVersions(const QVector<NewVersionCheck::Version> 
 				if(latest.downloadChecksumType == "sha256")
 					m_downloadSha256 = QByteArray::fromHex(latest.downloadChecksum.toLatin1());
 				m_downloadSize = latest.downloadSize;
-
-				m_downloadButton->setText(tr("Download %1 (%2 MB)")
-					.arg(latest.version)
-					.arg(latest.downloadSize / (1024.0 * 1024.0), 0, 'f', 2)
-					);
+				m_downloadButtonText.args(latest.version, latest.downloadSize);
 				m_downloadButton->show();
 			}
 		}
 	}
+
 	m_ui->views->setCurrentIndex(1);
 }
 
@@ -182,15 +200,15 @@ void VersionCheckDialog::downloadNewVersion()
 
 	connect(fd, &networkaccess::FileDownload::finished, this, [this, downloadDir](const QString &errorMessage) {
 		if(errorMessage.isEmpty()) {
-			m_ui->downloadLabel->setText(tr("Downloaded %1!").arg(m_downloadUrl.fileName()));
+			m_downloadLabelText.args(DownloadState::Downloaded, m_downloadUrl.fileName());
 			QDesktopServices::openUrl(QUrl::fromLocalFile(downloadDir.path()));
 			close();
 		} else {
-			m_ui->downloadLabel->setText(errorMessage);
+			m_downloadLabelText.args(DownloadState::Error, errorMessage);
 		}
 	});
 
-	m_ui->downloadLabel->setText(tr("Downloading %1...").arg(m_downloadUrl.fileName()));
+	m_downloadLabelText.args(DownloadState::Downloading, m_downloadUrl.fileName());
 	m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);
 	m_downloadButton->hide();
 	m_ui->views->setCurrentIndex(2);

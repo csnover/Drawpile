@@ -98,6 +98,7 @@ private:
 template <typename Callback, typename ...Args>
 Translator<Args...> makeTranslator(QObject *object, Callback callback, Args... args)
 {
+	Q_ASSERT(object);
 	return Translator<Args...>(object, std::move(callback), args...);
 }
 

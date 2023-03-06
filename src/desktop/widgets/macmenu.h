@@ -27,7 +27,6 @@ signals:
 public slots:
 	void newDocument();
 	void openDocument();
-	void joinSession();
 	void quitAll();
 
 private slots:

@@ -57,8 +57,8 @@ void AvatarImport::importAvatar(AvatarListModel *avatarList, QPointer<QWidget> p
 	}
 
 	QString path = QFileDialog::getOpenFileName(parentWindow, tr("Import Avatar"), QString(),
-		tr("Images (%1)").arg(formats) + ";;" +
-		QApplication::tr("All files (*)")
+		QCoreApplication::translate("FileFormatOptions", "Images (%1)").arg(formats) + ";;" +
+		QFileDialog::tr("All Files (*)")
 	);
 
 	if(path.isEmpty())

@@ -40,7 +40,7 @@ class BanListPageFactory : public PageFactory
 {
 public:
 	QString pageId() const override { return QStringLiteral("banlist"); }
-	QString title() const override { return QApplication::tr("IP bans"); }
+	QString title() const override { return PageFactory::tr("IP bans"); }
 
 	BanListPage *makePage(Server *server) const override { return new BanListPage(server); }
 };

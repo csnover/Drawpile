@@ -4,8 +4,6 @@
 #ifndef COLORSPINNERDOCK_H
 #define COLORSPINNERDOCK_H
 
-#include "desktop/utils/dynamicui.h"
-
 #include <QDockWidget>
 #include <memory>
 
@@ -17,9 +15,8 @@ namespace color_widgets {
 
 namespace docks {
 
-class ColorSpinnerDock : public Dynamic<QDockWidget> {
+class ColorSpinnerDock : public QDockWidget {
 	Q_OBJECT
-	DP_DYNAMIC_UI
 public:
 	ColorSpinnerDock(QWidget *parent);
 	~ColorSpinnerDock();

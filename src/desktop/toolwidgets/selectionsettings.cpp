@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/toolwidgets/selectionsettings.h"
+#include "desktop/utils/dynamicui.h"
 #include "libclient/canvas/selection.h"
 #include "libclient/canvas/canvasmodel.h"
 #include "libclient/net/client.h"
@@ -20,15 +21,16 @@ SelectionSettings::SelectionSettings(ToolController *ctrl, QObject *parent)
 }
 
 SelectionSettings::~SelectionSettings()
-{
-	delete m_ui;
-}
+{}
 
 QWidget *SelectionSettings::createUiWidget(QWidget *parent)
 {
 	QWidget *uiwidget = new QWidget(parent);
-	m_ui = new Ui_SelectionSettings;
+	m_ui.reset(new Ui_SelectionSettings);
 	m_ui->setupUi(uiwidget);
+	makeTranslator(uiwidget, [=] {
+		m_ui->retranslateUi(uiwidget);
+	});
 
 	connect(m_ui->flip, &QAbstractButton::clicked, this, &SelectionSettings::flipSelection);
 	connect(m_ui->mirror, SIGNAL(clicked()), this, SLOT(mirrorSelection()));

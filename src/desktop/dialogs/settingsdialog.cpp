@@ -57,6 +57,8 @@ public:
 
 namespace dialogs {
 
+DP_DYNAMIC_DEFAULT_IMPL(SettingsDialog)
+
 /**
  * Construct a settings dialog. The actions in the list should have
  * a "defaultshortcut" property for reset to default to work.
@@ -67,20 +69,26 @@ namespace dialogs {
 SettingsDialog::SettingsDialog(QWidget *parent)
 	: DynamicUiWidget(parent)
 {
-	connect(m_ui->notificationVolume, &QSlider::valueChanged, [this](int val) {
-		if(val>0)
-			m_ui->volumeLabel->setText(QString::number(val) + "%");
-		else
-			m_ui->volumeLabel->setText(tr("off", "notifications sounds"));
+	m_volumeLabelText = makeTranslator(m_ui->notificationVolume, [=](int val) {
+		m_ui->volumeLabel->setText(val > 0
+			? tr("%1%").arg(val)
+			: tr("off", "notifications sounds")
+		);
+	}, 0);
+
+	connect(m_ui->notificationVolume, &QSlider::valueChanged, [=](int val) {
+		m_volumeLabelText.args(val);
 	});
 
 	// Get available languages
 	m_ui->languageBox->addItem(tr("Default"), QString());
+	makeTranslator(m_ui->languageBox, [=] {
+		m_ui->languageBox->setItemText(0, tr("Default"));
+	});
 	m_ui->languageBox->addItem(QStringLiteral("English"), QStringLiteral("en"));
 	connect(m_ui->languageBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) {
 		const auto lang = m_ui->languageBox->currentData().toString();
 		static_cast<DrawpileApp *>(qApp)->setLanguage(lang);
-		retranslateUi();
 	});
 
 	const QLocale localeC = QLocale::c();
@@ -168,6 +176,12 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 	connect(m_ui->listserverDown, &QPushButton::clicked, this, &SettingsDialog::moveListingServerDown);
 
 	// Parental controls
+	m_nsfmLockText = makeTranslator(m_ui->nsfmLock, [=](bool lock) {
+		m_ui->nsfmLock->setText(lock
+			? tr("Unlock")
+			: tr("Lock")
+		);
+	}, false);
 	connect(m_ui->nsfmLock, &QPushButton::clicked, this, &SettingsDialog::lockParentalControls);
 
 	// Avatar list
@@ -203,16 +217,6 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
 SettingsDialog::~SettingsDialog()
 {}
-
-void SettingsDialog::retranslateUi()
-{
-	m_ui->retranslateUi(this);
-	m_ui->languageBox->setItemText(0, tr("Default"));
-	const auto lock = QSettings().value("pc/locked").toBool();
-	m_ui->nsfmLock->setText(lock ? tr("Unlock") : tr("Lock"));
-	update();
-	update();
-}
 
 void SettingsDialog::resetSettings()
 {
@@ -377,7 +381,7 @@ void SettingsDialog::setParentalControlsLocked(bool lock)
 	m_ui->nsfmNoJoin->setDisabled(lock);
 	m_ui->nsfmDisconnect->setDisabled(lock);
 	m_ui->noUncensoring->setDisabled(lock);
-	m_ui->nsfmLock->setText(lock ? tr("Unlock") : tr("Lock"));
+	m_nsfmLockText.args(lock);
 }
 
 void SettingsDialog::rememberSettings()
@@ -604,7 +608,7 @@ void SettingsDialog::importTrustedCertificate()
 {
 	QString path = QFileDialog::getOpenFileName(this, tr("Import trusted certificate"), QString(),
 		tr("Certificates (%1)").arg("*.pem *.crt *.cer") + ";;" +
-		QApplication::tr("All files (*)")
+		QFileDialog::tr("All Files (*)")
 	);
 
 	if(path.isEmpty())
@@ -706,7 +710,7 @@ void SettingsDialog::lockParentalControls()
 			cfg.setValue("locked", server::passwordhash::hash(pass));
 			locked = true;
 			rememberPcLevel();
-			m_ui->nsfmLock->setText(tr("Unlock"));
+			m_nsfmLockText.args(true);
 		}
 	}
 

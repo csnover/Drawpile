@@ -5,6 +5,7 @@
 #include "desktop/docks/colorspinner.h"
 #include "desktop/docks/colorpalette.h"
 #include "desktop/docks/titlewidget.h"
+#include "desktop/utils/dynamicui.h"
 
 #include <QtColorWidgets/swatch.hpp>
 #include <QtColorWidgets/color_wheel.hpp>
@@ -18,9 +19,11 @@ struct ColorSpinnerDock::Private {
 };
 
 ColorSpinnerDock::ColorSpinnerDock(QWidget *parent)
-	: Dynamic(parent)
+	: QDockWidget(parent)
 	, d(new Private)
 {
+	AUTO_TR(this, setWindowTitle, tr("Color Wheel"));
+
 	// Create title bar widget
 	auto *titlebar = new TitleWidget(this);
 	setTitleBarWidget(titlebar);
@@ -46,17 +49,11 @@ ColorSpinnerDock::ColorSpinnerDock(QWidget *parent)
 	// Restore UI state
 	connect(static_cast<DrawpileApp*>(qApp), &DrawpileApp::settingsChanged,
 			this, &ColorSpinnerDock::updateSettings);
-	retranslateUi();
 	updateSettings();
 }
 
 ColorSpinnerDock::~ColorSpinnerDock()
 {}
-
-void ColorSpinnerDock::retranslateUi()
-{
-	setWindowTitle(tr("Color Wheel"));
-}
 
 void ColorSpinnerDock::setColor(const QColor& color)
 {

@@ -253,8 +253,8 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 		auto *msgbox = new QMessageBox(
 					QMessageBox::Warning,
 					tr("Server out of space"),
-					tr("Server is running out of history space and session has grown too large to automatically reset! (Limit is %1 MB)\nSimplify the canvas and reset manually before space runs out.")
-						.arg(maxSize / double(1024*1024), 0, 'f', 2),
+					tr("Server is running out of history space and session has grown too large to automatically reset! (Limit is %1)\nSimplify the canvas and reset manually before space runs out.")
+						.arg(tr("%1MiB").arg(maxSize / double(1024*1024), 0, 'f', 2)),
 					QMessageBox::Ok,
 					this
 					);
@@ -327,7 +327,7 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	connect(m_doc, &Document::catchupProgress, m_netstatus, &widgets::NetStatus::setCatchupProgress);
 
 	connect(m_doc->client(), &net::Client::serverStatusUpdate, sessionHistorySize, [sessionHistorySize](int size) {
-		sessionHistorySize->setText(tr("%1 MB").arg(size / float(1024*1024), 0, 'f', 2));
+		sessionHistorySize->setText(tr("%1MiB").arg(size / float(1024*1024), 0, 'f', 2));
 	});
 
 	connect(m_chatbox, &widgets::ChatBox::message, m_doc->client(), &net::Client::sendEnvelope);
@@ -386,9 +386,10 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	connect(m_doc->client(), &net::Client::lagMeasured, m_netstatus, &widgets::NetStatus::lagMeasured);
 	connect(m_doc->client(), &net::Client::youWereKicked, m_netstatus, &widgets::NetStatus::kicked);
 
-	connect(qApp, SIGNAL(settingsChanged()), this, SLOT(loadShortcuts()));
-	connect(qApp, SIGNAL(settingsChanged()), this, SLOT(updateSettings()));
-	connect(qApp, SIGNAL(settingsChanged()), m_view, SLOT(updateShortcuts()));
+	auto *app = static_cast<DrawpileApp *>(qApp);
+	connect(app, &DrawpileApp::settingsChanged, this, &MainWindow::loadShortcuts);
+	connect(app, &DrawpileApp::settingsChanged, this, &MainWindow::updateSettings);
+	connect(app, &DrawpileApp::settingsChanged, m_view, &widgets::CanvasView::updateShortcuts);
 
 	updateSettings();
 
@@ -416,9 +417,17 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	connect(hbfilter, &HotBorderEventFilter::hotBorder, this, &MainWindow::hotBorderMenubar);
 #endif
 
-	makeTranslator(this, [=] {
-		updateTitle();
-	});
+	m_windowTitle = makeTranslator(this, [=](QString name, QString sessionTitle) {
+		if (name.isEmpty()) {
+			name = tr("Untitled");
+		}
+
+		setWindowTitle(sessionTitle.isEmpty()
+			? QStringLiteral("%1[*]").arg(name)
+			: QStringLiteral("%1[*] - %2").arg(name, sessionTitle)
+		);
+	}, QString(), QString());
+
 	show();
 
 	setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
@@ -556,18 +565,12 @@ void MainWindow::addRecentFile(const QString& file)
 void MainWindow::updateTitle()
 {
 	QString name;
-	if(m_doc->currentFilename().isEmpty()) {
-		name = tr("Untitled");
-
-	} else {
+	if(!m_doc->currentFilename().isEmpty()) {
 		const QFileInfo info(m_doc->currentFilename());
 		name = info.baseName();
 	}
 
-	if(m_doc->sessionTitle().isEmpty())
-		setWindowTitle(QStringLiteral("%1[*]").arg(name));
-	else
-		setWindowTitle(QStringLiteral("%1[*] - %2").arg(name, m_doc->sessionTitle()));
+	m_windowTitle.args(name, m_doc->sessionTitle());
 }
 
 void MainWindow::toggleChat(bool show)
@@ -1203,9 +1206,10 @@ void MainWindow::onCanvasSaved(const QString &errorMessage)
 	setWindowModified(m_doc->isDirty());
 	updateTitle();
 
-	if(!errorMessage.isEmpty())
+	if(!errorMessage.isEmpty()) {
+		m_viewStatusBar->clearMessage();
 		showErrorMessage(tr("Couldn't save image"), errorMessage);
-	else
+	} else
 		m_viewStatusBar->showMessage(tr("Image saved"), 1000);
 
 	// Cancel exit if canvas is modified while it was being saved
@@ -1275,25 +1279,7 @@ void MainWindow::showFlipbook()
 
 void MainWindow::setRecorderStatus(bool on)
 {
-	QAction *recordAction = getAction("recordsession");
-
-	if(m_playbackDialog) {
-		if(m_playbackDialog->isPlaying()) {
-			recordAction->setIcon(icon::fromTheme("media-playback-pause"));
-			recordAction->setText(tr("Pause"));
-		} else {
-			recordAction->setIcon(icon::fromTheme("media-playback-start"));
-			recordAction->setText(tr("Play"));
-		}
-	} else {
-		if(on) {
-			recordAction->setText(tr("Stop Recording"));
-			recordAction->setIcon(icon::fromTheme("media-playback-stop"));
-		} else {
-			recordAction->setText(tr("Record..."));
-			recordAction->setIcon(icon::fromTheme("media-record"));
-		}
-	}
+	m_recordAction.args(m_playbackDialog ? m_playbackDialog->isPlaying() : on);
 }
 
 void MainWindow::toggleRecording()
@@ -1422,21 +1408,27 @@ void MainWindow::hostSession(dialogs::HostDialog *dlg)
  */
 void MainWindow::join(const QUrl &url)
 {
-	auto dlg = new dialogs::JoinDialog(url, this);
+	showJoinDialog(this, url);
+}
 
-	connect(dlg, &dialogs::JoinDialog::finished, this, [this, dlg](int i) {
-		if(i==QDialog::Accepted) {
+void MainWindow::showJoinDialog(MainWindow *parent, const QUrl &url)
+{
+	auto dlg = new dialogs::JoinDialog(url, parent);
+	connect(dlg, &dialogs::JoinDialog::finished, [=](int i) {
+		if(i == QDialog::Accepted) {
 			QUrl url = dlg->getUrl();
+			if(url.isValid()) {
+				dlg->rememberSettings();
 
-			if(!url.isValid()) {
+				auto *mw = parent;
+				if(!mw) {
+					mw = new MainWindow;
+				}
+				mw->joinSession(url, dlg->autoRecordFilename());
+			} else {
 				// TODO add validator to prevent this from happening
-				showErrorMessage("Invalid address");
-				return;
+				showErrorMessage(parent, tr("Invalid address"));
 			}
-
-			dlg->rememberSettings();
-
-			joinSession(url, dlg->autoRecordFilename());
 		}
 		dlg->deleteLater();
 	});
@@ -1450,7 +1442,9 @@ void MainWindow::leave()
 {
 	QMessageBox *leavebox = new QMessageBox(
 		QMessageBox::Question,
-		m_doc->sessionTitle().isEmpty() ? tr("Untitled") : m_doc->sessionTitle(),
+		m_doc->sessionTitle().isEmpty()
+			? tr("Untitled")
+			: m_doc->sessionTitle(),
 		tr("Really leave the session?"),
 		QMessageBox::NoButton,
 		this,
@@ -1459,8 +1453,8 @@ void MainWindow::leave()
 	leavebox->setAttribute(Qt::WA_DeleteOnClose);
 	leavebox->addButton(tr("Leave"), QMessageBox::YesRole);
 	leavebox->setDefaultButton(
-			leavebox->addButton(tr("Stay"), QMessageBox::NoRole)
-			);
+		leavebox->addButton(tr("Stay"), QMessageBox::NoRole)
+	);
 	connect(leavebox, &QMessageBox::finished, this, [this](int result) {
 		if(result == 0)
 			m_doc->client()->disconnectFromServer();
@@ -1768,7 +1762,7 @@ void MainWindow::exit()
  * @param message error message
  * @param details error details
  */
-void MainWindow::showErrorMessage(const QString& message, const QString& details)
+void MainWindow::showErrorMessage(QWidget *parent, const QString& message, const QString& details)
 {
 	if(message.isEmpty())
 		return;
@@ -1777,13 +1771,18 @@ void MainWindow::showErrorMessage(const QString& message, const QString& details
 		QMessageBox::Warning,
 		QString(),
 		message, QMessageBox::Ok,
-		this,
+		parent,
 		Qt::Dialog|Qt::Sheet|Qt::MSWindowsFixedSizeDialogHint
 	);
 	msgbox->setAttribute(Qt::WA_DeleteOnClose);
 	msgbox->setWindowModality(Qt::WindowModal);
 	msgbox->setInformativeText(details);
 	msgbox->show();
+}
+
+void MainWindow::showErrorMessage(const QString &message, const QString &details)
+{
+	showErrorMessage(this, message, details);
 }
 
 void MainWindow::showErrorMessage(rustpile::CanvasIoError error)
@@ -2292,13 +2291,13 @@ void MainWindow::setupActions()
 		.checkable()
 		.remembered()
 		.addTo(toggledockmenu)
-		.onTriggered(this, &MainWindow::setFreezeDocks);
+		.onToggled(this, &MainWindow::setFreezeDocks);
 
 	makeAction(QT_TR_NOOP("Hide Docks"), "hidedocks")
 		.checkable()
 		.shortcut("tab")
 		.addTo(toggledockmenu)
-		.onTriggered(this, &MainWindow::setDocksHidden);
+		.onToggled(this, &MainWindow::setDocksHidden);
 
 	// File menu and toolbar
 	QToolBar *filetools = makeToolBar(QT_TR_NOOP("File Tools"));
@@ -2382,12 +2381,31 @@ void MainWindow::setupActions()
 					.onTriggered(this, &MainWindow::exportAnimationFrames)
 				);
 		})
-		.action(makeAction(QT_TR_NOOP("Record..."), "recordsession")
-			.icon("media-record")
-			.addTo(m_currentdoctools)
-			.addTo(filetools)
-			.onTriggered(this, &MainWindow::toggleRecording)
-		)
+		.action([=](ActionBuilder action) {
+			action
+				.icon("media-record")
+				.addTo(m_currentdoctools)
+				.addTo(filetools)
+				.addTo(this)
+				.onTriggered(this, &MainWindow::toggleRecording);
+
+			QAction *a = action;
+			m_recordAction = makeTranslator(a, [=](bool on) {
+				if (m_playbackDialog) {
+					a->setText(on ? tr("Pause") : tr("Play"));
+					a->setIcon(icon::fromTheme(on
+						? "media-playback-pause"
+						: "media-playback-start"
+					));
+				} else {
+					a->setText(on ? tr("Stop Recording") : tr("Record..."));
+					a->setIcon(icon::fromTheme(on
+						? "media-playback-stop"
+						: "media-record"
+					));
+				}
+			}, false);
+		})
 		.separator()
 		.action(makeAction(QT_TR_NOOP("&Quit"), "exitprogram")
 			.icon("application-exit")
@@ -3107,7 +3125,7 @@ void MainWindow::createDocks()
 	m_dockColorPalette->setObjectName("colorpalettedock");
 	addDockWidget(Qt::RightDockWidgetArea, m_dockColorPalette);
 
-	m_dockColorSliders = new docks::ColorSliderDock(tr("Color Sliders"), this);
+	m_dockColorSliders = new docks::ColorSliderDock(this);
 	m_dockColorSliders->setObjectName("colorsliderdock");
 	addDockWidget(Qt::RightDockWidgetArea, m_dockColorSliders);
 

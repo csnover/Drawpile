@@ -41,7 +41,7 @@ class ServersummaryPageFactory : public PageFactory
 {
 public:
 	QString pageId() const override { return QStringLiteral("summary:server"); }
-	QString title() const override { return QApplication::tr("Settings"); }
+	QString title() const override { return PageFactory::tr("Settings"); }
 	ServerSummaryPage *makePage(Server *server) const override { return new ServerSummaryPage(server); }
 };
 

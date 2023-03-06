@@ -36,6 +36,8 @@ static const int COMPACT_MODE_THRESHOLD = 300;
 // How often the listing view should be refreshed (in seconds)
 static const int REFRESH_INTERVAL = 60;
 
+DP_DYNAMIC_DEFAULT_IMPL(JoinDialog)
+
 JoinDialog::JoinDialog(const QUrl &url, QWidget *parent)
 	: DynamicUiWidget(parent)
 	, m_lastRefresh(0)
@@ -142,12 +144,6 @@ JoinDialog::JoinDialog(const QUrl &url, QWidget *parent)
 	refreshTimer->start(1000 * (REFRESH_INTERVAL + 1));
 
 	refreshListing();
-	retranslateUi();
-}
-
-void JoinDialog::retranslateUi()
-{
-	m_ui->retranslateUi(this);
 }
 
 JoinDialog::~JoinDialog()

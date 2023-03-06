@@ -16,6 +16,7 @@
 #include <QEvent>
 #include <QPaintEvent>
 #include <QList>
+#include <memory>
 
 class QSpinBox;
 class KisCubicCurve;
@@ -135,7 +136,7 @@ public:
 
 private:
 	class Private;
-	Private * const d;
+	const std::unique_ptr<Private> d;
 };
 
 #endif /* KIS_CURVE_WIDGET_H */

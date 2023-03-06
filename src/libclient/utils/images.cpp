@@ -7,7 +7,7 @@
 #include <QSize>
 #include <QImageReader>
 #include <QImageWriter>
-#include <QGuiApplication>
+#include <QCoreApplication>
 
 namespace utils {
 
@@ -86,7 +86,7 @@ QString fileFormatFilter(FileFormatOptions formats)
 				readImages = DRAWPILE_FILE_GROUP_IMAGE;
 			}
 
-			filter << QGuiApplication::tr("Images (%1)").arg(readImages);
+			filter << QCoreApplication::translate("FileFormatOptions", "Images (%1)").arg(readImages);
 		}
 	}
 
@@ -94,28 +94,28 @@ QString fileFormatFilter(FileFormatOptions formats)
 		if(formats.testFlag(FileFormatOption::Save)) {
 			// Recording formats individually for saving
 			filter
-				<< QGuiApplication::tr("Binary Recordings (%1)").arg("*.dprec")
-				<< QGuiApplication::tr("Text Recordings (%1)").arg("*.dptxt")
+				<< QCoreApplication::translate("FileFormatOptions", "Binary Recordings (%1)").arg("*.dprec")
+				<< QCoreApplication::translate("FileFormatOptions", "Text Recordings (%1)").arg("*.dptxt")
 				;
 
 		} else {
 			// A single Recordings filter for loading
 			recordings = DRAWPILE_FILE_GROUP_RECORDING;
 			filter
-				<< QGuiApplication::tr("Recordings (%1)").arg(recordings)
+				<< QCoreApplication::translate("FileFormatOptions", "Recordings (%1)").arg(recordings)
 				;
 		}
 	}
 
 	if(!readImages.isEmpty() && !recordings.isEmpty()) {
 		filter.prepend(
-			QGuiApplication::tr("All Supported Files (%1)").arg(readImages + ' ' + recordings)
+			QCoreApplication::translate("FileFormatOptions", "All Supported Files (%1)").arg(readImages + ' ' + recordings)
 		);
 	}
 
 	// An all files filter when requested
 	if(formats.testFlag(FileFormatOption::AllFiles)) {
-		filter << QGuiApplication::tr("All Files (*)");
+		filter << QCoreApplication::translate("QFileDialog", "All Files (*)");
 	}
 
 	return filter.join(";;");

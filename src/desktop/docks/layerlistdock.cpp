@@ -12,6 +12,7 @@
 #include "desktop/docks/layeraclmenu.h"
 #include "desktop/docks/titlewidget.h"
 #include "desktop/dialogs/layerproperties.h"
+#include "desktop/utils/dynamicui.h"
 #include "libclient/utils/icon.h"
 #include "libclient/net/envelopebuilder.h"
 
@@ -31,7 +32,7 @@
 namespace docks {
 
 LayerList::LayerList(QWidget *parent)
-	: QDockWidget(tr("Layers"), parent)
+	: QDockWidget(parent)
 	, m_canvas(nullptr)
 	, m_selectedId(0)
 	, m_nearestToDeletedId(0)
@@ -41,6 +42,8 @@ LayerList::LayerList(QWidget *parent)
 	, m_mergeLayerAction(nullptr)
 	, m_deleteLayerAction(nullptr)
 {
+	AUTO_TR(this, setWindowTitle, tr("Layers"));
+
 	auto *titlebar = new TitleWidget(this);
 	setTitleBarWidget(titlebar);
 

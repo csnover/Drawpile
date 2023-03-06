@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // SPDX-FileCopyrightText: Calle Laakkonen
 
+#include "desktop/main.h"
 #include "desktop/docks/layeraclmenu.h"
+#include "desktop/utils/actionbuilder.h"
 #include "libclient/canvas/userlist.h"
 #include "libclient/parentalcontrols/parentalcontrols.h"
 #include "rustpile/rustpile.h"
@@ -11,38 +13,67 @@
 
 namespace docks {
 
-static void addTier(QActionGroup *group, const QString &title, rustpile::Tier tier)
+LayerAclMenu::LayerAclMenu(QWidget *parent)
+	: QMenu(parent)
+	, m_userlist(nullptr)
+	, m_tiers(new QActionGroup(this))
+	, m_users(new QActionGroup(this))
 {
-	QAction *a = group->addAction(title);
-	a->setProperty("userTier", int(tier));
-	a->setCheckable(true);
-	a->setChecked(true);
-}
-
-LayerAclMenu::LayerAclMenu(QWidget *parent) :
-	QMenu(parent), m_userlist(nullptr)
-{
-	m_lock = addAction(tr("Lock this layer"));
-	m_lock->setCheckable(true);
-
-	m_censored = addAction(tr("Censor"));
-	m_censored->setCheckable(true);
-
-	addSection(tr("Access tier:"));
-	m_tiers = new QActionGroup(this);
-	addTier(m_tiers, tr("Operators"), rustpile::Tier::Operator);
-	addTier(m_tiers, tr("Trusted"), rustpile::Tier::Trusted);
-	addTier(m_tiers, tr("Registered"), rustpile::Tier::Authenticated);
-	addTier(m_tiers, tr("Everyone"), rustpile::Tier::Guest);
-	addActions(m_tiers->actions());
-
-	addSection(tr("Exclusive access:"));
-	m_users = new QActionGroup(this);
 	m_users->setExclusive(false);
 
-	connect(this, &LayerAclMenu::triggered, this, &LayerAclMenu::userClicked);
+	MenuBuilder(this, tr)
+		.action([=](ActionBuilder action) {
+			m_lock = action
+				.text(QT_TR_NOOP("Lock this layer"))
+				.checkable();
+		})
+		.action([=](ActionBuilder action) {
+			m_censored = action
+				.text(QT_TR_NOOP("Censor"))
+				.checkable();
+		})
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Access tier:"))
+				.separator(true);
+		})
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Operators"))
+				.property("userTier", int(rustpile::Tier::Operator))
+				.checkable()
+				.addTo(m_tiers);
+		})
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Trusted"))
+				.property("userTier", int(rustpile::Tier::Trusted))
+				.checkable()
+				.addTo(m_tiers);
+		})
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Registered"))
+				.property("userTier", int(rustpile::Tier::Authenticated))
+				.checkable()
+				.addTo(m_tiers);
+		})
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Everyone"))
+				.property("userTier", int(rustpile::Tier::Guest))
+				.checked(true)
+				.addTo(m_tiers);
+		})
+		.action([=](ActionBuilder action) {
+			action
+				.text(QT_TR_NOOP("Exclusive access:"))
+				.separator(true);
+		});
 
-	connect(qApp, SIGNAL(settingsChanged()), this, SLOT(refreshParentalControls()));
+	connect(this, &LayerAclMenu::triggered, this, &LayerAclMenu::userClicked);
+	connect(static_cast<DrawpileApp *>(qApp), &DrawpileApp::settingsChanged, this, &LayerAclMenu::refreshParentalControls);
+
 	refreshParentalControls();
 }
 

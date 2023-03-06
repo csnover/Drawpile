@@ -65,6 +65,9 @@ private:
 	CustomShortcutModel *m_customShortcuts;
 	sessionlisting::ListServerModel *m_listservers;
 	AvatarListModel *m_avatars;
+
+	Translator<int> m_volumeLabelText;
+	Translator<bool> m_nsfmLockText;
 };
 
 }

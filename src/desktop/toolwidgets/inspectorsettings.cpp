@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/toolwidgets/inspectorsettings.h"
+#include "desktop/utils/dynamicui.h"
 #include "libclient/tools/toolcontroller.h"
 #include "libclient/canvas/userlist.h"
 
@@ -15,15 +16,16 @@ InspectorSettings::InspectorSettings(ToolController *ctrl, QObject *parent)
 }
 
 InspectorSettings::~InspectorSettings()
-{
-	delete m_ui;
-}
+{}
 
 QWidget *InspectorSettings::createUiWidget(QWidget *parent)
 {
 	auto widget = new QWidget(parent);
-	m_ui = new Ui_InspectorSettings;
+	m_ui.reset(new Ui_InspectorSettings);
 	m_ui->setupUi(widget);
+	makeTranslator(widget, [=] {
+		m_ui->retranslateUi(widget);
+	});
 
 	return widget;
 }

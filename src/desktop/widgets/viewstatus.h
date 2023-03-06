@@ -16,10 +16,9 @@ namespace widgets {
 class GroupedToolButton;
 class KisAngleGauge;
 
-class ViewStatus : public Dynamic<QWidget>
+class ViewStatus : public QWidget
 {
 	Q_OBJECT
-	DP_DYNAMIC_UI
 public:
 	ViewStatus(QWidget *parent=nullptr);
 
@@ -39,8 +38,6 @@ private slots:
 	void angleBoxChanged(const QString &text);
 
 private:
-	virtual void recolorUi() override;
-
 	QSlider *m_zoomSlider;
 	QComboBox *m_zoomBox;
 	KisAngleGauge *m_compass;

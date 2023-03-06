@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/toolwidgets/fillsettings.h"
+#include "desktop/utils/dynamicui.h"
 #include "libclient/tools/toolcontroller.h"
 #include "libclient/tools/toolproperties.h"
 #include "libclient/tools/floodfill.h"
@@ -31,15 +32,16 @@ FillSettings::FillSettings(ToolController *ctrl, QObject *parent)
 }
 
 FillSettings::~FillSettings()
-{
-	delete _ui;
-}
+{}
 
 QWidget *FillSettings::createUiWidget(QWidget *parent)
 {
 	QWidget *uiwidget = new QWidget(parent);
-	_ui = new Ui_FillSettings;
+	_ui.reset(new Ui_FillSettings);
 	_ui->setupUi(uiwidget);
+	makeTranslator(uiwidget, [=] {
+		_ui->retranslateUi(uiwidget);
+	});
 
 	_ui->preview->setPreviewShape(rustpile::BrushPreviewShape::FloodFill);
 

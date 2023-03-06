@@ -16,7 +16,7 @@ namespace docks {
 class ColorSliderDock : public QDockWidget {
 	Q_OBJECT
 public:
-	ColorSliderDock(const QString& title, QWidget *parent);
+	ColorSliderDock(QWidget *parent);
 	~ColorSliderDock();
 
 public slots:

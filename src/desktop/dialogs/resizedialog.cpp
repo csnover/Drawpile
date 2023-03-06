@@ -11,6 +11,8 @@
 
 namespace dialogs {
 
+DP_DYNAMIC_DEFAULT_IMPL(ResizeDialog)
+
 ResizeDialog::ResizeDialog(const QSize &oldsize, QWidget *parent)
 	: DynamicUiWidget(parent)
 	, m_oldsize(oldsize)
@@ -20,8 +22,11 @@ ResizeDialog::ResizeDialog(const QSize &oldsize, QWidget *parent)
 	m_ui->resizer->setOriginalSize(oldsize);
 	m_ui->resizer->setTargetSize(oldsize);
 
-	m_centerButton = new QPushButton;
-	m_ui->buttons->addButton(m_centerButton, QDialogButtonBox::ActionRole);
+	AUTO_TR(m_ui->buttons->button(QDialogButtonBox::Ok), setText, tr("Resize"));
+
+	auto *centerButton = new QPushButton(this);
+	AUTO_TR(centerButton, setText, tr("Center"));
+	m_ui->buttons->addButton(centerButton, QDialogButtonBox::ActionRole);
 
 	m_ui->width->setValue(m_oldsize.width());
 	m_ui->height->setValue(m_oldsize.height());
@@ -30,22 +35,14 @@ ResizeDialog::ResizeDialog(const QSize &oldsize, QWidget *parent)
 	connect(m_ui->height, QOverload<int>::of(&QSpinBox::valueChanged), this, &ResizeDialog::heightChanged);
 	connect(m_ui->keepaspect, &QCheckBox::toggled, this, &ResizeDialog::toggleAspectRatio);
 
-	connect(m_centerButton, &QPushButton::clicked, m_ui->resizer, &widgets::ResizerWidget::center);
+	connect(centerButton, &QPushButton::clicked, m_ui->resizer, &widgets::ResizerWidget::center);
 	connect(m_ui->buttons->button(QDialogButtonBox::Reset), &QAbstractButton::clicked, this, &ResizeDialog::reset);
 
 	m_ui->keepaspect->setChecked(true);
-	retranslateUi();
 }
 
 ResizeDialog::~ResizeDialog()
 {}
-
-void ResizeDialog::retranslateUi()
-{
-	m_ui->retranslateUi(this);
-	m_ui->buttons->button(QDialogButtonBox::Ok)->setText(tr("Resize"));
-	m_centerButton->setText(tr("Center"));
-}
 
 void ResizeDialog::setPreviewImage(const QImage &image)
 {
@@ -69,7 +66,7 @@ void ResizeDialog::done(int r)
 {
 	if(r == QDialog::Accepted) {
 		if(!utils::checkImageSize(newSize())) {
-			QMessageBox::information(this, tr("Error"), tr("Size is too large"));
+			QMessageBox::critical(this, tr("Error"), tr("Size is too large"));
 			return;
 		}
 	}

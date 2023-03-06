@@ -9,14 +9,11 @@
 
 namespace dialogs {
 
-namespace {
-	QString first(const QStringList &sl)
-	{
-		// TODO: i18n
-		if(sl.isEmpty())
-			return QStringLiteral("(not set)");
-		return sl.at(0);
-	}
+static QString first(const QStringList &sl)
+{
+	if(sl.isEmpty())
+		return CertificateView::tr("(not set)");
+	return sl.at(0);
 }
 
 DP_DYNAMIC_DEFAULT_IMPL(CertificateView)
@@ -25,15 +22,13 @@ CertificateView::CertificateView(const QString &hostname, const QSslCertificate 
 	: DynamicUiWidget(parent)
 {
 	AUTO_TR(this, setWindowTitle, tr("SSL Certificate for %1").arg(hostname));
-
-	m_ui->cn_label->setText(first(certificate.subjectInfo(QSslCertificate::CommonName)));
-	m_ui->org_label->setText(first(certificate.subjectInfo(QSslCertificate::Organization)));
-	m_ui->orgunit_label->setText(first(certificate.subjectInfo(QSslCertificate::OrganizationalUnitName)));
+	AUTO_TR(m_ui->cn_label, setText, first(certificate.subjectInfo(QSslCertificate::CommonName)));
+	AUTO_TR(m_ui->org_label, setText, first(certificate.subjectInfo(QSslCertificate::Organization)));
+	AUTO_TR(m_ui->orgunit_label, setText, first(certificate.subjectInfo(QSslCertificate::OrganizationalUnitName)));
 	m_ui->sn_label->setText(certificate.serialNumber());
 
-	m_ui->icn_label->setText(first(certificate.issuerInfo(QSslCertificate::CommonName)));
-	m_ui->io_label->setText(first(certificate.issuerInfo(QSslCertificate::Organization)));
-	m_ui->iou_label->setText(first(certificate.issuerInfo(QSslCertificate::OrganizationalUnitName)));
+	AUTO_TR(m_ui->icn_label, setText, first(certificate.issuerInfo(QSslCertificate::CommonName)));
+	AUTO_TR(m_ui->io_label, setText, first(certificate.issuerInfo(QSslCertificate::Organization)));
 
 	m_ui->issuedon_label->setText(certificate.effectiveDate().toString());
 	m_ui->expireson_label->setText(certificate.expiryDate().toString());

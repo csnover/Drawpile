@@ -5,6 +5,7 @@
 #define TIMELINEWIDGET_H
 
 #include <QWidget>
+#include <memory>
 
 namespace canvas {
 	class TimelineModel;
@@ -54,7 +55,7 @@ private:
 	void updateScrollbars();
 
 	struct Private;
-	Private *d;
+	const std::unique_ptr<Private> d;
 };
 
 }

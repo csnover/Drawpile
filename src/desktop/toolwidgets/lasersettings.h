@@ -6,6 +6,8 @@
 
 #include "desktop/toolwidgets/toolsettings.h"
 
+#include <memory>
+
 class Ui_LaserSettings;
 
 namespace tools {
@@ -39,7 +41,7 @@ protected:
 	QWidget *createUiWidget(QWidget *parent) override;
 
 private:
-	Ui_LaserSettings * _ui;
+	std::unique_ptr<Ui_LaserSettings> _ui;
 	qreal m_quickAdjust1 = 0.0;
 };
 

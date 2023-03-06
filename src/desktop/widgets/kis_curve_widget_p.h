@@ -8,6 +8,8 @@
 
 #include "libclient/utils/kis_cubic_curve.h"
 
+#include <memory>
+
 enum enumState {
 	ST_NORMAL,
 	ST_DRAG
@@ -45,7 +47,7 @@ public:
 	QPixmap m_pix;
 	QPixmap m_pixmapBase;
 	bool m_pixmapDirty;
-	QPixmap *m_pixmapCache;
+	std::unique_ptr<QPixmap> m_pixmapCache;
 
 	/* In/Out controls */
 	QSpinBox *m_intIn;

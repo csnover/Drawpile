@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>405</height>
+    <width>404</width>
+    <height>403</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Export video</string>
@@ -19,57 +25,10 @@
      <property name="title">
       <string>Video Options</string>
      </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
      <layout class="QFormLayout">
       <property name="fieldGrowthPolicy">
        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
       </property>
-      <item row="1" column="1">
-       <layout class="QHBoxLayout">
-        <item>
-         <widget class="QSpinBox" name="fps">
-          <property name="suffix">
-           <string> FPS</string>
-          </property>
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="value">
-           <number>25</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel">
-        <property name="text">
-         <string>Size:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel">
-        <property name="text">
-         <string>Framerate:</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel">
         <property name="text">
@@ -91,7 +50,40 @@
         </item>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="1" column="0">
+       <widget class="QLabel">
+        <property name="text">
+         <string>Framerate:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="fps">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="suffix">
+         <string> FPS</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>25</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel">
+        <property name="text">
+         <string>Size:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
        <layout class="QHBoxLayout">
         <item>
          <widget class="QComboBox" name="sizeChoice"/>
@@ -157,9 +149,6 @@
     <widget class="QGroupBox">
      <property name="title">
       <string>Export Options</string>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
      </property>
      <layout class="QVBoxLayout">
       <property name="spacing">
@@ -231,10 +220,10 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="2" column="1">
            <widget class="QLabel">
             <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Supported pattern placeholders:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;{F}&lt;/span&gt; - frame number&lt;br/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;{E}&lt;/span&gt; - file extension&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string><![CDATA[<p>Supported pattern placeholders:<br><br><b>{F}</b> - frame number<br><b>{E}</b> - file extension</p>]]></string>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -245,6 +234,19 @@
         </widget>
         <widget class="QWidget">
          <layout class="QFormLayout">
+          <item row="0" column="0" colspan="2">
+           <widget class="QLabel" name="ffmpegNotFoundWarning">
+            <property name="styleSheet">
+             <string notr="true">color: red</string>
+            </property>
+            <property name="text">
+             <string>ffmpeg executable not found</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="0" colspan="2">
            <widget class="QLineEdit" name="ffmpegBasics">
             <property name="readOnly">
@@ -263,19 +265,6 @@
            <widget class="QPlainTextEdit" name="ffmpegCustom">
             <property name="readOnly">
              <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QLabel" name="ffmpegNotFoundWarning">
-            <property name="styleSheet">
-             <string notr="true">color: red</string>
-            </property>
-            <property name="text">
-             <string>ffmpeg executable not found</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>

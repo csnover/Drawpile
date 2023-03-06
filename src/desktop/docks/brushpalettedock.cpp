@@ -75,7 +75,7 @@ BrushPalette::BrushPalette(QWidget *parent)
 	titleWidget->addSpace(4);
 
 	d->searchLineEdit = new QLineEdit(this);
-	d->searchLineEdit->setPlaceholderText("Search");
+	AUTO_TR(d->searchLineEdit, setPlaceholderText, tr("Search"));
 	titleWidget->addCustomWidget(d->searchLineEdit, true);
 	titleWidget->addSpace(4);
 
@@ -141,13 +141,14 @@ BrushPalette::BrushPalette(QWidget *parent)
 			for (auto dimension = 16; dimension <= 128; dimension += 16) {
 				menu.action([=](ActionBuilder action) {
 					action
+						.text([=] {
+							return tr("%1×%1").arg(dimension);
+						})
 						.checkable()
 						.data(dimension)
 						.onTriggered([=] {
 							d->presetModel->setIconDimension(dimension);
 						});
-					auto *a = *action;
-					AUTO_TR(a, setText, tr("%1×%1").arg(dimension));
 				});
 			}
 		})
@@ -367,14 +368,14 @@ void BrushPalette::importMyPaintBrushes()
 		}
 
 		QStringList messages;
-		messages.append(tr("Import of %1 MyPaint brush(es).").arg(files.count()));
+		messages.append(tr("Import of %n MyPaint brush(es).", nullptr, files.count()));
 		if(!successes.isEmpty()) {
-			messages.append(tr("%1 successfully imported: %2")
-				.arg(successes.count()).arg(successes.join(", ")));
+			messages.append(tr("%n successfully imported: %1", nullptr, successes.count())
+				.arg(successes.join(", ")));
 		}
 		if(!failures.isEmpty()) {
-			messages.append(tr("%1 failed to import: %2")
-				.arg(failures.count()).arg(failures.join(", ")));
+			messages.append(tr("%n failed to import: %1", nullptr, failures.count())
+				.arg(failures.join(", ")));
 		}
 
 		QMessageBox::information(this, tr("MyPaint Brush Import"), messages.join("\n\n"));

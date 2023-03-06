@@ -62,7 +62,7 @@ MacMenu::MacMenu()
 			.disabled()
 		)
 		.action(MainWindow::makeAction(QT_TRANSLATE_NOOP("MainWindow", "&Join..."), "joinsession", this)
-			.onTriggered(this, &MacMenu::joinSession)
+			.onTriggered([] { MainWindow::showJoinDialog(nullptr); })
 		);
 
 	// Window menu (Mac specific)
@@ -116,29 +116,6 @@ void MacMenu::openRecent(QAction *action)
 {
 	MainWindow *mw = new MainWindow;
 	mw->open(QUrl::fromLocalFile(action->property("filepath").toString()));
-}
-
-void MacMenu::joinSession()
-{
-	auto dlg = new dialogs::JoinDialog(QUrl());
-	connect(dlg, &dialogs::JoinDialog::finished, [dlg](int i) {
-		if(i==QDialog::Accepted) {
-			QUrl url = dlg->getUrl();
-
-			if(!url.isValid()) {
-				// TODO add validator to prevent this from happening
-				QMessageBox::warning(0, "Error", "Invalid address");
-				return;
-			}
-
-			dlg->rememberSettings();
-
-			MainWindow *mw = new MainWindow;
-			mw->joinSession(url, dlg->autoRecordFilename());
-		}
-		dlg->deleteLater();
-	});
-	dlg->show();
 }
 
 /**

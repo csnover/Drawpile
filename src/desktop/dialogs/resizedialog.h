@@ -48,7 +48,6 @@ private:
 	QSize m_oldsize;
 	float m_aspectratio;
 	int m_lastchanged;
-	QPushButton *m_centerButton;
 };
 
 }

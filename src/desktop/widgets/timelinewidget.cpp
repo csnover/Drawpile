@@ -35,7 +35,8 @@ struct TimelineWidget::Private {
 };
 
 TimelineWidget::TimelineWidget(QWidget *parent)
-	: QWidget{parent}, d{new Private}
+	: QWidget{parent}
+	, d{new Private}
 {
 	d->verticalScroll = new QScrollBar(Qt::Vertical, this);
 	d->horizontalScroll = new QScrollBar(Qt::Horizontal, this);
@@ -45,9 +46,7 @@ TimelineWidget::TimelineWidget(QWidget *parent)
 }
 
 TimelineWidget::~TimelineWidget()
-{
-	delete d;
-}
+{}
 
 void TimelineWidget::setModel(canvas::TimelineModel *model)
 {

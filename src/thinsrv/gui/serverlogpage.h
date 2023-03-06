@@ -37,7 +37,7 @@ class ServerLogPageFactory : public PageFactory
 {
 public:
 	QString pageId() const override { return QStringLiteral("serverlog"); }
-	QString title() const override { return QApplication::tr("Server log"); }
+	QString title() const override { return PageFactory::tr("Server log"); }
 
 	ServerLogPage *makePage(Server *server) const override { return new ServerLogPage(server); }
 };

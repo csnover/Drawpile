@@ -4,6 +4,7 @@
 #ifndef NETSTATUS_H
 #define NETSTATUS_H
 
+#include "desktop/utils/dynamicui.h"
 #include "libclient/net/server.h"
 
 #include <QWidget>
@@ -98,6 +99,8 @@ private:
 	quint64 _sentbytes, _recvbytes, _lag;
 
 	QScopedPointer<const QSslCertificate> m_certificate;
+	Translator<net::Server::Security> m_securityState;
+	Translator<> m_labelText;
 };
 
 }

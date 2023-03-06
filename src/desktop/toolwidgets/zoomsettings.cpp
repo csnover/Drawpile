@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/toolwidgets/zoomsettings.h"
+#include "desktop/utils/dynamicui.h"
 
 #include <QWidget>
 #include <QVBoxLayout>
@@ -19,8 +20,10 @@ QWidget *ZoomSettings::createUiWidget(QWidget *parent)
 	QWidget *widget = new QWidget(parent);
 	auto layout = new QVBoxLayout(widget);
 
-	auto *resetButton = new QPushButton(tr("Normal Size"), widget);
-	auto *fitButton = new QPushButton(tr("Fit To Window"), widget);
+	auto *resetButton = new QPushButton(widget);
+	AUTO_TR(resetButton, setText, tr("Normal Size"));
+	auto *fitButton = new QPushButton(widget);
+	AUTO_TR(fitButton, setText, tr("Fit To Window"));
 
 	connect(resetButton, &QPushButton::clicked, this, &ZoomSettings::resetZoom);
 	connect(fitButton, &QPushButton::clicked, this, &ZoomSettings::fitToWindow);

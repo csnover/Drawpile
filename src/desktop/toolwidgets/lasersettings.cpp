@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/toolwidgets/lasersettings.h"
+#include "desktop/utils/dynamicui.h"
 #include "libclient/tools/toolcontroller.h"
 #include "libclient/tools/toolproperties.h"
 #include "libclient/tools/laser.h"
@@ -21,14 +22,13 @@ namespace props {
 }
 
 LaserPointerSettings::LaserPointerSettings(ToolController *ctrl, QObject *parent)
-	: ToolSettings(ctrl, parent), _ui(nullptr)
+	: ToolSettings(ctrl, parent)
+	, _ui(nullptr)
 {
 }
 
 LaserPointerSettings::~LaserPointerSettings()
-{
-	delete _ui;
-}
+{}
 
 void LaserPointerSettings::pushSettings()
 {
@@ -53,8 +53,11 @@ void LaserPointerSettings::pushSettings()
 QWidget *LaserPointerSettings::createUiWidget(QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
-	_ui = new Ui_LaserSettings;
+	_ui.reset(new Ui_LaserSettings);
 	_ui->setupUi(widget);
+	makeTranslator(widget, [=] {
+		_ui->retranslateUi(widget);
+	});
 
 	connect(_ui->trackpointer, SIGNAL(clicked(bool)), this, SIGNAL(pointerTrackingToggled(bool)));
 	connect(_ui->persistence, &QSlider::valueChanged, this, &LaserPointerSettings::pushSettings);

@@ -85,7 +85,7 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>An optional user friendly ID for the session</string>
+         <string>An optional user-friendly ID for the session</string>
         </property>
        </widget>
       </item>

@@ -7,6 +7,8 @@
 #include "libclient/canvas/pressure.h"
 #include "desktop/toolwidgets/toolsettings.h"
 
+#include <memory>
+
 class QAction;
 class QSpinBox;
 
@@ -97,7 +99,7 @@ private:
 	void emitPresetChanges(const input::Preset *preset);
 
 	struct Private;
-	Private *d;
+	const std::unique_ptr<Private> d;
 };
 
 }

@@ -5,7 +5,6 @@
 #include "libclient/utils/icon.h"
 #include "config.h"
 
-#include <QGuiApplication>
 #include <QUrl>
 #include <QDebug>
 
@@ -72,7 +71,7 @@ int SessionListingModel::columnCount(const QModelIndex &) const
 static QString ageString(const qint64 seconds)
 {
 	const auto minutes = seconds / 60;
-	return QGuiApplication::tr("%1h %2m").arg(minutes/60).arg(minutes%60);
+	return SessionListingModel::tr("%1h %2m").arg(minutes/60).arg(minutes%60);
 }
 
 static QUrl sessionUrl(const Session &s)

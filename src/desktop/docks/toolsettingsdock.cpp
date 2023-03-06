@@ -30,9 +30,9 @@ static const int LASTUSED_COLOR_COUNT = 8;
 struct ToolPage {
 	// Note: multiple different tools (e.g. Freehand and Line) can share the same settings
 	QSharedPointer<tools::ToolSettings> settings;
-	QString name;
+	const char *name;
 	QIcon icon;
-	QString title;
+	const char *title;
 };
 
 struct ToolSettings::Private {
@@ -46,6 +46,7 @@ public:
 	QStackedWidget *widgetStack = nullptr;
 	QStackedWidget *headerStack = nullptr;
 	QLabel *headerLabel = nullptr;
+	Translator<const char *> headerLabelText;
 	color_widgets::ColorDialog *colorDialog = nullptr;
 
 	tools::Tool::Type currentTool = tools::Tool::FREEHAND;
@@ -74,89 +75,89 @@ public:
 		auto sel = QSharedPointer<tools::ToolSettings>(new tools::SelectionSettings(ctrl));
 
 		pages[tools::Tool::FREEHAND] = {
-				brush,
-				"freehand",
-				icon::fromTheme("draw-brush"),
-				tr("Freehand")
-			};
+			brush,
+			"freehand",
+			icon::fromTheme("draw-brush"),
+			QT_TR_NOOP("Freehand")
+		};
 		pages[tools::Tool::ERASER] = {
-				brush,
-				"eraser",
+			brush,
+			"eraser",
 			icon::fromTheme("draw-eraser"),
-				tr("Eraser")
-			};
+			QT_TR_NOOP("Eraser")
+		};
 		pages[tools::Tool::LINE] = {
-				brush,
-				"line",
-				icon::fromTheme("draw-line"),
-				tr("Line")
-			};
+			brush,
+			"line",
+			icon::fromTheme("draw-line"),
+			QT_TR_NOOP("Line")
+		};
 		pages[tools::Tool::RECTANGLE] = {
-				brush,
-				"rectangle",
-				icon::fromTheme("draw-rectangle"),
-				tr("Rectangle")
-			};
+			brush,
+			"rectangle",
+			icon::fromTheme("draw-rectangle"),
+			QT_TR_NOOP("Rectangle")
+		};
 		pages[tools::Tool::ELLIPSE] = {
-				brush,
-				"ellipse",
-				icon::fromTheme("draw-ellipse"),
-				tr("Ellipse")
-			};
+			brush,
+			"ellipse",
+			icon::fromTheme("draw-ellipse"),
+			QT_TR_NOOP("Ellipse")
+		};
 		pages[tools::Tool::BEZIER] = {
-				brush,
-				"bezier",
-				icon::fromTheme("draw-bezier-curves"),
-				tr("Bezier Curve")
-			};
+			brush,
+			"bezier",
+			icon::fromTheme("draw-bezier-curves"),
+			QT_TR_NOOP("Bezier Curve")
+		};
 		pages[tools::Tool::FLOODFILL] = {
-				QSharedPointer<tools::ToolSettings>(new tools::FillSettings(ctrl)),
-				"fill",
-				icon::fromTheme("fill-color"),
-				tr("Flood Fill")
-			};
+			QSharedPointer<tools::ToolSettings>(new tools::FillSettings(ctrl)),
+			"fill",
+			icon::fromTheme("fill-color"),
+			QT_TR_NOOP("Flood Fill")
+		};
 		pages[tools::Tool::ANNOTATION] = {
-				QSharedPointer<tools::ToolSettings>(new tools::AnnotationSettings(ctrl)),
-				"annotation",
-				icon::fromTheme("draw-text"),
-				tr("Annotation")
-			};
+			QSharedPointer<tools::ToolSettings>(new tools::AnnotationSettings(ctrl)),
+			"annotation",
+			icon::fromTheme("draw-text"),
+			QT_TR_NOOP("Annotation")
+		};
 		pages[tools::Tool::PICKER] = {
-				QSharedPointer<tools::ToolSettings>(new tools::ColorPickerSettings(ctrl)),
-				"picker",
-				icon::fromTheme("color-picker"),
-				tr("Color Picker")
-			};
+			QSharedPointer<tools::ToolSettings>(new tools::ColorPickerSettings(ctrl)),
+			"picker",
+			icon::fromTheme("color-picker"),
+			QT_TR_NOOP("Color Picker")
+		};
 		pages[tools::Tool::LASERPOINTER] = {
-				QSharedPointer<tools::ToolSettings>(new tools::LaserPointerSettings(ctrl)),
-				"laser",
-				icon::fromTheme("cursor-arrow"),
-				tr("Laser Pointer")
-			};
+			QSharedPointer<tools::ToolSettings>(new tools::LaserPointerSettings(ctrl)),
+			"laser",
+			icon::fromTheme("cursor-arrow"),
+			QT_TR_NOOP("Laser Pointer")
+		};
 		pages[tools::Tool::SELECTION] = {
-				sel,
-				"selection",
-				icon::fromTheme("select-rectangular"),
-				tr("Selection (Rectangular)")
-			};
+			sel,
+			"selection",
+			icon::fromTheme("select-rectangular"),
+			QT_TR_NOOP("Selection (Rectangular)")
+		};
 		pages[tools::Tool::POLYGONSELECTION] = {
-				sel,
-				"selection",
-				icon::fromTheme("edit-select-lasso"),
-				tr("Selection (Free-Form)")
-			};
+			sel,
+			"selection",
+			icon::fromTheme("edit-select-lasso"),
+			QT_TR_NOOP("Selection (Free-Form)")
+		};
 		pages[tools::Tool::ZOOM] = {
-				QSharedPointer<tools::ToolSettings>(new tools::ZoomSettings(ctrl)),
-				"zoom",
-				icon::fromTheme("zoom-select"),
-				tr("Zoom")
-			};
+			QSharedPointer<tools::ToolSettings>(new tools::ZoomSettings(ctrl)),
+			"zoom",
+			icon::fromTheme("zoom-select"),
+			QT_TR_NOOP("Zoom")
+		};
 		pages[tools::Tool::INSPECTOR] = {
-				QSharedPointer<tools::ToolSettings>(new tools::InspectorSettings(ctrl)),
-				"inspector",
-				icon::fromTheme("help-whatsthis"),
-				tr("Inspector")
-			};
+			QSharedPointer<tools::ToolSettings>(new tools::InspectorSettings(ctrl)),
+			"inspector",
+			icon::fromTheme("help-whatsthis"),
+			QT_TR_NOOP("Inspector")
+		};
 
 		for(int i=0;i<tools::Tool::_LASTTOOL;++i) {
 			if(!toolSettings.contains(pages[i].settings))
@@ -182,6 +183,9 @@ ToolSettings::ToolSettings(tools::ToolController *ctrl, QWidget *parent)
 	d->headerLabel = new QLabel;
 	d->headerLabel->setAlignment(Qt::AlignCenter);
 	d->headerStack->addWidget(d->headerLabel);
+	d->headerLabelText = makeTranslator(d->headerLabel, [=](const char *key) {
+		d->headerLabel->setText(tr(key));
+	}, "");
 
 	setWidget(d->widgetStack);
 	titleWidget->addCustomWidget(d->headerStack, true);
@@ -370,7 +374,7 @@ void ToolSettings::selectTool(tools::Tool::Type tool)
 	if(ts->getHeaderWidget()) {
 		d->headerStack->setCurrentWidget(ts->getHeaderWidget());
 	} else {
-		d->headerLabel->setText(d->pages[tool].title);
+		d->headerLabelText.args(d->pages[tool].title);
 		d->headerStack->setCurrentWidget(d->headerLabel);
 	}
 

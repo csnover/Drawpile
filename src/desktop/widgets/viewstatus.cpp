@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // SPDX-FileCopyrightText: Calle Laakkonen
 
+#include "desktop/utils/dynamicui.h"
 #include "desktop/widgets/viewstatus.h"
 #include "desktop/widgets/groupedtoolbutton.h"
 #include "desktop/widgets/KisAngleGauge.h"
@@ -17,7 +18,7 @@
 namespace widgets {
 
 ViewStatus::ViewStatus(QWidget *parent)
-	: Dynamic(parent)
+	: QWidget(parent)
 	, m_updating(false)
 {
 	setMinimumHeight(22);
@@ -60,6 +61,7 @@ ViewStatus::ViewStatus(QWidget *parent)
 
 	// Canvas rotation box
 	m_angleBox = new QComboBox(this);
+	AUTO_TR(m_angleBox, setToolTip, tr("Canvas Rotation"));
 	m_angleBox->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
 	m_angleBox->setFixedWidth(m_angleBox->fontMetrics().boundingRect("9999-O--").width());
 	m_angleBox->setFrame(false);
@@ -134,16 +136,6 @@ ViewStatus::ViewStatus(QWidget *parent)
 	layout->addWidget(m_zoomSlider);
 	layout->addWidget(m_zoomBox);
 
-	recolorUi();
-}
-
-void ViewStatus::retranslateUi()
-{
-	m_angleBox->setToolTip(tr("Canvas Rotation"));
-}
-
-void ViewStatus::recolorUi()
-{
 #ifndef Q_OS_MACOS
 	auto boxPalette = palette();
 	boxPalette.setColor(QPalette::Base, boxPalette.color(QPalette::Window));
