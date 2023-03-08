@@ -26,16 +26,66 @@
 #include "desktop/bundled/kis_tablet/kis_tablet_support_win.h"
 #endif
 
+#include <QDebug>
 #include <QCommandLineParser>
+#include <QPainter>
+#include <QProxyStyle>
 #include <QSettings>
+#include <QStyleOption>
 #include <QUrl>
 #include <QTabletEvent>
 #include <QLibraryInfo>
 #include <QTranslator>
 #include <QDateTime>
 #include <QStyle>
+#include <QWidget>
 
 #include <QtColorWidgets/ColorWheel>
+
+#ifdef Q_OS_MACOS
+// The "native" style status bar looks weird because it uses the same gradient
+// as the title bar but is taller than a normal status bar. This makes it look
+// better.
+class MacViewStatusBarProxyStyle : public QProxyStyle {
+	void drawPrimitive(QStyle::PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = nullptr) const override
+	{
+		if (element != QStyle::PE_PanelStatusBar) {
+			return QProxyStyle::drawPrimitive(element, option, painter, widget);
+		}
+
+		static const QColor darkLine(0, 0, 0);
+		static const QColor darkFill(48, 48, 48);
+		static const QLinearGradient darkGradient = [](){
+			QLinearGradient gradient;
+			gradient.setColorAt(0, QColor(67, 67, 67));
+			gradient.setColorAt(1, QColor(48, 48, 48));
+			return gradient;
+		}();
+		static const QColor lightLine(193, 193, 193);
+		static const QColor lightFill(246, 246, 246);
+		static const QLinearGradient lightGradient = [](){
+			QLinearGradient gradient;
+			gradient.setColorAt(0, QColor(240, 240, 240));
+			gradient.setColorAt(1, QColor(224, 224, 224));
+			return gradient;
+		}();
+
+		const bool dark = icon::isDarkThemeSelected();
+
+		if(option->state & QStyle::State_Active) {
+			auto linearGrad = dark ? darkGradient : lightGradient;
+			linearGrad.setStart(0, option->rect.top());
+			linearGrad.setFinalStop(0, option->rect.bottom());
+			painter->fillRect(option->rect, linearGrad);
+		} else {
+			painter->fillRect(option->rect, dark ? darkFill : lightFill);
+		}
+
+		painter->setPen(dark ? darkLine : lightLine);
+		painter->drawLine(option->rect.left(), option->rect.top(), option->rect.right(), option->rect.top());
+	}
+};
+#endif
 
 DrawpileApp::DrawpileApp(int &argc, char **argv)
 	: QApplication(argc, argv)
@@ -77,6 +127,8 @@ bool DrawpileApp::event(QEvent *e) {
 
 		return true;
 
+	} else if (e->type() == QEvent::ApplicationPaletteChange) {
+		icon::setThemeSearchPaths();
 	}
 #ifdef Q_OS_MACOS
 	else if(e->type() == QEvent::ApplicationStateChange) {
@@ -112,7 +164,7 @@ void DrawpileApp::setDarkTheme(bool dark)
 	}
 
 	setPalette(pal);
-	icon::selectThemeVariant();
+	QIcon::setThemeName(dark ? "dark" : "light");
 }
 
 void DrawpileApp::openUrl(QUrl url)
@@ -289,7 +341,7 @@ static QStringList initApp(DrawpileApp &app)
 	if(theme==2) // choice 2: dark theme
 		app.setDarkTheme(true);
 	else
-		icon::selectThemeVariant();
+		icon::setThemeSearchPaths();
 
 #ifdef Q_OS_MACOS
 	// Mac specific settings
@@ -353,6 +405,9 @@ int main(int argc, char *argv[]) {
 	//QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 	DrawpileApp app(argc, argv);
+#ifdef Q_OS_MAC
+	app.setStyle(new MacViewStatusBarProxyStyle);
+#endif
 
 	{
 		const auto files = initApp(app);

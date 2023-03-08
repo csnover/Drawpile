@@ -6,52 +6,24 @@
 #include "libclient/utils/icon.h"
 
 #include <QAction>
+#include <QPainterPath>
 #include <QStyleOptionToolButton>
 #include <QStylePainter>
 #include <QToolButton>
 #include <QEvent>
+#include <QScopedValueRollback>
 
 namespace widgets
 {
 
 GroupedToolButton::GroupedToolButton(QWidget *parent) : GroupedToolButton(NotGrouped, parent) { }
 
-#ifdef Q_OS_MACOS
-static const QString LIGHT_STYLE = QStringLiteral(
-			"QToolButton {"
-				"background: white;"
-				"border: 1px solid #c0c0c0;"
-				"border-radius: 3px;"
-				"padding: 1px"
-			"}"
-			"QToolButton:checked, QToolButton:pressed {"
-				"background: #c0c0c0"
-			"}"
-		);
-
-static const QString DARK_STYLE = QStringLiteral(
-			"QToolButton {"
-				"background: #656565;"
-				"border-radius: 3px;"
-				"padding: 1px"
-			"}"
-			"QToolButton:checked, QToolButton:pressed {"
-				"background: #999"
-			"}"
-		);
-#endif
-
 GroupedToolButton::GroupedToolButton(GroupPosition position, QWidget* parent)
-: QToolButton(parent), mGroupPosition(position)
+	: QToolButton(parent)
+	, mGroupPosition(position)
 {
 	setFocusPolicy(Qt::NoFocus);
 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-#ifdef Q_OS_MACOS
-	if(icon::isDark(palette().color(QPalette::Window)))
-		setStyleSheet(DARK_STYLE);
-	else
-		setStyleSheet(LIGHT_STYLE);
-#endif
 }
 
 void GroupedToolButton::setGroupPosition(GroupedToolButton::GroupPosition groupPosition)
@@ -65,15 +37,69 @@ void GroupedToolButton::setColorSwatch(const QColor &c)
 	update();
 }
 
-void GroupedToolButton::paintEvent(QPaintEvent* event)
+static QPainterPath makePath(const QRect &rect, GroupedToolButton::GroupPosition mGroupPosition, bool mask)
 {
-	if (mGroupPosition == NotGrouped) {
-		QToolButton::paintEvent(event);
-		return;
+	constexpr auto RADIUS = 8;
+
+	QPainterPath path;
+
+	auto x = rect.x();
+	auto y = rect.y();
+	auto w = rect.width();
+	auto h = rect.height();
+
+	const auto rl = (mGroupPosition & GroupedToolButton::GroupRight) ? 0 : RADIUS;
+	const auto rr = (mGroupPosition & GroupedToolButton::GroupLeft) ? 0 : RADIUS;
+
+	if (rl) {
+		path.arcMoveTo(x, y, rl, rl, 180);
+		path.arcTo(x, y, rl, rl, 180, -90);
+	} else {
+		path.moveTo(x, y);
 	}
+
+	if (rr) {
+		path.arcTo(x+w-rr, y, rr, rr, 90, -90);
+		path.arcTo(x+w-rr, y+h-rr, rr, rr, 0, -90);
+	} else {
+		path.lineTo(x+w, y);
+		if (mask) {
+			path.lineTo(x+w, y+h);
+		} else {
+			path.moveTo(x+w, y+h);
+		}
+		path.arcMoveTo(x+w, y+h, 0, 0, 360);
+	}
+
+	if (rl) {
+		path.arcTo(x, y+h-rl, rl, rl, 270, -90);
+		// Since a path with no right radius is disjoint it is not possible
+		// to close the subpath and need to just draw to connect it up to the
+		// first element instead
+		auto first = path.elementAt(0);
+		path.lineTo(first.x, first.y);
+	} else {
+		path.lineTo(x, y+h);
+		if (mask) {
+			path.closeSubpath();
+		}
+	}
+
+	return path;
+}
+
+void GroupedToolButton::paintEvent(QPaintEvent *)
+{
 	QStylePainter painter(this);
 	QStyleOptionToolButton opt;
 	initStyleOption(&opt);
+	opt.palette.setColor(QPalette::Window, opt.palette.color(QPalette::Light));
+
+	const auto border = makePath(opt.rect, mGroupPosition, false);
+	const auto mask = makePath(opt.rect, mGroupPosition, true);
+
+	painter.save();
+	painter.setClipPath(mask);
 
 	// Color swatch (if set)
 	if(m_colorSwatch.isValid()) {
@@ -83,29 +109,24 @@ void GroupedToolButton::paintEvent(QPaintEvent* event)
 		opt.rect.setHeight(opt.rect.height() - swatchH);
 	}
 
-	QStyleOptionToolButton panelOpt = opt;
+	auto panelOpt = opt;
 
-	// Panel
-	QRect& panelRect = panelOpt.rect;
-	switch (mGroupPosition) {
-	case GroupLeft:
-		panelRect.setWidth(panelRect.width() * 2);
-		break;
-	case GroupCenter:
-		panelRect.setLeft(panelRect.left() - panelRect.width());
-		panelRect.setWidth(panelRect.width() * 3);
-		break;
-	case GroupRight:
-		panelRect.setLeft(panelRect.left() - panelRect.width());
-		break;
-	case NotGrouped:
-		Q_ASSERT(0);
-	}
-	painter.drawPrimitive(QStyle::PE_PanelButtonTool, panelOpt);
+	// Hide default borders by moving them outside the clipping area
+	const auto fw = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
+	panelOpt.rect.adjust(-fw, -fw, fw, fw);
 
-	// Separator
-	const int y1 = opt.rect.top() + 6;
-	const int y2 = opt.rect.bottom() - 6;
+	painter.drawComplexControl(QStyle::CC_ToolButton, panelOpt);
+	painter.restore();
+
+	painter.save();
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.setPen(opt.palette.color(QPalette::Mid));
+	painter.drawPath(border);
+	painter.restore();
+
+	// Separators
+	const int y1 = opt.rect.top() + 5;
+	const int y2 = opt.rect.bottom() - 5;
 	if (mGroupPosition & GroupRight) {
 		const int x = opt.rect.left();
 		painter.setPen(opt.palette.color(QPalette::Light));
@@ -115,26 +136,6 @@ void GroupedToolButton::paintEvent(QPaintEvent* event)
 		const int x = opt.rect.right();
 		painter.setPen(opt.palette.color(QPalette::Mid));
 		painter.drawLine(x, y1, x, y2);
-	}
-
-	const bool showDropdownArrow = menu() != nullptr && !text().isEmpty();
-
-	QRect textRect = opt.rect;
-	QRect arrowRect;
-
-	if(showDropdownArrow) {
-		arrowRect = QRect(textRect.right() - 20, textRect.y(), 20, textRect.height());
-		textRect.setWidth(textRect.width() - arrowRect.width());
-	}
-
-	// Text
-	opt.rect = textRect;
-	painter.drawControl(QStyle::CE_ToolButtonLabel, opt);
-
-	// Dropdown arrow
-	if(showDropdownArrow) {
-		opt.rect = arrowRect;
-		painter.drawPrimitive(QStyle::PE_IndicatorArrowDown, opt);
 	}
 }
 

@@ -96,7 +96,6 @@ ColorPaletteDock::ColorPaletteDock(QWidget *parent)
 	auto *menuButton = new widgets::GroupedToolButton;
 	menuButton->setIcon(icon::fromTheme("application-menu"));
 	menuButton->setPopupMode(QToolButton::InstantPopup);
-	menuButton->setStyleSheet("QToolButton::menu-indicator { image: none }");
 	menuButton->setMenu(MenuBuilder(this, tr)
 		.action([=](ActionBuilder action) {
 			action
@@ -131,6 +130,7 @@ ColorPaletteDock::ColorPaletteDock(QWidget *parent)
 		})
 	);
 	titlebar->addCustomWidget(menuButton);
+	titlebar->addSpace(style()->pixelMetric(QStyle::PM_ToolBarItemSpacing));
 
 	d->readonlyPalette = new widgets::GroupedToolButton;
 	AUTO_TR(d->readonlyPalette, setToolTip, tr("Write protect"));
@@ -147,14 +147,13 @@ ColorPaletteDock::ColorPaletteDock(QWidget *parent)
 		}
 	});
 	titlebar->addCustomWidget(d->readonlyPalette);
+	titlebar->addSpace(style()->pixelMetric(QStyle::PM_ToolBarItemSpacing));
 
 	d->paletteChoiceBox = new QComboBox;
 	d->paletteChoiceBox->setInsertPolicy(QComboBox::NoInsert); // we want to handle editingFinished signal ourselves
 	d->paletteChoiceBox->setModel(getSharedPaletteModel());
 	connect(d->paletteChoiceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ColorPaletteDock::paletteChanged);
 	titlebar->addCustomWidget(d->paletteChoiceBox, true);
-
-	titlebar->addSpace(24);
 
 	d->paletteSwatch = new color_widgets::Swatch(this);
 	setWidget(d->paletteSwatch);

@@ -57,7 +57,7 @@ signals:
 protected:
 	void paintEvent(QPaintEvent *event);
 	void resizeEvent(QResizeEvent *);
-	void changeEvent(QEvent *);
+	void changeEvent(QEvent *event);
 	void mouseDoubleClickEvent(QMouseEvent*);
 
 private:

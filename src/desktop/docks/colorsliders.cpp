@@ -50,9 +50,7 @@ ColorSliderDock::ColorSliderDock(QWidget *parent)
 	d->lastUsedSwatch->setBorder(Qt::NoPen);
 	d->lastUsedSwatch->setMinimumHeight(24);
 
-	titlebar->addSpace(24);
 	titlebar->addCustomWidget(d->lastUsedSwatch, true);
-	titlebar->addSpace(24);
 
 	connect(d->lastUsedSwatch, &color_widgets::Swatch::colorSelected, this, &ColorSliderDock::colorSelected);
 

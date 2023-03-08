@@ -47,13 +47,6 @@ LayerList::LayerList(QWidget *parent)
 	auto *titlebar = new TitleWidget(this);
 	setTitleBarWidget(titlebar);
 
-	m_lockButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::NotGrouped, titlebar);
-	m_lockButton->setIcon(icon::fromTheme("object-locked"));
-	m_lockButton->setCheckable(true);
-	m_lockButton->setPopupMode(QToolButton::InstantPopup);
-	titlebar->addCustomWidget(m_lockButton);
-	titlebar->addStretch();
-
 	m_view = new QTreeView;
 	m_view->setHeaderHidden(true);
 	setWidget(m_view);
@@ -67,15 +60,6 @@ LayerList::LayerList(QWidget *parent)
 
 	m_contextMenu = new QMenu(this);
 	connect(m_view, &QTreeView::customContextMenuRequested, this, &LayerList::showContextMenu);
-
-	// Layer ACL menu
-	m_aclmenu = new LayerAclMenu(this);
-	m_lockButton->setMenu(m_aclmenu);
-
-	connect(m_aclmenu, &LayerAclMenu::layerAclChange, this, &LayerList::changeLayerAcl);
-	connect(m_aclmenu, &LayerAclMenu::layerCensoredChange, this, &LayerList::censorSelected);
-
-	selectionChanged(QItemSelection());
 
 	// Custom layer list item delegate
 	LayerListDelegate *del = new LayerListDelegate(this);
@@ -121,6 +105,20 @@ void LayerList::setLayerEditActions(QAction *addLayer, QAction *addGroup, QActio
 	TitleWidget *titlebar = qobject_cast<TitleWidget*>(titleBarWidget());
 	Q_ASSERT(titlebar);
 
+	m_lockButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::NotGrouped, titlebar);
+	m_lockButton->setIcon(icon::fromTheme("object-locked"));
+	m_lockButton->setCheckable(true);
+	m_lockButton->setPopupMode(QToolButton::InstantPopup);
+	titlebar->addSpace(m_lockButton->sizeHint().width());
+
+	// Layer ACL menu
+	m_aclmenu = new LayerAclMenu(this);
+	connect(m_aclmenu, &LayerAclMenu::layerAclChange, this, &LayerList::changeLayerAcl);
+	connect(m_aclmenu, &LayerAclMenu::layerCensoredChange, this, &LayerList::censorSelected);
+	m_lockButton->setMenu(m_aclmenu);
+
+	titlebar->addStretch();
+
 	auto *addLayerButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupLeft, titlebar);
 	addLayerButton->setDefaultAction(addLayer);
 	titlebar->addCustomWidget(addLayerButton);
@@ -129,9 +127,9 @@ void LayerList::setLayerEditActions(QAction *addLayer, QAction *addGroup, QActio
 	addGroupButton->setDefaultAction(addGroup);
 	titlebar->addCustomWidget(addGroupButton);
 
-	auto *dupplicateLayerButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupCenter, titlebar);
-	dupplicateLayerButton->setDefaultAction(m_duplicateLayerAction);
-	titlebar->addCustomWidget(dupplicateLayerButton);
+	auto *duplicateLayerButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupCenter, titlebar);
+	duplicateLayerButton->setDefaultAction(m_duplicateLayerAction);
+	titlebar->addCustomWidget(duplicateLayerButton);
 
 	auto *mergeLayerButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupCenter, titlebar);
 	mergeLayerButton->setDefaultAction(m_mergeLayerAction);
@@ -163,6 +161,8 @@ void LayerList::setLayerEditActions(QAction *addLayer, QAction *addGroup, QActio
 	connect(m_mergeLayerAction, &QAction::triggered, this, &LayerList::mergeSelected);
 	connect(m_propertiesAction, &QAction::triggered, this, &LayerList::showPropertiesOfSelected);
 	connect(m_deleteLayerAction, &QAction::triggered, this, &LayerList::deleteSelected);
+
+	titlebar->addCustomWidget(m_lockButton);
 
 	updateLockedControls();
 }

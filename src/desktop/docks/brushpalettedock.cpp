@@ -72,19 +72,18 @@ BrushPalette::BrushPalette(QWidget *parent)
 	d->tagComboBox = new QComboBox(this);
 	d->tagComboBox->setInsertPolicy(QComboBox::NoInsert);
 	titleWidget->addCustomWidget(d->tagComboBox, true);
-	titleWidget->addSpace(4);
+	titleWidget->addSpace(style()->pixelMetric(QStyle::PM_ToolBarItemSpacing));
 
 	d->searchLineEdit = new QLineEdit(this);
 	AUTO_TR(d->searchLineEdit, setPlaceholderText, tr("Search"));
 	titleWidget->addCustomWidget(d->searchLineEdit, true);
-	titleWidget->addSpace(4);
+	titleWidget->addSpace(style()->pixelMetric(QStyle::PM_ToolBarItemSpacing));
 
 	d->menuButton = new widgets::GroupedToolButton(this);
 	d->menuButton->setIcon(icon::fromTheme("application-menu"));
 	d->menuButton->setPopupMode(QToolButton::InstantPopup);
 	d->menuButton->setMaximumHeight(d->tagComboBox->height());
 	titleWidget->addCustomWidget(d->menuButton);
-	titleWidget->addSpace(4);
 
 	d->menu = MenuBuilder(this, tr)
 		.action([=](ActionBuilder action) {

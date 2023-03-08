@@ -9,8 +9,6 @@
 
 namespace icon {
 
-static bool is_dark_theme = false;
-
 bool isDark(const QColor &c)
 {
 	const qreal luminance = c.redF() * 0.216 + c.greenF() * 0.7152 + c.blueF() * 0.0722;
@@ -18,28 +16,27 @@ bool isDark(const QColor &c)
 	return luminance <= 0.5;
 }
 
-bool isDarkThemeSelected() { return is_dark_theme; }
+bool isDarkThemeSelected() { return isDark(QPalette().color(QPalette::Window)); }
 
-void selectThemeVariant()
+void setThemeSearchPaths()
 {
-	is_dark_theme = isDark(QPalette().color(QPalette::Window));
+	static QStringList defaultThemePaths{QIcon::themeSearchPaths()};
 
-	const QString themePath = is_dark_theme ? QStringLiteral("/theme/dark") : QStringLiteral("/theme/light");
-
-	QStringList themePaths;
-	for(const QString &path : utils::paths::dataPaths()) {
-		themePaths.append(path + themePath);
+	QStringList themePaths{defaultThemePaths};
+	for (const auto &path : utils::paths::dataPaths()) {
+		themePaths.append(path + "/theme");
 	}
 
-#if 0
-	// We can use this after we no longer support anything older than Qt 5.11
-	// The nice thing about fallback search path is that the icons are automagically
-	// reloaded when it changes.
-	// Note: On Windows and Mac, we need to explicitly select a theme too. (A dummy theme should do.)
-	QIcon::setFallbackSearchPaths(themePaths);
-#endif
+	QIcon::setThemeSearchPaths(themePaths);
+
+	themePaths.clear();
+	auto *theme = isDarkThemeSelected() ? "dark" : "light";
+	for (const auto &path : utils::paths::dataPaths()) {
+		themePaths.append(path + "/theme/" + theme);
+	}
 
 	QDir::setSearchPaths("theme", themePaths);
+	QIcon::setThemeName(theme);
 }
 
 }

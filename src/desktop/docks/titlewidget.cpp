@@ -149,7 +149,9 @@ TitleWidget::TitleWidget(QDockWidget *parent) : QWidget(parent)
 {
 	m_layout = new QHBoxLayout;
 	m_layout->setSpacing(0);
-	m_layout->setContentsMargins(6, 2, 1, 2);
+	const auto mx = style()->pixelMetric(QStyle::PM_ToolBarItemSpacing);
+	const auto my = 2;
+	m_layout->setContentsMargins(mx, my, mx, my);
 	setLayout(m_layout);
 
 	// (un)dock and close buttons

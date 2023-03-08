@@ -11,8 +11,7 @@ namespace icon {
 //! Check if a dark theme icon should be used on a background of this color
 bool isDark(const QColor &color);
 
-//! Select whether to use the dark or light theme based on current palette
-void selectThemeVariant();
+void setThemeSearchPaths();
 
 //! Did selectThemeVariant pick the dark theme?
 bool isDarkThemeSelected();
