@@ -427,28 +427,15 @@ void LoginHandler::expectSessionDescriptionJoin(const ServerReply &msg)
 		for(const auto jsv : msg.reply["sessions"].toArray()) {
 			const QJsonObject js = jsv.toObject();
 
-			m_protocolVersion = protocol::ProtocolVersion::fromString(js["protocol"].toString());
-
-			QString incompatibleSeries;
-			if(!m_protocolVersion.isCompatible()) {
-				if(m_protocolVersion.isFuture()) {
-					incompatibleSeries = tr("New version");
-				} else {
-					incompatibleSeries = m_protocolVersion.versionName();
-				}
-
-				if(incompatibleSeries.isEmpty()) {
-					incompatibleSeries = tr("Unknown version");
-				}
-			}
+			const auto protocol = protocol::ProtocolVersion::fromString(js["protocol"].toString());
+			m_protocolVersion = protocol;
 
 			const LoginSession session {
 				js["id"].toString(),
 				js["alias"].toString(),
 				js["title"].toString(),
 				js["founder"].toString(),
-				incompatibleSeries,
-				m_protocolVersion.isPastCompatible(),
+				protocol,
 				js["userCount"].toInt(),
 				js["hasPassword"].toBool(),
 				js["persistent"].toBool(),
@@ -461,7 +448,7 @@ void LoginHandler::expectSessionDescriptionJoin(const ServerReply &msg)
 			if(!m_autoJoinId.isEmpty() && (session.id == m_autoJoinId || session.alias == m_autoJoinId)) {
 				// A session ID was given as part of the URL
 
-				auto canJoin = session.incompatibleSeries.isEmpty();
+				auto canJoin = protocol.isCompatible();
 				if (canJoin && pclevel >= contentfilter::Level::NoJoin) {
 					canJoin = (contentfilter::useAdvisoryTag() ? !session.nsfm : true)
 						&& !contentfilter::isNsfmTitle(session.title);
@@ -497,8 +484,8 @@ void LoginHandler::expectSessionDescriptionJoin(const ServerReply &msg)
 				failLogin(tr("Blocked by content filter"));
 				return;
 			}
-		} else if(!session.incompatibleSeries.isEmpty()) {
-			failLogin(tr("Session for a different Drawpile version (%1) in progress!").arg(session.incompatibleSeries));
+		} else if(!session.protocol.isCompatible()) {
+			failLogin(tr("Session for a different Drawpile version (%1) in progress!").arg(session.protocol.versionName()));
 			return;
 		}
 

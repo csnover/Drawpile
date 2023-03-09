@@ -42,9 +42,15 @@ QVariant LoginSessionModel::data(const QModelIndex &index, int role) const
 
 	const LoginSession &ls = m_sessions.at(index.row());
 
-	if(role == Qt::DisplayRole) {
+	switch(role) {
+	case SortRole:
+		if (index.column() == Version) {
+			return ls.protocol.asInteger();
+		}
+		[[fallthrough]];
+	case Qt::DisplayRole:
 		switch(index.column()) {
-		case ColumnTitle: {
+		case Title: {
 			QString title = ls.title.isEmpty() ? tr("(untitled)") : ls.title;
 			if(ls.alias.isEmpty()) {
 				return title;
@@ -52,86 +58,81 @@ QVariant LoginSessionModel::data(const QModelIndex &index, int role) const
 				return QStringLiteral("%1 [%2]").arg(title).arg(ls.alias);
 			}
 		}
-		case ColumnFounder:
+		case Owner:
 			return ls.founder;
-		case ColumnUsers:
+		case UserCount:
 			return ls.userCount;
 		default:
 			return QVariant{};
 		}
-
-	} else if(role == Qt::DecorationRole) {
+	case Qt::DecorationRole:
 		switch(index.column()) {
-		case ColumnVersion:
-			if(ls.isIncompatible()) {
-				return QIcon::fromTheme("state-error");
-			} else if(ls.compatibilityMode) {
+		case Version:
+			if(ls.protocol.isCurrent()) {
+				return QIcon::fromTheme("state-ok");
+			} else if(ls.protocol.isPastCompatible()) {
 				return QIcon::fromTheme("state-warning");
 			} else {
-				return QIcon::fromTheme("state-ok");
+				return QIcon::fromTheme("state-error");
 			}
-		case ColumnStatus:
-			if(ls.isIncompatible()) {
-				return QIcon::fromTheme("dontknow");
-			} else if(ls.closed) {
+		case Title:
+			if(ls.closed) {
 				return QIcon::fromTheme("im-ban-user");
 			} else if(ls.needPassword) {
 				return QIcon::fromTheme("object-locked");
+			} else if (isNsfm(ls)) {
+				return QIcon(":/icons/censored.svg");
 			} else {
-				return QVariant{};
+				QPixmap pm(64, 64);
+				pm.fill(Qt::transparent);
+				return QIcon(pm);
 			}
-		case ColumnTitle:
-			return isNsfm(ls) ? QIcon(":/icons/censored.svg") : QVariant{};
 		default:
 			return QVariant{};
 		}
-
-	} else if(role == Qt::ToolTipRole) {
+	case Qt::ToolTipRole:
 		switch(index.column()) {
-		case ColumnVersion:
-			if(ls.isIncompatible()) {
-				return tr("%1 (incompatible)").arg(ls.incompatibleSeries);
-			} else if(ls.compatibilityMode) {
-				return tr("Drawpile 2.1 (compatibility mode)");
+		case Version: {
+			const auto version = ls.protocol.versionName();
+			if (ls.protocol.isCurrent()) {
+				return tr("Compatible");
+			} else if (ls.protocol.isPastCompatible()) {
+				return tr("Requires compatibility mode (%1)").arg(version);
+			} else if (ls.protocol.isFuture()) {
+				return tr("Requires newer client (%1)").arg(version);
 			} else {
-				return tr("Drawpile 2.2 (fully compatible)");
+				return tr("Incompatible (%1)")
+					.arg(version.isEmpty() ? tr("unknown version") : version);
 			}
-		case ColumnStatus:
-			if(ls.isIncompatible()) {
-				return tr("Incompatible version");
-			} else if(ls.closed) {
+		}
+		case Title:
+			if(ls.closed) {
 				return tr("Closed (new logins blocked)");
 			} else if(ls.needPassword) {
 				return tr("Session password required");
 			} else {
-				return QVariant{};
+
 			}
-		case ColumnTitle:
 			return isNsfm(ls) ? tr("Not safe for me") : QVariant{};
 		default:
 			return QVariant{};
 		}
-
-	} else if(role == Qt::TextAlignmentRole) {
-		return index.column() == ColumnUsers ? Qt::AlignCenter : QVariant{};
-
-	} else {
-		switch(role) {
-		case IdRole: return ls.id;
-		case IdAliasRole: return ls.alias;
-		case AliasOrIdRole: return ls.idOrAlias();
-		case UserCountRole: return ls.userCount;
-		case TitleRole: return ls.title;
-		case FounderRole: return ls.founder;
-		case NeedPasswordRole: return ls.needPassword;
-		case PersistentRole: return ls.persistent;
-		case ClosedRole: return ls.closed;
-		case IncompatibleRole: return !ls.incompatibleSeries.isEmpty();
-		case JoinableRole: return (!ls.closed || m_moderatorMode) && ls.incompatibleSeries.isEmpty();
-		case NsfmRole: return isNsfm(ls);
-		case CompatibilityModeRole: return ls.compatibilityMode;
-		default: return QVariant{};
-		}
+	case Qt::TextAlignmentRole:
+		return index.column() == UserCount ? Qt::AlignCenter : QVariant{};
+	case IdRole: return ls.id;
+	case IdAliasRole: return ls.alias;
+	case AliasOrIdRole: return ls.idOrAlias();
+	case UserCountRole: return ls.userCount;
+	case TitleRole: return ls.title;
+	case FounderRole: return ls.founder;
+	case NeedPasswordRole: return ls.needPassword;
+	case PersistentRole: return ls.persistent;
+	case ClosedRole: return ls.closed;
+	case IncompatibleRole: return !ls.protocol.isCompatible();
+	case JoinableRole: return (!ls.closed || m_moderatorMode) && ls.protocol.isCompatible();
+	case NsfmRole: return isNsfm(ls);
+	case CompatibilityModeRole: return ls.protocol.isPastCompatible();
+	default: return QVariant{};
 	}
 }
 
@@ -141,7 +142,7 @@ Qt::ItemFlags LoginSessionModel::flags(const QModelIndex &index) const
 		return Qt::NoItemFlags;
 
 	const LoginSession &ls = m_sessions.at(index.row());
-	if(!ls.incompatibleSeries.isEmpty() || (ls.closed && !m_moderatorMode))
+	if(!ls.protocol.isCompatible() || (ls.closed && !m_moderatorMode))
 		return Qt::NoItemFlags;
 	else
 		return QAbstractTableModel::flags(index);
@@ -154,9 +155,9 @@ QVariant LoginSessionModel::headerData(int section, Qt::Orientation orientation,
 	}
 
 	switch(section) {
-	case ColumnTitle: return tr("Title");
-	case ColumnFounder: return tr("Started by");
-	case ColumnUsers: return tr("Users");
+	case Title: return tr("Title");
+	case Owner: return tr("Started by");
+	case UserCount: return tr("Users");
 	default: return QVariant{};
 	}
 }

@@ -9,6 +9,7 @@
 #include "libclient/tools/tool.h"
 
 #include <QAbstractButton>
+#include <QAbstractItemView>
 #include <QAbstractSlider>
 #include <QAbstractSpinBox>
 #include <QAction>
@@ -65,6 +66,36 @@ protected:
 		std::pair<QMetaObject::Connection, QMetaObject::Connection>
 	> bind(T initialValue, void (Self::*changed)(T), void (Self::*setter)(T), Widget *widget) {
 		return bindAs<bool>(initialValue, changed, setter, widget, &Widget::setChecked, &Widget::toggled);
+	}
+
+	template <typename T, typename Self>
+	inline auto bind(T initialValue, void (Self::*changed)(T), void (Self::*setter)(T), QAbstractItemView *widget, int role) {
+		const auto slot = [=](T value) {
+			const auto variant = QVariant::fromValue(value);
+			auto *model = widget->model();
+			// Adapted from QComboBox::findData
+			QModelIndex start = model->index(0, 0, widget->rootIndex());
+			const auto result = model->match(
+				start, role, value, 1,
+				Qt::MatchExactly | Qt::MatchCaseSensitive
+			);
+			if (result.isEmpty()) {
+				qWarning()
+					<< "bound invalid value" << variant
+					<< "to QAbstractItemView";
+			} else {
+				widget->setCurrentIndex(result.first());
+			}
+		};
+
+		std::invoke(slot, initialValue);
+
+		return std::pair {
+			connect(this, changed, widget, std::move(slot)),
+			connect(widget->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &current) {
+				std::invoke(setter, this, current.data(role).template value<T>());
+			})
+		};
 	}
 
 	template <typename T, typename Self>

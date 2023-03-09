@@ -9,6 +9,7 @@
 #include "libclient/contentfilter/contentfilter.h"
 
 #include "libclient/utils/avatarlistmodel.h"
+#include "libclient/utils/avatarlistmodeldelegate.h"
 #include "libclient/utils/sessionfilterproxymodel.h"
 #include "libclient/utils/usernamevalidator.h"
 #include "libclient/utils/html.h"
@@ -80,11 +81,12 @@ struct LoginDialog::Private {
 		ui->rememberPassword->setEnabled(false);
 #endif
 
-		ui->usernameIcon->setText(QString());
-		ui->usernameIcon->setPixmap(QIcon::fromTheme("im-user").pixmap(22, 22));
-
-		ui->passwordIcon->setText(QString());
-		ui->passwordIcon->setPixmap(QIcon::fromTheme("object-locked").pixmap(22, 22));
+		{
+			const auto iconSize = ui->username->sizeHint().height();
+			ui->avatarIcon->setPixmap(QIcon::fromTheme("photo").pixmap(iconSize));
+			ui->usernameIcon->setPixmap(QIcon::fromTheme("im-user").pixmap(iconSize));
+			ui->passwordIcon->setPixmap(QIcon::fromTheme("object-locked").pixmap(iconSize));
+		}
 
 		// Session list page
 		QObject::connect(ui->sessionList, &QTableView::doubleClicked, [this](const QModelIndex&) {
@@ -94,6 +96,7 @@ struct LoginDialog::Private {
 
 		ui->showNsfw->setEnabled(contentfilter::level() == contentfilter::Level::Unrestricted);
 		sessions = new SessionFilterProxyModel(dlg);
+		sessions->setSortRole(net::LoginSessionModel::SortRole);
 		sessions->setFilterCaseSensitivity(Qt::CaseInsensitive);
 		sessions->setFilterKeyColumn(-1);
 
@@ -101,6 +104,7 @@ struct LoginDialog::Private {
 		settings.bindFilterNsfm(ui->showNsfw);
 		settings.bindFilterNsfm(sessions, &SessionFilterProxyModel::setShowNsfw);
 
+		connect(ui->username, &QLineEdit::textChanged, avatars, &AvatarListModel::setDefaultAvatarUsername);
 		settings.bindLastUsername(ui->username);
 		settings.bindLastAvatar(ui->avatarList, AvatarListModel::FilenameRole);
 
@@ -108,6 +112,7 @@ struct LoginDialog::Private {
 						sessions, &SessionFilterProxyModel::setFilterFixedString);
 
 		ui->sessionList->setModel(sessions);
+		ui->sessionList->sortByColumn(net::LoginSessionModel::Version, Qt::AscendingOrder);
 
 		// Cert changed page
 		ui->warningIcon->setText(QString());
@@ -211,14 +216,20 @@ static QString keychainSecretName(const QString &username, const QUrl &extAuthUr
 }
 #endif
 
-
-LoginDialog::LoginDialog(net::LoginHandler *login, QWidget *parent) :
-	QDialog(parent), d(new Private(login, this))
+LoginDialog::LoginDialog(net::LoginHandler *login, QWidget *parent)
+	: QDialog(parent)
+	, d(new Private(login, this))
 {
 	setWindowModality(Qt::WindowModal);
 	setAttribute(Qt::WA_DeleteOnClose);
 	setWindowTitle(login->url().host());
 
+	d->ui->avatarList->setItemDelegate(new AvatarItemDelegate(this));
+	connect(d->ui->avatarList->selectionModel(), &QItemSelectionModel::selectionChanged, [=](const QItemSelection &selected, const QItemSelection &deselected) {
+		if (selected.isEmpty()) {
+			d->ui->avatarList->selectionModel()->select(deselected, QItemSelectionModel::SelectCurrent);
+		}
+	});
 	connect(d->ui->username, &QLineEdit::textChanged, this, &LoginDialog::updateOkButtonEnabled);
 	connect(d->ui->password, &QLineEdit::textChanged, this, &LoginDialog::updateOkButtonEnabled);
 	connect(d->ui->sessionPassword, &QLineEdit::textChanged, this, &LoginDialog::updateOkButtonEnabled);
@@ -451,11 +462,17 @@ void LoginDialog::onSessionChoiceNeeded(net::LoginSessionModel *sessions)
 	d->sessions->setSourceModel(sessions);
 	d->ui->sessionList->resizeColumnsToContents();
 	d->ui->sessionList->sortByColumn(
-		net::LoginSessionModel::ColumnTitle, Qt::AscendingOrder);
+		net::LoginSessionModel::Title, Qt::AscendingOrder);
 
 	QHeaderView *header = d->ui->sessionList->horizontalHeader();
-	header->setSectionResizeMode(net::LoginSessionModel::ColumnTitle, QHeaderView::Stretch);
-	header->setSectionResizeMode(net::LoginSessionModel::ColumnFounder, QHeaderView::ResizeToContents);
+	header->setSectionResizeMode(net::LoginSessionModel::Version, QHeaderView::Fixed);
+	header->setSectionResizeMode(net::LoginSessionModel::Title, QHeaderView::Stretch);
+	header->setSectionResizeMode(net::LoginSessionModel::Owner, QHeaderView::ResizeToContents);
+	header->setSectionResizeMode(net::LoginSessionModel::UserCount, QHeaderView::ResizeToContents);
+
+	auto *sl = d->ui->sessionList;
+	const auto iconSize = sl->style()->pixelMetric(QStyle::PM_ListViewIconSize, nullptr, sl) + sl->style()->pixelMetric(QStyle::PM_HeaderMargin, nullptr, sl) * 2;
+	header->resizeSection(net::LoginSessionModel::Version, iconSize);
 
 	d->resetMode(Mode::sessionlist);
 	updateOkButtonEnabled();
@@ -514,8 +531,8 @@ void LoginDialog::onOkClicked()
 		qWarning("OK button click in wrong mode!");
 		break;
 	case Mode::identity: {
-		const QPixmap avatar = d->ui->avatarList->currentData(Qt::DecorationRole).value<QPixmap>();
-		const QString avatarFile = avatar.isNull() ? QString() : d->ui->avatarList->currentData(AvatarListModel::FilenameRole).toString();
+		const QPixmap avatar = d->ui->avatarList->currentIndex().data(Qt::DecorationRole).value<QPixmap>();
+		const QString avatarFile = avatar.isNull() ? QString() : d->ui->avatarList->currentIndex().data(AvatarListModel::FilenameRole).toString();
 
 		if(!avatar.isNull())
 			d->loginHandler->selectAvatar(avatar.toImage());

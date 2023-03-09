@@ -3,6 +3,8 @@
 #ifndef LOGINSESSIONS_H
 #define LOGINSESSIONS_H
 
+#include "libshared/net/protover.h"
+
 #include <QAbstractTableModel>
 #include <QVector>
 
@@ -16,8 +18,7 @@ struct LoginSession {
 	QString alias;
 	QString title;
 	QString founder;
-	QString incompatibleSeries; // if not empty, this session is for a different version series
-	bool compatibilityMode;
+	protocol::ProtocolVersion protocol;
 
 	int userCount;
 
@@ -32,8 +33,6 @@ struct LoginSession {
 		Q_ASSERT(!idOrAlias.isEmpty());
 		return id == idOrAlias || alias == idOrAlias;
 	}
-
-	bool isIncompatible() const { return !incompatibleSeries.isEmpty(); }
 };
 
 /**
@@ -57,14 +56,14 @@ public:
 		JoinableRole,              // Is this session joinable
 		NsfmRole,                  // Is this session tagged as Not Safe For Me
 		CompatibilityModeRole,     // Is this a Drawpile 2.1.x session
+		SortRole,
 	};
 
 	enum Column : int {
-		ColumnVersion,
-		ColumnStatus,
-		ColumnTitle,
-		ColumnFounder,
-		ColumnUsers,
+		Title,
+		Owner,
+		UserCount,
+		Version,
 		ColumnCount,
 	};
 

@@ -3,6 +3,7 @@
 #include "libclient/net/sessionlistingmodel.h"
 #include "libclient/net/loginsessions.h"
 #include "libclient/utils/sessionfilterproxymodel.h"
+#include "libshared/net/protover.h"
 
 #include <QtTest/QtTest>
 
@@ -102,8 +103,7 @@ private:
 			QString(),
 			"Title: " + id,
 			QString(),
-			QString(),
-			false,
+			protocol::ProtocolVersion::current(),
 			0,
 			password,
 			false,
