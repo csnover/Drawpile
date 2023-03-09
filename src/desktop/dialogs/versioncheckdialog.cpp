@@ -93,7 +93,6 @@ void VersionCheckDialog::doVersionCheckIfNeeded()
 		const auto icon = icon::fromTheme("update-none");
 		const auto iconSize = mb.style()->pixelMetric(QStyle::PM_MessageBoxIconSize, nullptr, &mb);
 		auto pixmap = icon.pixmap(iconSize);
-		pixmap.setDevicePixelRatio(2);
 		mb.setIconPixmap(pixmap);
 		mb.setInformativeText(tr("You can always check for updates manually from the menu."));
 		const auto result = mb.exec();
