@@ -37,6 +37,9 @@ public:
 	//! Save changes
 	bool commit();
 
+public slots:
+	void setDefaultAvatarUsername(const QString &username);
+
 private:
 	struct Avatar {
 		QPixmap icon;

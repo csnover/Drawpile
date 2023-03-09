@@ -15,6 +15,7 @@
 #include "libclient/utils/listservermodel.h"
 #include "desktop/utils/listserverdelegate.h"
 #include "libclient/utils/avatarlistmodel.h"
+#include "libclient/utils/avatarlistmodeldelegate.h"
 #include "libclient/parentalcontrols/parentalcontrols.h"
 #include "libshared/listings/announcementapi.h"
 #include "libshared/util/passwordhash.h"
@@ -187,6 +188,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 	// Avatar list
 	m_avatars = new AvatarListModel(this);
 	m_ui->avatarList->setModel(m_avatars);
+	m_ui->avatarList->setItemDelegate(new AvatarItemDelegate(this));
 
 	connect(m_ui->addAvatar, &QPushButton::clicked, this, &SettingsDialog::addAvatar);
 	connect(m_ui->deleteAvatar, &QPushButton::clicked, this, &SettingsDialog::removeSelectedAvatar);

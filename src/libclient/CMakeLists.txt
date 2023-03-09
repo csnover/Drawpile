@@ -96,6 +96,7 @@ add_library(dpclient STATIC
 	tools/zoom.h
 	utils/avatarlistmodel.cpp
 	utils/avatarlistmodel.h
+	utils/avatarlistmodeldelegate.h
 	utils/changeflags.h
 	utils/colorscheme.cpp
 	utils/colorscheme.h

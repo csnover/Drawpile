@@ -30,7 +30,7 @@ bool isOSActive();
 /**
  * @brief Are parental control settings locked?
  *
- * This means options to access material tagged as "Not Safe For Minors" should be disabled.
+ * This means options to access material tagged as "Not Safe For Me" should be disabled.
  */
 bool isLocked();
 

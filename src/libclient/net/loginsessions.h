@@ -41,6 +41,14 @@ class LoginSessionModel : public QAbstractTableModel
 {
 	Q_OBJECT
 public:
+	enum Column {
+		StatusColumn,
+		TitleColumn,
+		FounderColumn,
+		UserCountColumn,
+		ColumnCount,
+	};
+
 	enum LoginSessionRoles {
 		IdRole = Qt::UserRole,     // Session ID
 		IdAliasRole,               // ID alias
@@ -53,7 +61,8 @@ public:
 		ClosedRole,                // Is this session closed to new users
 		IncompatibleRole,          // Is the session meant for some other client version
 		JoinableRole,              // Is this session joinable
-		NsfmRole                   // Is this session tagged as Not Suitable For Minors
+		NsfmRole,                  // Is this session tagged as Not Suitable For Me
+		SortRole,
 	};
 
 	explicit LoginSessionModel(QObject *parent=nullptr);

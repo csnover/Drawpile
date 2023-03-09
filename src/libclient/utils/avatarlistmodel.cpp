@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "libclient/utils/avatarlistmodel.h"
+#include "libclient/utils/identicon.h"
 #include "libshared/util/paths.h"
 
 #include <QDir>
@@ -20,6 +21,14 @@ int AvatarListModel::rowCount(const QModelIndex &parent) const
 	return m_avatars.size();
 }
 
+void AvatarListModel::setDefaultAvatarUsername(const QString &username)
+{
+	auto &avatar = m_avatars.first();
+	avatar.icon = QPixmap::fromImage(make_identicon(username));
+	const auto index = createIndex(0, 0);
+	emit dataChanged(index, index, { Qt::DecorationRole });
+}
+
 QVariant AvatarListModel::data(const QModelIndex &index, int role) const
 {
 	if(!index.isValid() || index.row() < 0 || index.row() >= m_avatars.size())
@@ -28,7 +37,7 @@ QVariant AvatarListModel::data(const QModelIndex &index, int role) const
 	const Avatar &a = m_avatars.at(index.row());
 
 	switch(role) {
-	case Qt::DisplayRole: return a.icon.isNull() ? a.filename : QString();
+	case Qt::DisplayRole: return a.icon.isNull() ? a.filename : QVariant();
 	case Qt::DecorationRole: return a.icon;
 	case FilenameRole: return a.filename;
 	}
@@ -86,7 +95,7 @@ void AvatarListModel::loadAvatars(bool includeBlank)
 
 	if(includeBlank) {
 		avatars << Avatar {
-			QPixmap(),
+			QPixmap::fromImage(make_identicon(" ")),
 			tr("No avatar")
 		};
 	}

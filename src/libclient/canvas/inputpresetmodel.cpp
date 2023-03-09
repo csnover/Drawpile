@@ -4,6 +4,8 @@
 #include "libclient/canvas/inputpresetmodel.h"
 #include "libshared/util/ulid.h"
 
+#include <QEvent>
+
 namespace input {
 
 PresetModel::PresetModel(QObject *parent) :

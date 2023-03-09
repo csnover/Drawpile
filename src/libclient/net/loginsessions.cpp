@@ -35,13 +35,7 @@ int LoginSessionModel::columnCount(const QModelIndex &parent) const
 	if(parent.isValid())
 		return 0;
 
-	// Columns:
-	// 0 - closed/incompatible/password needed status icon
-	// 1 - title
-	// 2 - session founder name
-	// 3 - user count
-
-	return 4;
+	return ColumnCount;
 }
 
 QVariant LoginSessionModel::data(const QModelIndex &index, int role) const
@@ -51,51 +45,66 @@ QVariant LoginSessionModel::data(const QModelIndex &index, int role) const
 
 	const LoginSession &ls = m_sessions.at(index.row());
 
-	if(role == Qt::DisplayRole) {
+	switch(role) {
+	case SortRole:
+		if (index.column() == StatusColumn) {
+			if (!ls.incompatibleSeries.isEmpty())
+				return 4;
+			else if(ls.closed)
+				return 3;
+			else if(ls.needPassword)
+				return 2;
+			else if(ls.nsfm)
+				return 1;
+			else
+				return 0;
+		}
+		// fall through
+	case Qt::DisplayRole:
 		switch(index.column()) {
-		case 1: {
+		case TitleColumn: {
 			QString title = ls.title.isEmpty() ? tr("(untitled)") : ls.title;
 			if(!ls.alias.isEmpty())
-				title = QStringLiteral("%1 [%2]").arg(title).arg(ls.alias);
+				title = tr("%1 [%2]").arg(title).arg(ls.alias);
 			return title;
 		}
-		case 2: return ls.founder;
-		case 3: return ls.userCount;
+		case FounderColumn: return ls.founder;
+		case UserCountColumn: return ls.userCount;
 		}
-
-	} else if(role == Qt::DecorationRole) {
-		if(index.column()==0) {
+		break;
+	case Qt::DecorationRole:
+		switch(index.column()) {
+		case StatusColumn:
 			if(!ls.incompatibleSeries.isEmpty())
 				return icon::fromTheme("dontknow");
 			else if(ls.closed)
 				return icon::fromTheme("im-ban-user");
 			else if(ls.needPassword)
 				return icon::fromTheme("object-locked");
-		} else if(index.column()==1) {
+			else
+				return QVariant();
+		case TitleColumn:
 			if(ls.nsfm)
 				return QIcon(":/icons/censored.svg");
 		}
-
-	} else if(role == Qt::ToolTipRole) {
+		break;
+	case Qt::ToolTipRole:
 		if(!ls.incompatibleSeries.isEmpty()) {
 			return tr("Incompatible version (%1)").arg(ls.incompatibleSeries);
 		}
-
-	} else {
-		switch(role) {
-		case IdRole: return ls.id;
-		case IdAliasRole: return ls.alias;
-		case AliasOrIdRole: return ls.idOrAlias();
-		case UserCountRole: return ls.userCount;
-		case TitleRole: return ls.title;
-		case FounderRole: return ls.founder;
-		case NeedPasswordRole: return ls.needPassword;
-		case PersistentRole: return ls.persistent;
-		case ClosedRole: return ls.closed;
-		case IncompatibleRole: return !ls.incompatibleSeries.isEmpty();
-		case JoinableRole: return (!ls.closed || m_moderatorMode) && ls.incompatibleSeries.isEmpty();
-		case NsfmRole: return ls.nsfm;
-		}
+		break;
+	case IdRole: return ls.id;
+	case IdAliasRole: return ls.alias;
+	case AliasOrIdRole: return ls.idOrAlias();
+	case UserCountRole: return ls.userCount;
+	case TitleRole: return ls.title;
+	case FounderRole: return ls.founder;
+	case NeedPasswordRole: return ls.needPassword;
+	case PersistentRole: return ls.persistent;
+	case ClosedRole: return ls.closed;
+	case IncompatibleRole: return !ls.incompatibleSeries.isEmpty();
+	case JoinableRole: return (!ls.closed || m_moderatorMode) && ls.incompatibleSeries.isEmpty();
+	case NsfmRole: return ls.nsfm;
 	}
 
 	return QVariant();
@@ -113,15 +122,26 @@ Qt::ItemFlags LoginSessionModel::flags(const QModelIndex &index) const
 		return QAbstractTableModel::flags(index);
 }
 
-QVariant LoginSessionModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant LoginSessionModel::headerData(int section, Qt::Orientation, int role) const
 {
-	if(role != Qt::DisplayRole || orientation != Qt::Horizontal)
-		return QVariant();
-
-	switch(section) {
-	case 1: return tr("Title");
-	case 2: return tr("Started by");
-	case 3: return tr("Users");
+	switch(role) {
+	case Qt::InitialSortOrderRole:
+		switch(section) {
+			case StatusColumn:
+			case TitleColumn:
+			case FounderColumn:
+				return Qt::AscendingOrder;
+			case UserCountColumn:
+				return Qt::DescendingOrder;
+		}
+		break;
+	case Qt::DisplayRole:
+		switch(section) {
+			case StatusColumn: return tr("Status");
+			case TitleColumn: return tr("Title");
+			case FounderColumn: return tr("Started by");
+			case UserCountColumn: return tr("Users");
+		}
 	}
 
 	return QVariant();

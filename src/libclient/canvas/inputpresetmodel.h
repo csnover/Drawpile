@@ -10,6 +10,8 @@
 #include <QSettings>
 #include <QVector>
 
+class QEvent;
+
 namespace input {
 
 struct Preset {

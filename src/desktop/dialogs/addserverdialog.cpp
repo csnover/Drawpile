@@ -7,6 +7,7 @@
 
 #include <QIcon>
 #include <QPushButton>
+#include <QStyle>
 
 namespace dialogs {
 
@@ -58,7 +59,8 @@ void AddServerDialog::showSuccess()
 	show();
 
 	if(m_serverInfo.faviconUrl == "drawpile") {
-		const auto icon = QIcon(":/icons/drawpile.png").pixmap(128, 128);
+		const auto iconSize = style()->pixelMetric(QStyle::PM_MessageBoxIconSize, nullptr, this);
+		const auto icon = QIcon(":/icons/drawpile.png").pixmap(iconSize);
 		m_favicon = icon.toImage();
 		setIconPixmap(icon);
 	} else {
@@ -112,9 +114,10 @@ void AddServerDialog::onAddClicked()
 	);
 
 	if(!m_favicon.isNull()) {
+		const auto iconSize = style()->pixelMetric(QStyle::PM_MessageBoxIconSize, nullptr, this);
 		listservers->setFavicon(
 			url,
-			QIcon(":/icons/drawpile.png").pixmap(128, 128).toImage()
+			QIcon(":/icons/drawpile.png").pixmap(iconSize).toImage()
 			);
 	}
 
