@@ -93,6 +93,32 @@ ColorPaletteDock::ColorPaletteDock(QWidget *parent)
 	auto *titlebar = new TitleWidget(this);
 	setTitleBarWidget(titlebar);
 
+	const auto space = titlebar->style()->pixelMetric(QStyle::PM_ToolBarItemSpacing, nullptr, titlebar);
+
+	d->paletteChoiceBox = new QComboBox;
+	d->paletteChoiceBox->setInsertPolicy(QComboBox::NoInsert); // we want to handle editingFinished signal ourselves
+	d->paletteChoiceBox->setModel(getSharedPaletteModel());
+	connect(d->paletteChoiceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ColorPaletteDock::paletteChanged);
+	titlebar->addCustomWidget(d->paletteChoiceBox, true);
+	titlebar->addSpace(space);
+
+	d->readonlyPalette = new widgets::GroupedToolButton;
+	AUTO_TR(d->readonlyPalette, setToolTip, tr("Write protect"));
+	d->readonlyPalette->setIcon(icon::fromTheme("object-locked"));
+	d->readonlyPalette->setCheckable(true);
+	connect(d->readonlyPalette, &QToolButton::clicked, [=](bool checked) {
+		int idx = d->paletteChoiceBox->currentIndex();
+		if(idx >= 0) {
+			auto *pm = getSharedPaletteModel();
+			auto pal = pm->palette(idx);
+			pal.setProperty("editable", !checked);
+			pm->updatePalette(idx, pal, false);
+			setPaletteReadonly(checked);
+		}
+	});
+	titlebar->addCustomWidget(d->readonlyPalette);
+	titlebar->addSpace(space);
+
 	auto *menuButton = new widgets::GroupedToolButton;
 	menuButton->setIcon(icon::fromTheme("application-menu"));
 	menuButton->setPopupMode(QToolButton::InstantPopup);
@@ -130,30 +156,6 @@ ColorPaletteDock::ColorPaletteDock(QWidget *parent)
 		})
 	);
 	titlebar->addCustomWidget(menuButton);
-	titlebar->addSpace(style()->pixelMetric(QStyle::PM_ToolBarItemSpacing));
-
-	d->readonlyPalette = new widgets::GroupedToolButton;
-	AUTO_TR(d->readonlyPalette, setToolTip, tr("Write protect"));
-	d->readonlyPalette->setIcon(icon::fromTheme("object-locked"));
-	d->readonlyPalette->setCheckable(true);
-	connect(d->readonlyPalette, &QToolButton::clicked, [=](bool checked) {
-		int idx = d->paletteChoiceBox->currentIndex();
-		if(idx >= 0) {
-			auto *pm = getSharedPaletteModel();
-			auto pal = pm->palette(idx);
-			pal.setProperty("editable", !checked);
-			pm->updatePalette(idx, pal, false);
-			setPaletteReadonly(checked);
-		}
-	});
-	titlebar->addCustomWidget(d->readonlyPalette);
-	titlebar->addSpace(style()->pixelMetric(QStyle::PM_ToolBarItemSpacing));
-
-	d->paletteChoiceBox = new QComboBox;
-	d->paletteChoiceBox->setInsertPolicy(QComboBox::NoInsert); // we want to handle editingFinished signal ourselves
-	d->paletteChoiceBox->setModel(getSharedPaletteModel());
-	connect(d->paletteChoiceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ColorPaletteDock::paletteChanged);
-	titlebar->addCustomWidget(d->paletteChoiceBox, true);
 
 	d->paletteSwatch = new color_widgets::Swatch(this);
 	setWidget(d->paletteSwatch);

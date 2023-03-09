@@ -27,6 +27,7 @@ class MenuBuilder;
 namespace widgets {
 	class CanvasView;
 	class NetStatus;
+	class NotificationBar;
 	class ChatBox;
 	class ViewStatus;
 }
@@ -222,6 +223,7 @@ private:
 	widgets::ChatBox *m_chatbox;
 
 	widgets::CanvasView *m_view;
+	widgets::NotificationBar *m_notificationBar;
 
 	QStatusBar *m_viewStatusBar;
 	QLabel *m_lockstatus;

@@ -7,6 +7,7 @@
 #include <QDockWidget>
 
 class QBoxLayout;
+class QSpacerItem;
 
 namespace docks {
 
@@ -29,6 +30,7 @@ private:
 	QBoxLayout *m_layout;
 	Button *m_dockButton;
 	Button *m_closeButton;
+	QSpacerItem *m_buttonSpacer;
 };
 
 }

@@ -21,6 +21,8 @@
 #include <QStyle>
 #include <QToolButton>
 #include <QBoxLayout>
+#include <memory>
+#include <utility>
 
 namespace docks {
 
@@ -304,7 +306,8 @@ void NavigatorView::onCursorMove(uint8_t userId, uint16_t layer, int x, int y)
  * Construct the navigator dock widget.
  */
 Navigator::Navigator(QWidget *parent)
-	: QDockWidget(parent), m_updating(false)
+	: QDockWidget(parent)
+	, m_updating(false)
 {
 	AUTO_TR(this, setWindowTitle, tr("Navigator"));
 	setObjectName("navigatordock");
@@ -313,11 +316,8 @@ Navigator::Navigator(QWidget *parent)
 	setTitleBarWidget(titlebar);
 
 	m_view = new NavigatorView(this);
-	setWidget(m_view);
-
-	m_resetZoomButton = new QToolButton;
-	m_resetZoomButton->setIcon(icon::fromTheme("zoom-original"));
-	titlebar->addCustomWidget(m_resetZoomButton);
+	connect(m_view, &NavigatorView::focusMoved, this, &Navigator::focusMoved);
+	connect(m_view, &NavigatorView::wheelZoom, this, &Navigator::wheelZoom);
 
 	m_zoomSlider = new QSlider;
 	m_zoomSlider->setMinimum(50);
@@ -325,13 +325,29 @@ Navigator::Navigator(QWidget *parent)
 	m_zoomSlider->setPageStep(50);
 	m_zoomSlider->setValue(100);
 	m_zoomSlider->setOrientation(Qt::Horizontal);
-	titlebar->addSpace(style()->pixelMetric(QStyle::PM_ToolBarItemSpacing));
-	titlebar->addCustomWidget(m_zoomSlider, true);
-
-	connect(m_view, &NavigatorView::focusMoved, this, &Navigator::focusMoved);
-	connect(m_view, &NavigatorView::wheelZoom, this, &Navigator::wheelZoom);
-	connect(m_resetZoomButton, &QToolButton::clicked, this, [this]() { emit zoomChanged(100.0); });
 	connect(m_zoomSlider, &QSlider::valueChanged, this, &Navigator::updateZoom);
+
+	m_resetZoomButton = new QToolButton;
+	m_resetZoomButton->setIcon(icon::fromTheme("zoom-original"));
+	connect(m_resetZoomButton, &QToolButton::clicked, [=] { emit zoomChanged(100.0); });
+
+	m_zoomControls = new QWidget(this);
+	auto *controlsLayout = new QHBoxLayout;
+	m_zoomControls->setLayout(controlsLayout);
+	const auto mx = style()->pixelMetric(QStyle::PM_ToolBarItemSpacing, nullptr, this);
+	const auto my = style()->pixelMetric(QStyle::PM_DockWidgetTitleBarButtonMargin, nullptr, this);
+	controlsLayout->setContentsMargins(mx, my, mx, my);
+	controlsLayout->setSpacing(mx);
+	controlsLayout->addWidget(m_zoomSlider, 1);
+	controlsLayout->addWidget(m_resetZoomButton);
+
+	m_viewContainer = new QWidget(this);
+	auto *viewContainerLayout = new QVBoxLayout;
+	m_viewContainer->setLayout(viewContainerLayout);
+	viewContainerLayout->setContentsMargins(0, 0, 0, 0);
+	viewContainerLayout->setSpacing(0);
+	viewContainerLayout->addWidget(m_view, 1);
+	setWidget(m_viewContainer);
 
 	QSettings cfg;
 	cfg.beginGroup("navigator");
@@ -360,11 +376,55 @@ Navigator::Navigator(QWidget *parent)
 		.addTo(m_view);
 	m_view->setRealtimeUpdate(realtimeUpdate);
 
+	m_bottomZoom = cfg.value("bottomZoom", true).toBool();
+	ActionBuilder(m_view, tr)
+		.text(QT_TR_NOOP("Controls on bottom"))
+		.checkable()
+		.checked(m_bottomZoom)
+		.onTriggered([=](bool bottomZoom) {
+			QSettings().setValue("navigator/bottomZoom", bottomZoom);
+			setZoomControlPosition(bottomZoom);
+		})
+		.addTo(m_view);
+
+	if (m_bottomZoom) {
+		viewContainerLayout->addWidget(m_zoomControls);
+	} else {
+		titlebar->addCustomWidget(m_zoomControls, true);
+	}
+
 	m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
 }
 
 Navigator::~Navigator()
 {
+}
+
+void Navigator::setZoomControlPosition(bool bottom)
+{
+	if (m_bottomZoom == bottom) {
+		return;
+	}
+
+	auto *from = qobject_cast<QBoxLayout *>(static_cast<TitleWidget *>(titleBarWidget())->layout());
+	Q_ASSERT(from);
+	auto *to = static_cast<QBoxLayout *>(m_viewContainer->layout());
+	if (m_bottomZoom) {
+		std::swap(from, to);
+	}
+	for (int i = 0, count = from->count(); i < count; ++i) {
+		if (from->itemAt(i)->widget() == m_zoomControls) {
+			// Can’t just move the QLayoutItem because the two box layouts may
+			// be incompatible, so just move the widget and then destroy the old
+			// item
+			std::unique_ptr<QLayoutItem> item{from->takeAt(i)};
+			to->insertWidget(bottom ? 1 : 0, item->widget(), !bottom);
+			m_bottomZoom = bottom;
+			return;
+		}
+	}
+
+	Q_ASSERT_X(false, "Navigator::setZoomControlPosition", "lost track of zoom controls");
 }
 
 void Navigator::setCanvasModel(canvas::CanvasModel *model)

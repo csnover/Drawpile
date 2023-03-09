@@ -83,28 +83,14 @@ struct LoginDialog::Private {
 		m_ui->rememberPassword->setEnabled(false);
 #endif
 
-#ifdef Q_OS_MACOS
-		// The avatar selection combobox looks terrible on macOS
-		// With this style, it looks slightly less terrible.
-		m_ui->avatarList->setStyleSheet(
-			"QComboBox {"
-				"border: none;"
-				"background: transparent;"
-			"}"
-			"QComboBox:hover {"
-				"border: 1px dotted black;"
-			"}"
-			"QComboBox::drop-down {"
-				"background: transparent;"
-			"}"
-		);
-#endif
+		{
+			const auto iconSize = m_ui->username->sizeHint().height();
+			m_ui->usernameIcon->setText(QString());
+			m_ui->usernameIcon->setPixmap(icon::fromTheme("im-user").pixmap(iconSize));
 
-		m_ui->usernameIcon->setText(QString());
-		m_ui->usernameIcon->setPixmap(icon::fromTheme("im-user").pixmap(22, 22));
-
-		m_ui->passwordIcon->setText(QString());
-		m_ui->passwordIcon->setPixmap(icon::fromTheme("object-locked").pixmap(22, 22));
+			m_ui->passwordIcon->setText(QString());
+			m_ui->passwordIcon->setPixmap(icon::fromTheme("object-locked").pixmap(iconSize));
+		}
 
 		// Session list page
 		QObject::connect(m_ui->sessionList, &QTableView::doubleClicked, [this](const QModelIndex&) {
@@ -128,8 +114,11 @@ struct LoginDialog::Private {
 		m_ui->sessionList->setModel(sessions);
 
 		// Cert changed page
-		m_ui->warningIcon->setText(QString());
-		m_ui->warningIcon->setPixmap(dlg->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(64, 64));
+		{
+			const auto iconSize = dlg->style()->pixelMetric(QStyle::PM_MessageBoxIconSize, nullptr, dlg);
+			m_ui->warningIcon->setText(QString());
+			m_ui->warningIcon->setPixmap(dlg->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(iconSize));
+		}
 
 		// Buttons
 		okButton = m_ui->buttonBox->button(QDialogButtonBox::Ok);
@@ -320,9 +309,9 @@ void LoginDialog::onUsernameNeeded(bool canSelectAvatar)
 		d->m_ui->avatarList->show();
 		const QString avatar = cfg.value("history/avatar").toString();
 		if(avatar.isEmpty())
-			d->m_ui->avatarList->setCurrentIndex(0);
+			d->m_ui->avatarList->setCurrentIndex(d->avatars->index(0));
 		else
-			d->m_ui->avatarList->setCurrentIndex(d->avatars->getAvatar(avatar).row());
+			d->m_ui->avatarList->setCurrentIndex(d->avatars->getAvatar(avatar));
 	} else {
 		d->m_ui->avatarList->hide();
 	}
@@ -534,8 +523,8 @@ void LoginDialog::onOkClicked()
 		qWarning("OK button click in wrong mode!");
 		break;
 	case Mode::identity: {
-		const QPixmap avatar = d->m_ui->avatarList->currentData(Qt::DecorationRole).value<QPixmap>();
-		const QString avatarFile = avatar.isNull() ? QString() : d->m_ui->avatarList->currentData(AvatarListModel::FilenameRole).toString();
+		const QPixmap avatar = d->m_ui->avatarList->currentIndex().data(Qt::DecorationRole).value<QPixmap>();
+		const QString avatarFile = avatar.isNull() ? QString() : d->m_ui->avatarList->currentIndex().data(AvatarListModel::FilenameRole).toString();
 
 		QSettings cfg;
 		cfg.setValue("history/username", d->m_ui->username->text());

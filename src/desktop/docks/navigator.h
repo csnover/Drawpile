@@ -94,10 +94,15 @@ signals:
 	void zoomChanged(qreal newZoom);
 
 private:
+	void setZoomControlPosition(bool bottom);
+
+	QWidget *m_viewContainer;
+	QWidget *m_zoomControls;
 	QSlider *m_zoomSlider;
 	QToolButton *m_resetZoomButton;
 	NavigatorView *m_view;
 	bool m_updating;
+	bool m_bottomZoom;
 };
 
 }

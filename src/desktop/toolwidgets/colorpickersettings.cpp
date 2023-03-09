@@ -13,6 +13,7 @@
 #include <QLabel>
 #include <QSlider>
 #include <QSpinBox>
+#include <QStyle>
 #include <QCheckBox>
 
 namespace tools {
@@ -39,7 +40,9 @@ QWidget *ColorPickerSettings::createUiWidget(QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	QVBoxLayout *layout = new QVBoxLayout(widget);
-	layout->setContentsMargins(3, 3, 3, 3);
+	const auto mx = widget->style()->pixelMetric(QStyle::PM_LayoutTopMargin, nullptr, widget) / 2;
+	const auto my = widget->style()->pixelMetric(QStyle::PM_LayoutLeftMargin, nullptr, widget) / 2;
+	layout->setContentsMargins(mx, my, mx, my);
 	widget->setLayout(layout);
 
 	QHBoxLayout *sizelayout = new QHBoxLayout;

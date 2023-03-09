@@ -7,7 +7,6 @@
 
 #include "desktop/notifications.h"
 
-#include "desktop/widgets/notifbar.h"
 #include "desktop/utils/qtguicompat.h"
 
 #include <QMouseEvent>
@@ -26,19 +25,33 @@
 namespace widgets {
 
 CanvasView::CanvasView(QWidget *parent)
-	: QGraphicsView(parent), m_pendown(NOTDOWN), m_penmode(PenMode::Normal), m_dragmode(ViewDragMode::None),
-	m_outlineSize(2), m_showoutline(true), m_subpixeloutline(true), m_squareoutline(false),
-	m_zoom(100), m_rotate(0), m_flip(false), m_mirror(false),
-	m_scene(nullptr),
-	m_zoomWheelDelta(0),
-	m_enableTablet(true),
-	m_locked(false), m_pointertracking(false), m_pixelgrid(true),
-	m_enableTouchScroll(true), m_enableTouchPinch(true), m_enableTouchTwist(true),
-	m_touching(false), m_touchRotating(false),
-	m_dpi(96),
-	m_brushCursorStyle(0),
-	m_enableViewportEntryHack(false),
-	m_brushOutlineWidth(1.0)
+	: QGraphicsView(parent)
+	, m_pendown(NOTDOWN)
+	, m_penmode(PenMode::Normal)
+	, m_dragmode(ViewDragMode::None)
+	, m_outlineSize(2)
+	, m_showoutline(true)
+	, m_subpixeloutline(true)
+	, m_squareoutline(false)
+	, m_zoom(100)
+	, m_rotate(0)
+	, m_flip(false)
+	, m_mirror(false)
+	, m_scene(nullptr)
+	, m_zoomWheelDelta(0)
+	, m_enableTablet(true)
+	, m_locked(false)
+	, m_pointertracking(false)
+	, m_pixelgrid(true)
+	, m_enableTouchScroll(true)
+	, m_enableTouchPinch(true)
+	, m_enableTouchTwist(true)
+	, m_touching(false)
+	, m_touchRotating(false)
+	, m_dpi(96)
+	, m_brushCursorStyle(0)
+	, m_enableViewportEntryHack(false)
+	, m_brushOutlineWidth(1.0)
 {
 	viewport()->setAcceptDrops(true);
 #ifdef Q_OS_MACOS // Standard touch events seem to work better with mac touchpad
@@ -50,9 +63,6 @@ CanvasView::CanvasView(QWidget *parent)
 	setAcceptDrops(true);
 
 	setBackgroundBrush(QColor(100,100,100));
-
-	m_notificationBar = new NotificationBar(this);
-	connect(m_notificationBar, &NotificationBar::actionButtonClicked, this, &CanvasView::reconnectRequested);
 
 	m_activationTimer = new QTimer(this);
 	m_activationTimer->setSingleShot(true);
@@ -66,11 +76,6 @@ CanvasView::CanvasView(QWidget *parent)
 	m_rotatecursor = QCursor(QPixmap(":/cursors/rotate.png"), 16, 16);
 
 	updateShortcuts();
-}
-
-void CanvasView::showDisconnectedWarning(const QString &message)
-{
-	m_notificationBar->show(message, tr("Reconnect"), NotificationBar::RoleColor::Warning);
 }
 
 void CanvasView::updateShortcuts()
@@ -90,14 +95,6 @@ void CanvasView::setCanvas(drawingboard::CanvasScene *scene)
 			scrollBy(xoff * z, yoff * z);
 			viewRectChanged();
 		}
-	});
-
-	connect(m_scene, &drawingboard::CanvasScene::paintEngineCrashed, this, [this]() {
-		m_notificationBar->show(
-			tr("Paint engine has crashed! Save your work and restart the application."),
-			QString(),
-			NotificationBar::RoleColor::Fatal
-		);
 	});
 
 	viewRectChanged();

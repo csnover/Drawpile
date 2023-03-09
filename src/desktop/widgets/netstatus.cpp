@@ -20,6 +20,7 @@
 #include <QCheckBox>
 #include <QTimer>
 #include <QSettings>
+#include <QStyle>
 
 namespace widgets {
 
@@ -33,8 +34,10 @@ NetStatus::NetStatus(QWidget *parent)
 	setMinimumHeight(16+2);
 
 	QHBoxLayout *layout = new QHBoxLayout(this);
-	layout->setContentsMargins(1, 1, 1, 1);
-	layout->setSpacing(4);
+	const auto mx = style()->pixelMetric(QStyle::PM_MenuBarHMargin, nullptr, this);
+	const auto my = style()->pixelMetric(QStyle::PM_MenuBarVMargin, nullptr, this);
+	layout->setContentsMargins(mx, my, mx, my);
+	layout->setSpacing(style()->pixelMetric(QStyle::PM_ToolBarItemSpacing, nullptr, this));
 
 	m_hideServer = QSettings().value("settings/hideServerIp", false).toBool();
 
@@ -49,14 +52,11 @@ NetStatus::NetStatus(QWidget *parent)
 
 	// Host address label
 	m_label = new QLabel(this);
-	m_label->setTextInteractionFlags(
-			Qt::TextSelectableByMouse|Qt::TextSelectableByKeyboard
-			);
-	m_label->setCursor(Qt::IBeamCursor);
 	m_label->setContextMenuPolicy(Qt::ActionsContextMenu);
 	layout->addWidget(m_label);
 	m_labelText = makeTranslator(m_label, [=] {
 		QString txt;
+		bool selectable = false;
 		switch(m_state) {
 		case NotConnected: txt = tr("not connected"); break;
 		case Connecting:
@@ -68,13 +68,21 @@ NetStatus::NetStatus(QWidget *parent)
 		case LoggedIn:
 			if(m_hideServer)
 				txt = tr("Connected");
-			else if(m_roomcode.isEmpty())
+			else if(m_roomcode.isEmpty()) {
+				selectable = true;
 				txt = tr("Host: %1").arg(fullAddress());
-			else
+			} else {
+				selectable = true;
 				txt = tr("Room: %1").arg(m_roomcode);
+			}
 			break;
 		case Disconnecting: txt = tr("Logging out..."); break;
 		}
+		m_label->setTextInteractionFlags(selectable
+			? Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard
+			: Qt::NoTextInteraction
+		);
+		m_label->setCursor(selectable ? Qt::IBeamCursor : Qt::ArrowCursor);
 		m_label->setText(txt);
 	});
 
@@ -152,7 +160,8 @@ NetStatus::NetStatus(QWidget *parent)
 		if(iconname.isEmpty()) {
 			m_security->hide();
 		} else {
-			m_security->setPixmap(icon::fromTheme(iconname).pixmap(16, 16));
+			const auto iconSize = m_security->style()->pixelMetric(QStyle::PM_SmallIconSize, nullptr, m_security);
+			m_security->setPixmap(icon::fromTheme(iconname).pixmap(iconSize));
 			m_security->setToolTip(tooltip);
 			m_security->show();
 		}

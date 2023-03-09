@@ -4,6 +4,7 @@
 #include <QWidget>
 
 class QLabel;
+class QPaintEvent;
 class QPushButton;
 
 namespace widgets {
@@ -25,16 +26,11 @@ signals:
 	void actionButtonClicked();
 
 protected:
-	bool eventFilter(QObject *obj, QEvent *event) override;
 	void paintEvent(QPaintEvent *) override;
-	void showEvent(QShowEvent *) override;
-	void hideEvent(QHideEvent *) override;
 
 private:
-	void setColor(const QColor &color);
-	void updateSize(const QSize &parentSize);
-
 	QColor m_color;
+	QLabel *m_icon;
 	QLabel *m_label;
 	QPushButton *m_actionButton;
 	QPushButton *m_closeButton;

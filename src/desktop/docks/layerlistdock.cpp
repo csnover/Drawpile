@@ -109,6 +109,7 @@ void LayerList::setLayerEditActions(QAction *addLayer, QAction *addGroup, QActio
 	m_lockButton->setIcon(icon::fromTheme("object-locked"));
 	m_lockButton->setCheckable(true);
 	m_lockButton->setPopupMode(QToolButton::InstantPopup);
+	// To make the edit action buttons centred
 	titlebar->addSpace(m_lockButton->sizeHint().width());
 
 	// Layer ACL menu

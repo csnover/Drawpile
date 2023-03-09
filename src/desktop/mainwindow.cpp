@@ -29,9 +29,7 @@
 #include <QTextEdit>
 #include <QThreadPool>
 #include <QKeySequence>
-#ifdef Q_OS_MACOS
 #include <QStyle>
-#endif
 #include <Qt>
 
 #include <QtColorWidgets/ColorDialog>
@@ -71,6 +69,7 @@ static constexpr auto CTRL_KEY = Qt::CTRL;
 
 #include "desktop/widgets/viewstatus.h"
 #include "desktop/widgets/netstatus.h"
+#include "desktop/widgets/notifbar.h"
 #include "desktop/chat/chatbox.h"
 
 #include "desktop/docks/toolsettingsdock.h"
@@ -205,8 +204,29 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	int SPLITTER_WIDGET_IDX = 0;
 
 	// Create canvas view (first splitter item)
+	auto *viewContainer = new QWidget(this);
+
+	auto *viewLayout = new QVBoxLayout;
+	viewLayout->setContentsMargins(0, 0, 0, 0);
+	viewLayout->setSpacing(0);
+	viewContainer->setLayout(viewLayout);
+
 	m_view = new widgets::CanvasView(this);
-	m_splitter->addWidget(m_view);
+
+	m_notificationBar = new widgets::NotificationBar(this);
+	connect(m_notificationBar, &widgets::NotificationBar::actionButtonClicked, m_view, &widgets::CanvasView::reconnectRequested);
+	connect(m_canvasscene, &drawingboard::CanvasScene::paintEngineCrashed, [=] {
+		m_notificationBar->show(
+			tr("Paint engine has crashed! Save your work and restart the application."),
+			QString(),
+			widgets::NotificationBar::RoleColor::Fatal
+		);
+	});
+
+	viewLayout->addWidget(m_notificationBar);
+	viewLayout->addWidget(m_view, 1);
+
+	m_splitter->addWidget(viewContainer);
 	m_splitter->setCollapsible(SPLITTER_WIDGET_IDX++, false);
 
 	// Create the chatbox
@@ -1633,7 +1653,11 @@ void MainWindow::onServerDisconnected(const QString &message, const QString &err
 	}
 	// If logged in but disconnected unexpectedly, show notification bar
 	else if(m_doc->client()->isLoggedIn() && !localDisconnect) {
-		m_view->showDisconnectedWarning(tr("Disconnected:") + " " + message);
+		m_notificationBar->show(
+			tr("Disconnected:") + " " + message,
+			tr("Reconnect"),
+			widgets::NotificationBar::RoleColor::Warning
+		);
 	}
 }
 
@@ -1679,7 +1703,8 @@ void MainWindow::updateLockWidget()
 	locked |= m_dockLayers->isCurrentLayerLocked();
 
 	if(locked) {
-		m_lockstatus->setPixmap(icon::fromTheme("object-locked").pixmap(16, 16));
+		const auto iconSize = m_lockstatus->style()->pixelMetric(QStyle::PM_SmallIconSize, nullptr, m_lockstatus);
+		m_lockstatus->setPixmap(icon::fromTheme("object-locked").pixmap(iconSize));
 		m_lockstatus->setToolTip(tr("Board is locked"));
 	} else {
 		m_lockstatus->setPixmap(QPixmap());

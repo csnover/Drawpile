@@ -10,6 +10,9 @@
 #include <QtColorWidgets/swatch.hpp>
 #include <QtColorWidgets/color_wheel.hpp>
 #include <QSettings>
+#include <QSizePolicy>
+#include <QStyle>
+#include <QVBoxLayout>
 
 namespace docks {
 
@@ -39,8 +42,17 @@ ColorSpinnerDock::ColorSpinnerDock(QWidget *parent)
 	connect(d->lastUsedSwatch, &color_widgets::Swatch::colorSelected, this, &ColorSpinnerDock::colorSelected);
 
 	// Create main widget
-	d->colorwheel = new color_widgets::ColorWheel(this);
-	setWidget(d->colorwheel);
+	// Setting contents margins on QDockWidget is fucked (QTBUG-51359) so
+	// gotta do it this way
+	auto *container = new QWidget(this);
+	auto *layout = new QVBoxLayout;
+	const auto mx = style()->pixelMetric(QStyle::PM_LayoutTopMargin, nullptr, this) / 2;
+	const auto my = style()->pixelMetric(QStyle::PM_LayoutLeftMargin, nullptr, this) / 2;
+	layout->setContentsMargins(mx, my, mx, my);
+	container->setLayout(layout);
+	d->colorwheel = new color_widgets::ColorWheel(container);
+	layout->addWidget(d->colorwheel);
+	setWidget(container);
 
 	connect(d->colorwheel, &color_widgets::ColorWheel::colorSelected, this, &ColorSpinnerDock::colorSelected);
 

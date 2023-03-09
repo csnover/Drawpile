@@ -11,6 +11,7 @@
 #ifndef QT_NO_STYLE_PROXY
 #include <QProxyStyle>
 #endif
+#include <QSpacerItem>
 #include <QStyle>
 #include <QStyleOptionToolButton>
 #include <QStylePainter>
@@ -145,14 +146,20 @@ void TitleWidget::Button::paintEvent(QPaintEvent *)
 	p.drawComplexControl(QStyle::CC_ToolButton, opt);
 }
 
-TitleWidget::TitleWidget(QDockWidget *parent) : QWidget(parent)
+static constexpr int DEFAULT_WIDGET_COUNT = 3;
+
+TitleWidget::TitleWidget(QDockWidget *parent)
+	: QWidget(parent)
 {
 	m_layout = new QHBoxLayout;
 	m_layout->setSpacing(0);
-	const auto mx = style()->pixelMetric(QStyle::PM_ToolBarItemSpacing);
-	const auto my = 2;
+	const auto mx = style()->pixelMetric(QStyle::PM_ToolBarItemSpacing, nullptr, this);
+	const auto my = style()->pixelMetric(QStyle::PM_DockWidgetTitleBarButtonMargin, nullptr, this);
 	m_layout->setContentsMargins(mx, my, mx, my);
 	setLayout(m_layout);
+
+	m_buttonSpacer = new QSpacerItem(mx, 0, QSizePolicy::Fixed);
+	m_layout->addSpacerItem(m_buttonSpacer);
 
 	// (un)dock and close buttons
 	m_dockButton = new Button(style()->standardIcon(QStyle::SP_TitleBarNormalButton), this);
@@ -171,25 +178,44 @@ TitleWidget::TitleWidget(QDockWidget *parent) : QWidget(parent)
 
 void TitleWidget::addCustomWidget(QWidget *widget, bool stretch)
 {
-	m_layout->insertWidget(m_layout->count()-2, widget);
+	m_layout->insertWidget(m_layout->count()-DEFAULT_WIDGET_COUNT, widget);
 	if(stretch)
 		m_layout->setStretchFactor(widget, 1);
 }
 
 void TitleWidget::addSpace(int space)
 {
-	m_layout->insertSpacing(m_layout->count()-2, space);
+	m_layout->insertSpacing(m_layout->count()-DEFAULT_WIDGET_COUNT, space);
 }
 
 void TitleWidget::addStretch(int stretch)
 {
-	m_layout->insertStretch(m_layout->count()-2, stretch);
+	m_layout->insertStretch(m_layout->count()-DEFAULT_WIDGET_COUNT, stretch);
 }
 
 void TitleWidget::onFeaturesChanged(QDockWidget::DockWidgetFeatures features)
 {
-	m_dockButton->setVisible(features.testFlag(QDockWidget::DockWidgetMovable));
-	m_closeButton->setVisible(features.testFlag(QDockWidget::DockWidgetClosable));
+	const bool hasFeatures = features & (
+		QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable
+	);
+
+	const auto hasWidgets = layout()->count() > DEFAULT_WIDGET_COUNT;
+
+	// Just hiding the widget itself has no effect for an unknown reason
+	if (!hasWidgets && !hasFeatures) {
+		m_layout->setContentsMargins(0, 0, 0, 0);
+	} else {
+		const auto mx = style()->pixelMetric(QStyle::PM_ToolBarItemSpacing, nullptr, this);
+		const auto my = style()->pixelMetric(QStyle::PM_DockWidgetTitleBarButtonMargin, nullptr, this);
+		m_layout->setContentsMargins(mx, my, mx, my);
+	}
+
+	m_buttonSpacer->changeSize(hasFeatures
+		? style()->pixelMetric(QStyle::PM_ToolBarItemSpacing, nullptr, this)
+		: 0
+	, 0, hasWidgets ? QSizePolicy::Fixed : QSizePolicy::Expanding);
+	m_dockButton->setVisible(features & QDockWidget::DockWidgetMovable);
+	m_closeButton->setVisible(features & QDockWidget::DockWidgetClosable);
 }
 
 }

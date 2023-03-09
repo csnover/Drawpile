@@ -12,6 +12,7 @@
 #include <QCheckBox>
 #include <QSpinBox>
 #include <QLabel>
+#include <QStyle>
 
 namespace docks {
 
@@ -50,7 +51,8 @@ Timeline::Timeline(QWidget *parent)
 	connect(m_currentFrame, QOverload<int>::of(&QSpinBox::valueChanged), m_widget, &widgets::TimelineWidget::setCurrentFrame);
 	titlebar->addCustomWidget(m_currentFrame);
 
-	titlebar->addSpace(12);
+	const auto space = titlebar->style()->pixelMetric(QStyle::PM_ToolBarSeparatorExtent, nullptr, titlebar);
+	titlebar->addSpace(space);
 
 	{
 		auto *label = new QLabel;

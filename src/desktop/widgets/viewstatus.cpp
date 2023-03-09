@@ -24,8 +24,13 @@ ViewStatus::ViewStatus(QWidget *parent)
 	setMinimumHeight(22);
 	QHBoxLayout *layout = new QHBoxLayout(this);
 
-	layout->setContentsMargins(1, 1, 1, 1);
+	const auto mx = style()->pixelMetric(QStyle::PM_MenuBarHMargin, nullptr, this);
+	const auto my = style()->pixelMetric(QStyle::PM_MenuBarVMargin, nullptr, this);
+	layout->setContentsMargins(mx, my, mx, my);
 	layout->setSpacing(0);
+
+	const auto sectionSpace = style()->pixelMetric(QStyle::PM_ToolBarSeparatorExtent, nullptr, this);
+	const auto itemSpace = style()->pixelMetric(QStyle::PM_ToolBarItemSpacing, nullptr, this);
 
 	// View flipping
 	m_viewFlip = new widgets::GroupedToolButton(this);
@@ -43,15 +48,14 @@ ViewStatus::ViewStatus(QWidget *parent)
 	m_rotationReset = new widgets::GroupedToolButton(this);
 	m_rotationReset->setAutoRaise(true);
 
-	layout->addSpacing(10);
+	layout->addSpacing(sectionSpace);
 	layout->addWidget(m_rotationReset);
 
 	// Canvas compass
 	m_compass = new KisAngleGauge(this);
 	m_compass->setFixedSize(22, 22);
-	m_compass->setIncreasingDirection(KisAngleGauge::IncreasingDirection_Clockwise);
 	connect(m_compass, &KisAngleGauge::angleChanged, this, &ViewStatus::angleChanged);
-	layout->addSpacing(10);
+	layout->addSpacing(sectionSpace);
 	layout->addWidget(m_compass);
 
 	// Canvas rotation box
@@ -82,14 +86,14 @@ ViewStatus::ViewStatus(QWidget *parent)
 	);
 	connect(m_angleBox, &QComboBox::editTextChanged, this, &ViewStatus::angleBoxChanged);
 
-	layout->addSpacing(4);
+	layout->addSpacing(itemSpace);
 	layout->addWidget(m_angleBox);
 
 	// Zoom reset button
 	m_zoomReset = new widgets::GroupedToolButton(this);
 	m_zoomReset->setAutoRaise(true);
 
-	layout->addSpacing(10);
+	layout->addSpacing(sectionSpace);
 	layout->addWidget(m_zoomReset);
 
 	// Zoom slider
