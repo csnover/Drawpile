@@ -51,8 +51,12 @@ class Translator final {
 
 		bool eventFilter(QObject *object, QEvent *event) override
 		{
-			if (event->type() == QEvent::LanguageChange) {
+			switch (event->type()) {
+			case QEvent::LanguageChange:
+			case QEvent::LocaleChange:
 				std::apply(m_callback, m_args);
+				break;
+			default: {}
 			}
 			return QObject::eventFilter(object, event);
 		}
@@ -125,6 +129,7 @@ protected:
 		Base::changeEvent(event);
 		switch (event->type()) {
 		case QEvent::LanguageChange:
+		case QEvent::LocaleChange:
 			retranslateUi();
 			break;
 		case QEvent::PaletteChange:
