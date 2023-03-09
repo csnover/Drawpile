@@ -132,15 +132,11 @@ protected:
 		case QEvent::LocaleChange:
 			retranslateUi();
 			break;
-		case QEvent::PaletteChange:
-			recolorUi();
-			break;
 		default: {}
 		}
 	}
 
 	virtual void retranslateUi() = 0;
-	virtual void recolorUi() {}
 };
 
 template<typename Base, typename Ui>
