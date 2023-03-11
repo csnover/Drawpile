@@ -64,6 +64,7 @@ public slots:
 
 	void copyAddress();
 	void copyUrl();
+	void message(const QString &msg);
 
 private slots:
 	void discoverAddress();
@@ -73,7 +74,6 @@ private slots:
 
 private:
 	void showCGNAlert();
-	void message(const QString &msg);
 	void updateLabel();
 
 	enum { NotConnected, Connecting, LoggedIn, Disconnecting } m_state;
