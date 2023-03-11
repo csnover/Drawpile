@@ -62,7 +62,7 @@ void SessionServer::loadNewSessions()
 			fh->setArchive(m_config->getConfigBool(config::ArchiveMode));
 			Session *session = new ThinSession(fh, m_config, m_announcements, this);
 			initSession(session);
-			session->log(Log().about(Log::Level::Debug, Log::Topic::Status).message("Loaded from file."));
+			session->log(Log().about(Log::Level::Debug, Log::Topic::Status).message(tr("Loaded from file.")));
 		}
 	}
 }
@@ -101,33 +101,35 @@ SessionHistory *SessionServer::initHistory(const QString &id, const QString alia
 	}
 }
 
-std::tuple<Session*, QString> SessionServer::createSession(const QString &id, const QString &idAlias, const protocol::ProtocolVersion &protocolVersion, const QString &founder)
+std::tuple<Session*, protocol::Error> SessionServer::createSession(const QString &id, const QString &idAlias, const protocol::ProtocolVersion &protocolVersion, const QString &founder)
 {
 	Q_ASSERT(!id.isNull());
 
 	if(m_sessions.size() >= m_config->getConfigInt(config::SessionCountLimit)) {
-		return std::tuple<Session*, QString> { nullptr, "closed" };
+		return { nullptr, protocol::Error::Closed };
 	}
 
 	if(getSessionById(id, false) || (!idAlias.isEmpty() && getSessionById(idAlias, false))) {
-		return std::tuple<Session*, QString> { nullptr, "idInUse" };
+		return { nullptr, protocol::Error::IdInUse };
 	}
 
 	if(protocolVersion.serverVersion() != protocol::ProtocolVersion::current().serverVersion()) {
-		return std::tuple<Session*, QString> { nullptr, "badProtocol" };
+		return { nullptr, protocol::Error::BadProtocol };
 	}
 
 	Session *session = new ThinSession(initHistory(id, idAlias, protocolVersion, founder), m_config, m_announcements, this);
 
 	initSession(session);
 
-	QString aka = idAlias.isEmpty() ? QString() : QStringLiteral(" (AKA %1)").arg(idAlias);
+	QString aka = idAlias.isEmpty()
+		? QString()
+		: tr(" (AKA %1)").arg(idAlias);
 
 	session->log(Log()
 		.about(Log::Level::Info, Log::Topic::Status)
-		.message("Session" + aka + " created by " + founder));
+		.message(tr("Session%1 created by %2").arg(aka).arg(founder)));
 
-	return std::make_tuple(session, QString());
+	return std::make_tuple(session, protocol::Error::Unknown);
 }
 
 Session *SessionServer::createFromTemplate(const QString &idAlias)
@@ -153,7 +155,7 @@ Session *SessionServer::createFromTemplate(const QString &idAlias)
 	initSession(session);
 	session->log(Log()
 		.about(Log::Level::Info, Log::Topic::Status)
-		.message(QStringLiteral("Session instantiated from template %1").arg(idAlias)));
+		.message(tr("Session instantiated from template %1").arg(idAlias)));
 
 	return session;
 }
@@ -249,12 +251,12 @@ void SessionServer::onSessionAttributeChanged(Session *session)
 	bool delSession = false;
 
 	if(session->userCount()==0 && session->state() != Session::State::Shutdown) {
-		session->log(Log().about(Log::Level::Info, Log::Topic::Status).message("Last user left."));
+		session->log(Log().about(Log::Level::Info, Log::Topic::Status).message(tr("Last user left.")));
 
 		// A non-persistent session is deleted when the last user leaves
 		// A persistent session can also be deleted if it doesn't contain a snapshot point.
 		if(!session->history()->hasFlag(SessionHistory::Persistent)) {
-			session->log(Log().about(Log::Level::Info, Log::Topic::Status).message("Closing non-persistent session."));
+			session->log(Log().about(Log::Level::Info, Log::Topic::Status).message(tr("Closing non-persistent session.")));
 			delSession = true;
 		}
 	}
@@ -272,7 +274,7 @@ void SessionServer::cleanupSessions()
 	if(expirationTime>0) {
 		for(Session *s : m_sessions) {
 			if(s->lastEventTime() > expirationTime) {
-				s->log(Log().about(Log::Level::Info, Log::Topic::Status).message("Idle session expired."));
+				s->log(Log().about(Log::Level::Info, Log::Topic::Status).message(tr("Idle session expired.")));
 				s->killSession();
 			}
 		}

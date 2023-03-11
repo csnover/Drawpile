@@ -9,6 +9,7 @@
 #include "libserver/serverlog.h"
 
 #include "libshared/net/control.h"
+#include "libshared/net/error.h"
 #include "libshared/util/authtoken.h"
 #include "libshared/util/networkaccess.h"
 #include "libshared/util/validators.h"
@@ -136,7 +137,7 @@ void LoginHandler::announceSessionEnd(const QString &id)
 void LoginHandler::handleLoginMessage(protocol::MessagePtr msg)
 {
 	if(msg->type() != protocol::MSG_COMMAND) {
-		m_client->log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message("Login handler was passed a non-login message"));
+		m_client->log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(tr("Login handler was passed a non-login message")));
 		return;
 	}
 
@@ -147,8 +148,8 @@ void LoginHandler::handleLoginMessage(protocol::MessagePtr msg)
 		if(cmd.cmd == "startTls") {
 			handleStarttls();
 		} else {
-			m_client->log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message("Client did not upgrade to TLS mode!"));
-			sendError("tlsRequired", "TLS required");
+			m_client->log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(tr("Client did not upgrade to TLS mode!")));
+			sendError(protocol::Error::TlsRequired);
 		}
 
 	} else if(m_state == State::WaitForIdent) {
@@ -156,7 +157,7 @@ void LoginHandler::handleLoginMessage(protocol::MessagePtr msg)
 		if(cmd.cmd == "ident") {
 			handleIdentMessage(cmd);
 		} else {
-			m_client->log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message("Invalid login command (while waiting for ident): " + cmd.cmd));
+			m_client->log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(tr("Invalid login command (while waiting for ident): %1").arg(cmd.cmd)));
 			m_client->disconnectClient(Client::DisconnectionReason::Error, "invalid message");
 		}
 	} else {
@@ -167,7 +168,7 @@ void LoginHandler::handleLoginMessage(protocol::MessagePtr msg)
 		} else if(cmd.cmd == "report") {
 			handleAbuseReport(cmd);
 		} else {
-			m_client->log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message("Invalid login command (while waiting for join/host): " + cmd.cmd));
+			m_client->log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(tr("Invalid login command (while waiting for join/host): %1").arg(cmd.cmd)));
 			m_client->disconnectClient(Client::DisconnectionReason::Error, "invalid message");
 		}
 	}
@@ -189,7 +190,7 @@ static QStringList jsonArrayToStringList(const QJsonArray &a)
 void LoginHandler::handleIdentMessage(const protocol::ServerCommand &cmd)
 {
 	if(cmd.args.size()!=1 && cmd.args.size()!=2) {
-		sendError("syntax", "Expected username and (optional) password");
+		sendError(protocol::Error::ExpectedUsernamePassword);
 		return;
 	}
 
@@ -197,7 +198,7 @@ void LoginHandler::handleIdentMessage(const protocol::ServerCommand &cmd)
 	const QString password = cmd.args.size()>1 ? cmd.args[1].toString() : QString();
 
 	if(!validateUsername(username)) {
-		sendError("badUsername", "Invalid username");
+		sendError(protocol::Error::BadUsername);
 		return;
 	}
 
@@ -206,7 +207,7 @@ void LoginHandler::handleIdentMessage(const protocol::ServerCommand &cmd)
 	if(userAccount.status != RegisteredUser::NotFound && cmd.kwargs.contains("extauth")) {
 		// This should never happen. If it does, it means there's a bug in the client
 		// or someone is probing for bugs in the server.
-		sendError("extAuthError", "Cannot use extauth with an internal user account!");
+		sendError(protocol::Error::CannotExtAuthInternal);
 		return;
 	}
 
@@ -227,17 +228,17 @@ void LoginHandler::handleIdentMessage(const protocol::ServerCommand &cmd)
 			if(cmd.kwargs.contains("extauth")) {
 				// An external authentication token was provided
 				if(m_extauth_nonce == 0) {
-					sendError("extAuthError", "Ext auth not requested!");
+					sendError(protocol::Error::ExtAuthNotRequested);
 					return;
 				}
 				const AuthToken extAuthToken(cmd.kwargs["extauth"].toString().toUtf8());
 				const QByteArray key = QByteArray::fromBase64(m_config->getConfigString(config::ExtAuthKey).toUtf8());
 				if(!extAuthToken.checkSignature(key)) {
-					sendError("extAuthError", "Ext auth token signature mismatch!");
+					sendError(protocol::Error::ExtAuthBadSignature);
 					return;
 				}
 				if(!extAuthToken.validatePayload(m_config->getConfigString(config::ExtAuthGroup), m_extauth_nonce)) {
-					sendError("extAuthError", "Ext auth token is invalid!");
+					sendError(protocol::Error::ExtAuthInvalidToken);
 					return;
 				}
 
@@ -306,12 +307,12 @@ void LoginHandler::handleIdentMessage(const protocol::ServerCommand &cmd)
 			send(identReply);
 
 		} else {
-			sendError("badPassword", "Incorrect password");
+			sendError(protocol::Error::BadPassword);
 		}
 		return;
 
 	case RegisteredUser::Banned:
-		sendError("bannedName", "This username is banned");
+		sendError(protocol::Error::BannedName);
 		return;
 
 	case RegisteredUser::Ok:
@@ -376,20 +377,20 @@ void LoginHandler::extAuthGuestLogin(const QString &username)
 	if(!authGroup.isEmpty())
 		o["group"] = authGroup;
 
-	m_client->log(Log().about(Log::Level::Info, Log::Topic::Status).message(QStringLiteral("Querying auth server for %1...").arg(username)));
+	m_client->log(Log().about(Log::Level::Info, Log::Topic::Status).message(tr("Querying auth server for %1...").arg(username)));
 	QNetworkReply *reply = networkaccess::getInstance()->post(req, QJsonDocument(o).toJson());
 	connect(reply, &QNetworkReply::finished, this, [reply, username, this]() {
 		reply->deleteLater();
 
 		if(m_state != State::WaitForIdent) {
-			sendError("extauth", "Received auth serveer reply in unexpected state");
+			sendError(protocol::Error::ExtAuth);
 			return;
 		}
 
 		bool fail = false;
 		if(reply->error() != QNetworkReply::NoError) {
 			fail = true;
-			m_client->log(Log().about(Log::Level::Warn, Log::Topic::Status).message("Auth server error: " + reply->errorString()));
+			m_client->log(Log().about(Log::Level::Warn, Log::Topic::Status).message(tr("Auth server error: %1").arg(reply->errorString())));
 		}
 
 		QJsonDocument doc;
@@ -398,7 +399,7 @@ void LoginHandler::extAuthGuestLogin(const QString &username)
 			doc = QJsonDocument::fromJson(reply->readAll(), &error);
 			if(error.error != QJsonParseError::NoError) {
 				fail = true;
-				m_client->log(Log().about(Log::Level::Warn, Log::Topic::Status).message("Auth server JSON parse error: " + error.errorString()));
+				m_client->log(Log().about(Log::Level::Warn, Log::Topic::Status).message(tr("Auth server JSON parse error: %1").arg(error.errorString())));
 			}
 		}
 
@@ -408,7 +409,7 @@ void LoginHandler::extAuthGuestLogin(const QString &username)
 				guestLogin(username);
 			} else {
 				// If fallback mode is disabled, deny all non-internal logins
-				sendError("noExtAuth", "Authentication server is unavailable!");
+				sendError(protocol::Error::NoExtAuth);
 			}
 			return;
 
@@ -423,10 +424,13 @@ void LoginHandler::extAuthGuestLogin(const QString &username)
 			guestLogin(username);
 
 		} else if(status == "outgroup") {
-			sendError("extauthOutgroup", "This username cannot log in to this server");
+			sendError(protocol::Error::ExtAuthOutgroup);
 
 		} else {
-			sendError("extauth", "Unexpected ext-auth response: " + status);
+			sendError(protocol::Error(
+				protocol::Error::ExtAuthBadResponse,
+				{ status }
+			));
 		}
 	});
 }
@@ -455,7 +459,7 @@ void LoginHandler::requestExtAuth()
 void LoginHandler::guestLogin(const QString &username)
 {
 	if(!m_config->getConfigBool(config::AllowGuests)) {
-		sendError("noGuest", "Guest logins not allowed");
+		sendError(protocol::Error::NoGuest);
 		return;
 	}
 
@@ -491,21 +495,21 @@ void LoginHandler::handleHostMessage(const protocol::ServerCommand &cmd)
 
 	// Basic validation
 	if(!m_config->getConfigBool(config::AllowGuestHosts) && !m_hostPrivilege) {
-		sendError("unauthorizedHost", "Hosting not authorized");
+		sendError(protocol::Error::UnauthorizedHost);
 		return;
 	}
 
 	protocol::ProtocolVersion protocolVersion = protocol::ProtocolVersion::fromString(cmd.kwargs.value("protocol").toString());
 
 	if(!protocolVersion.isValid()) {
-		sendError("syntax", "Unparseable protocol version");
+		sendError(protocol::Error::UnparseableProtocol);
 		return;
 	}
 
 	int userId = cmd.kwargs.value("user_id").toInt();
 
 	if(userId < 1 || userId>254) {
-		sendError("syntax", "Invalid user ID (must be in range 1-254)");
+		sendError(protocol::Error::InvalidUserId);
 		return;
 	}
 
@@ -514,14 +518,14 @@ void LoginHandler::handleHostMessage(const protocol::ServerCommand &cmd)
 	QString sessionAlias = cmd.kwargs.value("alias").toString();
 	if(!sessionAlias.isEmpty()) {
 		if(!validateSessionIdAlias(sessionAlias)) {
-			sendError("badAlias", "Invalid session alias");
+			sendError(protocol::Error::BadAlias);
 			return;
 		}
 	}
 
 	// Create a new session
 	Session *session;
-	QString sessionErrorCode;
+	protocol::Error sessionErrorCode = protocol::Error::Unknown;
 	std::tie(session, sessionErrorCode) = m_sessions->createSession(
 		Ulid::make().toString(),
 		sessionAlias,
@@ -530,17 +534,7 @@ void LoginHandler::handleHostMessage(const protocol::ServerCommand &cmd)
 		);
 
 	if(!session) {
-		QString msg;
-		if(sessionErrorCode == "idInUse")
-			msg = "An internal server error occurred.";
-		else if(sessionErrorCode == "badProtocol")
-			msg = "This server does not support this protocol version.";
-		else if(sessionErrorCode == "closed")
-			msg = "This server is full.";
-		else
-			msg = sessionErrorCode;
-
-		sendError(sessionErrorCode, msg);
+		sendError(sessionErrorCode);
 		return;
 	}
 
@@ -570,7 +564,7 @@ void LoginHandler::handleJoinMessage(const protocol::ServerCommand &cmd)
 {
 	Q_ASSERT(!m_client->username().isEmpty());
 	if(cmd.args.size()!=1) {
-		sendError("syntax", "Expected session ID");
+		sendError(protocol::Error::ExpectedSessionId);
 		return;
 	}
 
@@ -578,40 +572,40 @@ void LoginHandler::handleJoinMessage(const protocol::ServerCommand &cmd)
 
 	Session *session = m_sessions->getSessionById(sessionId, true);
 	if(!session) {
-		sendError("notFound", "Session not found!");
+		sendError(protocol::Error::NotFound);
 		return;
 	}
 
 	if(!m_client->isModerator()) {
 		// Non-moderators have to obey access restrictions
 		if(session->history()->banlist().isBanned(m_client->peerAddress(), m_client->authId())) {
-			sendError("banned", "You have been banned from this session");
+			sendError(protocol::Error::Banned);
 			return;
 		}
 		if(session->isClosed()) {
-			sendError("closed", "This session is closed");
+			sendError(protocol::Error::Closed);
 			return;
 		}
 		if(session->history()->hasFlag(SessionHistory::AuthOnly) && !m_client->isAuthenticated()) {
-			sendError("authOnly", "This session does not allow guest logins");
+			sendError(protocol::Error::AuthOnly);
 			return;
 		}
 
 		if(!session->history()->checkPassword(cmd.kwargs.value("password").toString())) {
-			sendError("badPassword", "Incorrect password");
+			sendError(protocol::Error::BadPassword);
 			return;
 		}
 	}
 
 	if(session->getClientByUsername(m_client->username())) {
 #ifdef NDEBUG
-		sendError("nameInuse", "This username is already in use");
+		sendError(protocol::Error::NameInUse);
 		return;
 #else
 		// Allow identical usernames in debug builds, so I don't have to keep changing
 		// the username when testing. There is no technical requirement for unique usernames;
 		// the limitation is solely for the benefit of the human users.
-		m_client->log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message("Username clash ignored because this is a debug build."));
+		m_client->log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(tr("Username clash ignored because this is a debug build.")));
 #endif
 	}
 
@@ -648,12 +642,12 @@ void LoginHandler::handleStarttls()
 {
 	if(!m_client->hasSslSupport()) {
 		// Note. Well behaved clients shouldn't send STARTTLS if TLS was not listed in server features.
-		sendError("noTls", "TLS not supported");
+		sendError(protocol::Error::NoTls);
 		return;
 	}
 
 	if(m_client->isSecure()) {
-		sendError("alreadySecure", "Connection already secured"); // shouldn't happen normally
+		sendError(protocol::Error::AlreadySecure); // shouldn't happen normally
 		return;
 	}
 
@@ -680,12 +674,12 @@ bool LoginHandler::send(const protocol::ServerReply &cmd)
 	return true;
 }
 
-void LoginHandler::sendError(const QString &code, const QString &message)
+void LoginHandler::sendError(const protocol::Error &error)
 {
 	protocol::ServerReply r;
 	r.type = protocol::ServerReply::ERROR;
-	r.message = message;
-	r.reply["code"] = code;
+	r.message = error.message();
+	r.reply = error.toJson();
 	send(r);
 	m_client->disconnectClient(Client::DisconnectionReason::Error, "Login error");
 }

@@ -5,6 +5,7 @@
 #define DP_SHARED_SERVER_SESSION_H
 
 #include "libserver/announcable.h"
+#include "libshared/net/chat.h"
 #include "libshared/net/message.h"
 #include "libshared/net/protover.h"
 #include "libserver/sessionhistory.h"
@@ -224,6 +225,14 @@ public:
 	void messageAll(const QString &message, bool alert);
 
 	/**
+	 * @brief Send a standard system message to every user of this session
+	 * using a key suitable for client-side translation
+	 * @param message
+	 * @param alert is this an alert type message?
+	 */
+	void sysToAll(const protocol::SystemChat &message, bool alert);
+
+	/**
 	 * @brief Generate a request for session announcement
 	 *
 	 * @param url listing server API url
@@ -257,17 +266,17 @@ public:
 	 * @brief Grant or revoke OP status of a user
 	 * @param id user ID
 	 * @param op new status
-	 * @param changedBy name of the user who issued the command
+	 * @param changedBy the user who issued the command
 	 */
-	void changeOpStatus(uint8_t id, bool op, const QString &changedBy);
+	void changeOpStatus(uint8_t id, bool op, const protocol::ChatActor &changedBy);
 
 	/**
 	 * @brief Grant or revoke trusted status of a user
 	 * @param id user ID
 	 * @param trusted new status
-	 * @param changedBy name of the user who issued the command
+	 * @param changedBy the user who issued the command
 	 */
-	void changeTrustedStatus(uint8_t id, bool trusted, const QString &changedBy);
+	void changeTrustedStatus(uint8_t id, bool trusted, const protocol::ChatActor &changedBy);
 
 	//! Send refreshed ban list to all logged in users
 	void sendUpdatedBanlist();
@@ -373,22 +382,21 @@ private:
 	 * @brief Update session operator bits
 	 *
 	 * Generates log entries for each change
-	 *
 	 * @param ids new list of session operators
-	 * @param changedBy name of the user who issued the change command
+	 * @param changedBy the user who issued the change command
 	 * @return sanitized list of actual session operators
 	 */
-	QList<uint8_t> updateOwnership(QList<uint8_t> ids, const QString &changedBy);
+	QList<uint8_t> updateOwnership(QList<uint8_t> ids, const protocol::ChatActor &changedBy);
 
 	/**
 	 * @brief Update the list of trusted users
 	 *
 	 * Generates log entries for each change
 	 * @param ids new list of trusted users
-	 * @param changedBy name of the user who issued the change command
+	 * @param changedBy the user who issued the change command
 	 * @return sanitized list of actual trusted users
 	 */
-	QList<uint8_t> updateTrustedUsers(QList<uint8_t> ids, const QString &changedBy);
+	QList<uint8_t> updateTrustedUsers(QList<uint8_t> ids, const protocol::ChatActor &changedBy);
 
 	void restartRecording();
 	void stopRecording();

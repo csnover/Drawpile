@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // SPDX-FileCopyrightText: Calle Laakkonen
 
+#include "libshared/net/error.h"
 #include "libshared/net/protover.h"
 #include "libserver/jsonapi.h"
 #include "libserver/sessions.h"
@@ -76,7 +77,7 @@ public:
 	 * @param founder session founder username
 	 * @return the newly created session
 	 */
-	std::tuple<Session*, QString> createSession(const QString &id, const QString &idAlias, const protocol::ProtocolVersion &protocolVersion, const QString &founder) override;
+	std::tuple<Session*, protocol::Error> createSession(const QString &id, const QString &idAlias, const protocol::ProtocolVersion &protocolVersion, const QString &founder) override;
 
 	/**
 	 * @brief Create a new session by instantiating a template

@@ -8,6 +8,7 @@
 #include "libserver/opcommands.h"
 #include "libserver/announcements.h"
 
+#include "libshared/net/chat.h"
 #include "libshared/net/control.h"
 #include "libshared/net/meta.h"
 #include "libshared/record/writer.h"
@@ -24,6 +25,7 @@
 namespace server {
 
 using protocol::MessagePtr;
+using protocol::SystemChat;
 
 Session::Session(SessionHistory *history, ServerConfig *config, sessionlisting::Announcements *announcements, QObject *parent)
 	: QObject(parent),
@@ -100,7 +102,7 @@ void Session::switchState(State newstate)
 			if(!m_history->reset(resetImage)) {
 				// This shouldn't normally happen, as the size limit should be caught while
 				// still uploading the reset.
-				messageAll("Session reset failed!", true);
+				sysToAll(SystemChat::ResetFailed, true);
 				success = false;
 
 			} else {
@@ -131,7 +133,7 @@ void Session::switchState(State newstate)
 
 		m_resetstream.clear();
 		m_resetstreamsize = 0;
-		messageAll("Preparing for session reset!", true);
+		sysToAll(SystemChat::PreparingReset, true);
 	}
 
 	m_state = newstate;
@@ -183,10 +185,10 @@ void Session::joinUser(Client *user, bool host)
 	addToHistory(user->joinMessage());
 
 	if(user->isOperator() || m_history->isOperator(user->authId()))
-		changeOpStatus(user->id(), true, "the server");
+		changeOpStatus(user->id(), true, protocol::ChatActor::Server);
 
 	if(user->authFlags().contains("TRUSTED") || m_history->isTrusted(user->authId()))
-		changeTrustedStatus(user->id(), true, "the server");
+		changeTrustedStatus(user->id(), true, protocol::ChatActor::Server);
 
 	ensureOperatorExists();
 
@@ -202,7 +204,7 @@ void Session::joinUser(Client *user, bool host)
 
 	m_history->joinUser(user->id(), user->username());
 
-	user->log(Log().about(Log::Level::Info, Log::Topic::Join).message("Joined session"));
+	user->log(Log().about(Log::Level::Info, Log::Topic::Join).message(tr("Joined session")));
 	emit sessionAttributeChanged(this);
 }
 
@@ -220,7 +222,7 @@ void Session::removeUser(Client *user)
 	});
 
 	Q_ASSERT(user->session() == this);
-	user->log(Log().about(Log::Level::Info, Log::Topic::Leave).message("Left session"));
+	user->log(Log().about(Log::Level::Info, Log::Topic::Leave).message(tr("Left session")));
 	user->setSession(nullptr);
 
 	disconnect(user, nullptr, this, nullptr);
@@ -251,7 +253,7 @@ void Session::abortReset()
 	m_resetstream.clear();
 	m_resetstreamsize = 0;
 	switchState(State::Running);
-	messageAll("Session reset cancelled.", true);
+	sysToAll(SystemChat::ResetCancelled, true);
 }
 
 Client *Session::getClientById(uint8_t id)
@@ -276,7 +278,7 @@ void Session::addBan(const Client *target, const QString &bannedBy)
 {
 	Q_ASSERT(target);
 	if(m_history->addBan(target->username(), target->peerAddress(), target->authId(), bannedBy)) {
-		target->log(Log().about(Log::Level::Info, Log::Topic::Ban).message("Banned by " + bannedBy));
+		target->log(Log().about(Log::Level::Info, Log::Topic::Ban).message(tr("Banned by %1").arg(bannedBy)));
 		sendUpdatedBanlist();
 	}
 }
@@ -285,7 +287,7 @@ void Session::addBan(const PastClient &target, const QString &bannedBy)
 {
 	Q_ASSERT(target.id>0);
 	if(m_history->addBan(target.username, target.peerAddress, target.authId, bannedBy)) {
-		log(Log().user(target.id, target.peerAddress, target.username).about(Log::Level::Info, Log::Topic::Ban).message("Banned by " + bannedBy));
+		log(Log().user(target.id, target.peerAddress, target.username).about(Log::Level::Info, Log::Topic::Ban).message(tr("Banned by %1").arg(bannedBy)));
 		sendUpdatedBanlist();
 	}
 }
@@ -294,7 +296,7 @@ void Session::removeBan(int entryId, const QString &removedBy)
 {
 	QString unbanned = m_history->removeBan(entryId);
 	if(!unbanned.isEmpty()) {
-		log(Log().about(Log::Level::Info, Log::Topic::Unban).message(unbanned + " unbanned by " + removedBy));
+		log(Log().about(Log::Level::Info, Log::Topic::Unban).message(tr("%1 unbanned by %2").arg(unbanned).arg(removedBy)));
 		sendUpdatedBanlist();
 	}
 }
@@ -320,7 +322,7 @@ void Session::setSessionConfig(const QJsonObject &conf, Client *changedBy)
 
 	if(conf.contains("closed")) {
 		m_closed = conf["closed"].toBool();
-		changes << (m_closed ? "closed" : "opened");
+		changes << (m_closed ? tr("closed") : tr("opened"));
 	}
 
 	SessionHistory::Flags flags = m_history->flags();
@@ -331,23 +333,23 @@ void Session::setSessionConfig(const QJsonObject &conf, Client *changedBy)
 		// Otherwise it would be possible for users to accidentally lock themselves out.
 		if(!authOnly || !changedBy || changedBy->isAuthenticated()) {
 			flags.setFlag(SessionHistory::AuthOnly, authOnly);
-			changes << (authOnly ? "blocked guest logins" : "permitted guest logins");
+			changes << (authOnly ? tr("blocked guest logins") : tr("permitted guest logins"));
 		}
 	}
 
 	if(conf.contains("persistent")) {
 		flags.setFlag(SessionHistory::Persistent, conf["persistent"].toBool() && m_config->getConfigBool(config::EnablePersistence));
-		changes << (conf["persistent"].toBool() ? "made persistent" : "made nonpersistent");
+		changes << (conf["persistent"].toBool() ? tr("made persistent") : tr("made nonpersistent"));
 	}
 
 	if(conf.contains("title")) {
 		m_history->setTitle(conf["title"].toString().mid(0, 100));
-		changes << "changed title";
+		changes << tr("changed title");
 	}
 
 	if(conf.contains("maxUserCount")) {
 		m_history->setMaxUsers(conf["maxUserCount"].toInt());
-		changes << "changed max. user count";
+		changes << tr("changed max. user count");
 	}
 
 	if(conf.contains("resetThreshold")) {
@@ -357,17 +359,17 @@ void Session::setSessionConfig(const QJsonObject &conf, Client *changedBy)
 		else
 			val = ServerConfig::parseSizeString(conf["resetThreshold"].toString());
 		m_history->setAutoResetThreshold(val);
-		changes << "changed autoreset threshold";
+		changes << tr("changed autoreset threshold");
 	}
 
 	if(conf.contains("password")) {
 		m_history->setPassword(conf["password"].toString());
-		changes << "changed password";
+		changes << tr("changed password");
 	}
 
 	if(conf.contains("opword")) {
 		m_history->setOpword(conf["opword"].toString());
-		changes << "changed opword";
+		changes << tr("changed opword");
 	}
 
 	// Note: this bit is only relayed by the server: it informs
@@ -375,24 +377,24 @@ void Session::setSessionConfig(const QJsonObject &conf, Client *changedBy)
 	// by default.
 	if(conf.contains("preserveChat")) {
 		flags.setFlag(SessionHistory::PreserveChat, conf["preserveChat"].toBool());
-		changes << (conf["preserveChat"].toBool() ? "preserve chat" : "don't preserve chat");
+		changes << (conf["preserveChat"].toBool() ? tr("preserve chat") : tr("don't preserve chat"));
 	}
 
 	if(conf.contains("nsfm")) {
 		flags.setFlag(SessionHistory::Nsfm, conf["nsfm"].toBool());
-		changes << (conf["nsfm"].toBool() ? "tagged NSFM" : "removed NSFM tag");
+		changes << (conf["nsfm"].toBool() ? tr("tagged NSFM") : tr("removed NSFM tag"));
 	}
 
 	if(conf.contains("deputies")) {
 		flags.setFlag(SessionHistory::Deputies, conf["deputies"].toBool());
-		changes << (conf["deputies"].toBool() ? "enabled deputies" : "disabled deputies");
+		changes << (conf["deputies"].toBool() ? tr("enabled deputies") : tr("disabled deputies"));
 	}
 
 	m_history->setFlags(flags);
 
 	if(!changes.isEmpty()) {
 		sendUpdatedSessionProperties();
-		QString logmsg = changes.join(", ");
+		QString logmsg = changes.join(tr(", "));
 		logmsg[0] = logmsg[0].toUpper();
 
 		Log l = Log().about(Log::Level::Info, Log::Topic::Status).message(logmsg);
@@ -403,7 +405,7 @@ void Session::setSessionConfig(const QJsonObject &conf, Client *changedBy)
 	}
 }
 
-QList<uint8_t> Session::updateOwnership(QList<uint8_t> ids, const QString &changedBy)
+QList<uint8_t> Session::updateOwnership(QList<uint8_t> ids, const protocol::ChatActor &changedBy)
 {
 	QList<uint8_t> truelist;
 	Client *kickResetter = nullptr;
@@ -421,18 +423,20 @@ QList<uint8_t> Session::updateOwnership(QList<uint8_t> ids, const QString &chang
 			}
 
 			c->setOperator(op);
-			QString msg;
 			if(op) {
-				msg = "Made operator by " + changedBy;
-				c->log(Log().about(Log::Level::Info, Log::Topic::Op).message(msg));
+				c->log(Log().about(Log::Level::Info, Log::Topic::Op).message(tr("Made operator by %1").arg(changedBy.name())));
 			} else {
-				msg = "Operator status revoked by " + changedBy;
-				c->log(Log().about(Log::Level::Info, Log::Topic::Deop).message(msg));
+				c->log(Log().about(Log::Level::Info, Log::Topic::Deop).message(tr("Deopped by %1").arg(changedBy.name())));
 			}
-			messageAll(c->username() + " " + msg, false);
+			sysToAll(SystemChat(op
+				? SystemChat::OpAdded
+				: SystemChat::OpRemoved,
+				changedBy,
+				{ c->username() }),
+				false
+			);
 			if(c->isAuthenticated() && !c->isModerator())
 				m_history->setAuthenticatedOperator(c->authId(), op);
-
 		}
 		if(c->isOperator())
 			truelist << c->id();
@@ -444,7 +448,7 @@ QList<uint8_t> Session::updateOwnership(QList<uint8_t> ids, const QString &chang
 	return truelist;
 }
 
-void Session::changeOpStatus(uint8_t id, bool op, const QString &changedBy)
+void Session::changeOpStatus(uint8_t id, bool op, const protocol::ChatActor &changedBy)
 {
 	QList<uint8_t> ids;
 	for(const Client *c : m_clients) {
@@ -461,7 +465,7 @@ void Session::changeOpStatus(uint8_t id, bool op, const QString &changedBy)
 	addToHistory(protocol::MessagePtr(new protocol::SessionOwner(0, ids)));
 }
 
-QList<uint8_t> Session::updateTrustedUsers(QList<uint8_t> ids, const QString &changedBy)
+QList<uint8_t> Session::updateTrustedUsers(QList<uint8_t> ids, const protocol::ChatActor &changedBy)
 {
 	QList<uint8_t> truelist;
 	for(Client *c : m_clients) {
@@ -470,13 +474,17 @@ QList<uint8_t> Session::updateTrustedUsers(QList<uint8_t> ids, const QString &ch
 			c->setTrusted(trusted);
 			QString msg;
 			if(trusted) {
-				msg = "Trusted by " + changedBy;
-				c->log(Log().about(Log::Level::Info, Log::Topic::Trust).message(msg));
+				c->log(Log().about(Log::Level::Info, Log::Topic::Trust).message(tr("Trusted by %1").arg(changedBy.name())));
 			} else {
-				msg = "Untrusted by " + changedBy;
-				c->log(Log().about(Log::Level::Info, Log::Topic::Untrust).message(msg));
+				c->log(Log().about(Log::Level::Info, Log::Topic::Untrust).message(tr("Untrusted by %1").arg(changedBy.name())));
 			}
-			messageAll(c->username() + " " + msg, false);
+			sysToAll(SystemChat(trusted
+				? SystemChat::TrustedAdded
+				: SystemChat::TrustedRemoved,
+				changedBy,
+				{ c->username() }),
+				false
+			);
 			if(c->isAuthenticated())
 				m_history->setAuthenticatedTrust(c->authId(), trusted);
 
@@ -488,7 +496,7 @@ QList<uint8_t> Session::updateTrustedUsers(QList<uint8_t> ids, const QString &ch
 	return truelist;
 }
 
-void Session::changeTrustedStatus(uint8_t id, bool trusted, const QString &changedBy)
+void Session::changeTrustedStatus(uint8_t id, bool trusted, const protocol::ChatActor &changedBy)
 {
 	QList<uint8_t> ids;
 	for(const Client *c : m_clients) {
@@ -600,7 +608,7 @@ void Session::handleClientMessage(Client &client, protocol::MessagePtr msg)
 	case MSG_USER_JOIN:
 	case MSG_USER_LEAVE:
 	case MSG_SOFTRESET:
-		client.log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message("Received server-to-user only command " + msg->messageName()));
+		client.log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(tr("Received server-to-user only command %1").arg(msg->messageName())));
 		return;
 	case MSG_DISCONNECT:
 		// we don't do anything with disconnect notifications from the client
@@ -617,7 +625,7 @@ void Session::handleClientMessage(Client &client, protocol::MessagePtr msg)
 		}
 		case protocol::MSG_SESSION_OWNER: {
 			if(!client.isOperator()) {
-				client.log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message("Tried to change session ownership"));
+				client.log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(tr("Tried to change session ownership")));
 				return;
 			}
 
@@ -649,7 +657,7 @@ void Session::handleClientMessage(Client &client, protocol::MessagePtr msg)
 		}
 		case protocol::MSG_TRUSTED_USERS: {
 			if(!client.isOperator()) {
-				log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message("Tried to change trusted user list"));
+				log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(tr("Tried to change trusted user list")));
 				return;
 			}
 
@@ -693,12 +701,12 @@ void Session::handleInitBegin(int ctxId)
 	Client *c = getClientById(ctxId);
 	if(!c) {
 		// Shouldn't happen
-		log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(QString("Non-existent user %1 sent init-begin").arg(ctxId)));
+		log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(tr("Non-existent user %1 sent init-begin").arg(ctxId)));
 		return;
 	}
 
 	if(ctxId != m_initUser) {
-		c->log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(QString("Sent init-begin, but init user is #%1").arg(m_initUser)));
+		c->log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(tr("Sent init-begin, but init user is #%1").arg(m_initUser)));
 		return;
 	}
 
@@ -709,7 +717,7 @@ void Session::handleInitBegin(int ctxId)
 	// the start of the true reset snapshot, so we can clear out the buffer here.
 	// For backward-compatibility, sending the init-begin command is optional.
 	if(m_resetstreamsize>0) {
-		c->log(Log().about(Log::Level::Debug, Log::Topic::Status).message(QStringLiteral("%1 extra messages cleared by init-begin").arg(m_resetstream.size())));
+		c->log(Log().about(Log::Level::Debug, Log::Topic::Status).message(tr("%1 extra messages cleared by init-begin").arg(m_resetstream.size())));
 		m_resetstream.clear();
 		m_resetstreamsize = 0;
 	}
@@ -720,16 +728,16 @@ void Session::handleInitComplete(int ctxId)
 	Client *c = getClientById(ctxId);
 	if(!c) {
 		// Shouldn't happen
-		log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(QString("Non-existent user %1 sent init-complete").arg(ctxId)));
+		log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(tr("Non-existent user %1 sent init-complete").arg(ctxId)));
 		return;
 	}
 
 	if(ctxId != m_initUser) {
-		c->log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(QString("Sent init-complete, but init user is #%1").arg(m_initUser)));
+		c->log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(tr("Sent init-complete, but init user is #%1").arg(m_initUser)));
 		return;
 	}
 
-	c->log(Log().about(Log::Level::Debug, Log::Topic::Status).message("init-complete"));
+	c->log(Log().about(Log::Level::Debug, Log::Topic::Status).message(tr("init-complete")));
 
 	switchState(State::Running);
 }
@@ -739,16 +747,16 @@ void Session::handleInitCancel(int ctxId)
 	Client *c = getClientById(ctxId);
 	if(!c) {
 		// Shouldn't happen
-		log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(QString("Non-existent user %1 sent init-complete").arg(ctxId)));
+		log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(tr("Non-existent user %1 sent init-complete").arg(ctxId)));
 		return;
 	}
 
 	if(ctxId != m_initUser) {
-		c->log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(QString("Sent init-cancel, but init user is #%1").arg(m_initUser)));
+		c->log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(tr("Sent init-cancel, but init user is #%1").arg(m_initUser)));
 		return;
 	}
 
-	c->log(Log().about(Log::Level::Debug, Log::Topic::Status).message("init-cancel"));
+	c->log(Log().about(Log::Level::Debug, Log::Topic::Status).message(tr("init-cancel")));
 	abortReset();
 }
 
@@ -810,6 +818,17 @@ void Session::messageAll(const QString &message, bool alert)
 	);
 }
 
+void Session::sysToAll(const SystemChat &message, bool alert)
+{
+	directToAll(protocol::MessagePtr(new protocol::Command(0,
+		(protocol::ServerReply {
+			alert ? protocol::ServerReply::ALERT : protocol::ServerReply::MESSAGE,
+			message.message(),
+			message.toJson()
+		}).toJson()))
+	);
+}
+
 void Session::ensureOperatorExists()
 {
 	// If there is a way to gain OP status without being explicitly granted,
@@ -826,7 +845,7 @@ void Session::ensureOperatorExists()
 	}
 
 	if(!hasOp && !m_clients.isEmpty()) {
-		changeOpStatus(m_clients.first()->id(), true, "the server");
+		changeOpStatus(m_clients.first()->id(), true, protocol::ChatActor::Server);
 	}
 }
 
@@ -968,19 +987,19 @@ void Session::sendAbuseReport(const Client *reporter, int aboutUser, const QStri
 {
 	Q_ASSERT(reporter);
 
-	reporter->log(Log().about(Log::Level::Info, Log::Topic::Status).message(QString("Abuse report about user %1 received: %2").arg(aboutUser).arg(message)));
+	reporter->log(Log().about(Log::Level::Info, Log::Topic::Status).message(tr("Abuse report about user %1 received: %2").arg(aboutUser).arg(message)));
 
 	const QUrl url = m_config->internalConfig().reportUrl;
 	if(!url.isValid()) {
 		// This shouldn't happen normally. If the URL is not configured,
 		// the server does not advertise the capability to receive reports.
-		log(Log().about(Log::Level::Warn, Log::Topic::Status).message("Cannot send abuse report: server URL not configured!"));
+		log(Log().about(Log::Level::Warn, Log::Topic::Status).message(tr("Cannot send abuse report: server URL not configured!")));
 		return;
 	}
 
 	if(!m_config->getConfigBool(config::AbuseReport)) {
 		// This can happen if reporting is disabled when a session is still in progress
-		log(Log().about(Log::Level::Warn, Log::Topic::Status).message("Cannot send abuse report: not enabled!"));
+		log(Log().about(Log::Level::Warn, Log::Topic::Status).message(tr("Cannot send abuse report: not enabled!")));
 		return;
 	}
 
@@ -1016,7 +1035,7 @@ void Session::sendAbuseReport(const Client *reporter, int aboutUser, const QStri
 	QNetworkReply *reply = networkaccess::getInstance()->post(req, QJsonDocument(o).toJson());
 	connect(reply, &QNetworkReply::finished, this, [this, reply]() {
 		if(reply->error() != QNetworkReply::NoError) {
-			log(Log().about(Log::Level::Warn, Log::Topic::Status).message("Unable to send abuse report: " + reply->errorString()));
+			log(Log().about(Log::Level::Warn, Log::Topic::Status).message(tr("Unable to send abuse report: %1").arg(reply->errorString())));
 		}
 	});
 	connect(reply, &QNetworkReply::finished, reply, &QObject::deleteLater);

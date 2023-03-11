@@ -47,6 +47,10 @@ target_link_libraries(dpserver
 	${QT_PACKAGE_NAME}::Network
 )
 
+if(${QT_PACKAGE_NAME}LinguistTools_FOUND)
+	add_subdirectory(i18n)
+endif()
+
 if(TESTS)
 	add_subdirectory(tests)
 endif()

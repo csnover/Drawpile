@@ -4,6 +4,7 @@
 #ifndef SESSIONS_INTERFACE_H
 #define SESSIONS_INTERFACE_H
 
+#include "libshared/net/error.h"
 #include <tuple>
 
 class QJsonArray;
@@ -41,20 +42,20 @@ public:
 	/**
 	 * Create a new session
 	 *
-	 * In case of error, one of the following error codes may be returned:
+	 * In case of error, one of the following error kinds may be returned:
 	 *
-	 *  - idInuse     - a session with this ID or alias already exists
-	 *  - badProtocol - this protocol version is not supported by this server
-	 *  - closed      - this server is full or not accepting new sessions
+	 *  - IdInUse     - a session with this ID or alias already exists
+	 *  - BadProtocol - this protocol version is not supported by this server
+	 *  - Closed      - this server is full or not accepting new sessions
 	 *
 	 * @param id session unique ID
 	 * @param alias session alias (may be empty)
 	 * @param protocolVersion session protocol version
 	 * @param founder name of the user who created the session
 	 *
-	 * @return session, error string pair: if session is null, error string contains the error code
+	 * @return session, error pair: if session is null, error contains the error
 	 */
-	virtual std::tuple<Session*, QString> createSession(const QString &id, const QString &alias, const protocol::ProtocolVersion &protocolVersion, const QString &founder) = 0;
+	virtual std::tuple<Session*, protocol::Error> createSession(const QString &id, const QString &alias, const protocol::ProtocolVersion &protocolVersion, const QString &founder) = 0;
 };
 
 }

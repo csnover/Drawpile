@@ -17,9 +17,9 @@ TabletTestDialog::TabletTestDialog(QWidget *parent)
 	connect(static_cast<DrawpileApp*>(qApp), &DrawpileApp::eraserNear, this, [this](bool near) {
 		QString msg;
 		if(near)
-			msg = QStringLiteral("Eraser brought near");
+			msg = tr("Eraser brought near");
 		else
-			msg = QStringLiteral("Eraser taken away");
+			msg = tr("Eraser taken away");
 
 		m_ui->logView->appendPlainText(msg);
 	});

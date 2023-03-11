@@ -90,7 +90,7 @@ bool LoginHandler::receiveMessage(const ServerReply &msg)
 
 	if(msg.type == ServerReply::ReplyType::Error) {
 		// The server disconnects us right after sending the error message
-		handleError(msg.reply["code"].toString(), msg.message);
+		handleError(protocol::Error::fromJson(msg.reply, msg.message));
 		return true;
 
 	} else if(msg.type != ServerReply::ReplyType::Login && msg.type != ServerReply::ReplyType::Result) {
@@ -730,34 +730,26 @@ void LoginHandler::cancelLogin()
 	m_server->loginFailure(tr("Cancelled"), "CANCELLED");
 }
 
+void LoginHandler::handleError(const protocol::Error &error)
+{
+	qWarning() << "Login error:" << error.message();
+
+	failLogin(error.message(), error.code());
+}
+
 void LoginHandler::handleError(const QString &code, const QString &msg)
 {
 	qWarning() << "Login error:" << code << msg;
 
-	QString error;
-	if(code == "notFound")
-		error = tr("Session not found!");
-	else if(code == "badPassword") {
-		error = tr("Incorrect password!");
-		emit badLoginPassword();
-	} else if(code == "badUsername")
-		error = tr("Invalid username!");
-	else if(code == "bannedName")
-		error = tr("This username has been locked");
-	else if(code == "nameInUse")
-		error = tr("Username already taken!");
-	else if(code == "closed")
-		error = m_mode == Mode::Join ? tr("Session is closed!") : tr("Server is full!");
-	else if(code == "unauthorizedHost")
-		error = tr("Hosting not authorized");
-	else if(code == "banned")
-		error = tr("You have been banned from this session!");
-	else if(code == "idInUse")
-		error = tr("Session alias is reserved!");
-	else
-		error = msg;
-
-	failLogin(error, code);
+	// Since codes are not unique per error, Unknown may be returned,
+	// in which case the original untranslated message must be passed
+	// as-is since there is no way to disambiguate it
+	protocol::Error error{protocol::Error::fromCode(code)};
+	failLogin(error.kind() == protocol::Error::Kind::Unknown
+		? msg
+		: error.message(),
+		code
+	);
 }
 
 void LoginHandler::failLogin(const QString &message, const QString &errorcode)

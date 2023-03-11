@@ -404,9 +404,9 @@ void LoginDialog::onExtAuthNeeded(const QString &forUsername, const QUrl &url)
 	if(!forUsername.isEmpty())
 		d->m_ui->username->setText(forUsername);
 
-	QString prompt = tr("Log in with %1 credentials").arg("<i>" + url.host() + "</i>");
-	if(url.scheme() != "https")
-		prompt += " (INSECURE CONNECTION!)";
+	QString prompt = tr("Log in with %1 credentials%2")
+		.arg("<i>" + url.host() + "</i>")
+		.arg(url.scheme() != "https" ? tr(" (INSECURE CONNECTION!)") : QString());
 
 	d->extauthurl = url;
 	d->setLoginMode(prompt);

@@ -7,8 +7,12 @@ add_library(dpshared STATIC
 	net/annotation.h
 	net/brushes.cpp
 	net/brushes.h
+	net/chat.cpp
+	net/chat.h
 	net/control.cpp
 	net/control.h
+	net/error.cpp
+	net/error.h
 	net/image.cpp
 	net/image.h
 	net/layer.cpp
@@ -76,6 +80,10 @@ if(KF5DNSSD_FOUND)
 	target_link_libraries(dpshared KF5::DNSSD)
 endif()
 add_feature_info("Zeroconf support" KF5DNSSD_FOUND "")
+
+if(${QT_PACKAGE_NAME}LinguistTools_FOUND)
+	add_subdirectory(i18n)
+endif()
 
 if(TESTS)
 	add_subdirectory(tests)

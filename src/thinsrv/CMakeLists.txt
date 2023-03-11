@@ -97,6 +97,10 @@ if(SERVERGUI)
 	target_link_libraries(${srvlib} ${QT_PACKAGE_NAME}::Widgets)
 endif()
 
+if(${QT_PACKAGE_NAME}LinguistTools_FOUND)
+	add_subdirectory(i18n)
+endif()
+
 if(UNIX AND NOT APPLE)
 	if(INITSYS STREQUAL "systemd")
 		find_package(PkgConfig QUIET)

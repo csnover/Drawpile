@@ -6,6 +6,7 @@
 #include "libserver/serverlog.h"
 #include "libserver/serverconfig.h"
 
+#include "libshared/net/chat.h"
 #include "libshared/net/control.h"
 
 namespace server {
@@ -25,7 +26,7 @@ void ThinSession::addToHistory(protocol::MessagePtr msg)
 
 	// Add message to history (if there is space)
 	if(!history()->addMessage(msg)) {
-		messageAll("History size limit reached! Session must be reset to continue.", false);
+		sysToAll(protocol::SystemChat::HistoryLimit, false);
 		return;
 	}
 
@@ -47,7 +48,7 @@ void ThinSession::addToHistory(protocol::MessagePtr msg)
 	const uint autoResetThreshold = history()->effectiveAutoResetThreshold();
 	if(autoResetThreshold>0 && m_autoResetRequestStatus == AutoResetState::NotSent && history()->sizeInBytes() > autoResetThreshold) {
 		log(Log().about(Log::Level::Info, Log::Topic::Status).message(
-			QString("Autoreset threshold (%1, effectively %2 MB) reached.")
+			tr("Autoreset threshold (%1, effectively %2 MB) reached.")
 				.arg(history()->autoResetThreshold()/(1024.0*1024.0), 0, 'g', 1)
 				.arg(autoResetThreshold/(1024.0*1024.0), 0, 'g', 1)
 		));
@@ -101,24 +102,24 @@ void ThinSession::readyToAutoReset(int ctxId)
 	Client *c = getClientById(ctxId);
 	if(!c) {
 		// Shouldn't happen
-		log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(QString("Non-existent user %1 sent ready-to-autoreset").arg(ctxId)));
+		log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(tr("Non-existent user %1 sent ready-to-autoreset").arg(ctxId)));
 		return;
 	}
 
 	if(!c->isOperator()) {
 		// Unlikely to happen normally, but possible if connection is
 		// really slow and user is deopped at just the right moment
-		log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(QString("User %1 is not an operator, but sent ready-to-autoreset").arg(ctxId)));
+		log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(tr("User %1 is not an operator, but sent ready-to-autoreset").arg(ctxId)));
 		return;
 	}
 
 	if(m_autoResetRequestStatus != AutoResetState::Queried) {
 		// Only the first response in handled
-		log(Log().about(Log::Level::Debug, Log::Topic::Status).message(QString("User %1 was late to respond to an autoreset request").arg(ctxId)));
+		log(Log().about(Log::Level::Debug, Log::Topic::Status).message(tr("User %1 was late to respond to an autoreset request").arg(ctxId)));
 		return;
 	}
 
-	log(Log().about(Log::Level::Info, Log::Topic::Status).message(QString("User %1 responded to autoreset request first").arg(ctxId)));
+	log(Log().about(Log::Level::Info, Log::Topic::Status).message(tr("User %1 responded to autoreset request first").arg(ctxId)));
 
 	protocol::ServerReply resetRequest;
 	resetRequest.type = protocol::ServerReply::RESETREQUEST;

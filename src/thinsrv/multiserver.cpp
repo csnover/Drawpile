@@ -139,7 +139,7 @@ bool MultiServer::start(quint16 port, const QHostAddress& address) {
 
 	emit serverStarted();
 	m_sessions->config()->logger()->logMessage(Log().about(Log::Level::Info, Log::Topic::Status)
-		.message(QString("Started listening on port %1 at address %2").arg(port).arg(address.toString())));
+		.message(tr("Started listening on port %1 at address %2").arg(port).arg(address.toString())));
 	return true;
 }
 
@@ -156,7 +156,7 @@ bool MultiServer::startFd(int fd)
 		return false;
 
 	if(!m_server->setSocketDescriptor(fd)) {
-		m_sessions->config()->logger()->logMessage(Log().about(Log::Level::Error, Log::Topic::Status).message("Couldn't set server socket descriptor!"));
+		m_sessions->config()->logger()->logMessage(Log().about(Log::Level::Error, Log::Topic::Status).message(tr("Couldn't set server socket descriptor!")));
 		delete m_server;
 		m_server = nullptr;
 		m_state = STOPPED;
@@ -166,7 +166,7 @@ bool MultiServer::startFd(int fd)
 	m_port = m_server->serverPort();
 
 	m_sessions->config()->logger()->logMessage(Log().about(Log::Level::Info, Log::Topic::Status)
-		.message(QString("Started listening on passed socket")));
+		.message(tr("Started listening on passed socket")));
 
 	return true;
 }
@@ -233,14 +233,14 @@ void MultiServer::newClient()
 
 	m_sessions->config()->logger()->logMessage(Log().about(Log::Level::Info, Log::Topic::Status)
 		.user(0, socket->peerAddress(), QString())
-		.message(QStringLiteral("New client connected")));
+		.message(tr("New client connected")));
 
 	auto *client = new ThinServerClient(socket, m_sessions->config()->logger());
 
 	if(m_config->isAddressBanned(socket->peerAddress())) {
 		client->log(Log().about(Log::Level::Warn, Log::Topic::Kick)
 			.user(0, socket->peerAddress(), QString())
-			.message("Kicking banned user straight away"));
+			.message(tr("Kicking banned user straight away")));
 
 		client->disconnectClient(Client::DisconnectionReason::Error, "BANNED");
 
@@ -252,7 +252,7 @@ void MultiServer::newClient()
 
 void MultiServer::printStatusUpdate()
 {
-	initsys::notifyStatus(QString("%1 users and %2 sessions")
+	initsys::notifyStatus(tr("%1 users and %2 sessions")
 		.arg(m_sessions->totalUsers())
 		.arg(m_sessions->sessionCount())
 	);
@@ -266,7 +266,7 @@ void MultiServer::tryAutoStop()
 	if(m_state == RUNNING && m_autoStop && m_sessions->sessionCount() == 0 && m_sessions->totalUsers() == 0) {
 		m_sessions->config()->logger()->logMessage(Log()
 			.about(Log::Level::Info, Log::Topic::Status)
-			.message("Autostopping due to lack of sessions."));
+			.message(tr("Autostopping due to lack of sessions.")));
 		stop();
 	}
 }
@@ -278,7 +278,7 @@ void MultiServer::stop() {
 	if(m_state == RUNNING) {
 		m_sessions->config()->logger()->logMessage(Log()
 			.about(Log::Level::Info, Log::Topic::Status)
-			.message(QString("Stopping server and kicking out %1 users...")
+			.message(tr("Stopping server and kicking out %1 users...")
 					 .arg(m_sessions->totalUsers())
 			));
 
@@ -296,7 +296,7 @@ void MultiServer::stop() {
 			m_server = nullptr;
 			m_sessions->config()->logger()->logMessage(Log()
 				.about(Log::Level::Info, Log::Topic::Status)
-				.message("Server stopped."));
+				.message(tr("Server stopped.")));
 			emit serverStopped();
 		}
 	}

@@ -5,6 +5,7 @@
 #define DP_CLIENT_NET_LOGINHANDLER_H
 
 #include "libclient/net/envelope.h"
+#include "libshared/net/error.h"
 
 #include <QString>
 #include <QUrl>
@@ -352,7 +353,8 @@ private:
 	bool expectLoginOk(const ServerReply &msg);
 	void startTls();
 	void continueTls();
-	void handleError(const QString &code, const QString &message);
+	void handleError(const protocol::Error &error);
+	void handleError(const QString &code, const QString &msg);
 
 	Mode m_mode;
 	QUrl m_address;

@@ -27,7 +27,7 @@ void Announcements::announceSession(Announcable *session, const QUrl &listServer
 	if(!listServer.isValid() || !m_config->isAllowedAnnouncementUrl(listServer)) {
 		server::Log()
 			.about(server::Log::Level::Warn, server::Log::Topic::PubList)
-			.message("Announcement API URL not allowed: " + listServer.toString())
+			.message(tr("Announcement API URL not allowed: %1").arg(listServer.toString()))
 			.to(m_config->logger());
 		return;
 	}
@@ -51,7 +51,7 @@ void Announcements::announceSession(Announcable *session, const QUrl &listServer
 	server::Log()
 		.about(server::Log::Level::Info, server::Log::Topic::PubList)
 		.session(session->id())
-		.message("Announcing session at at " + listServer.toString())
+		.message(tr("Announcing session at %1").arg(listServer.toString()))
 		.to(m_config->logger());
 
 	auto *response = sessionlisting::announceSession(listServer, description);
@@ -68,7 +68,7 @@ void Announcements::announceSession(Announcable *session, const QUrl &listServer
 		if(!error.isEmpty()) {
 			server::Log()
 				.about(server::Log::Level::Warn, server::Log::Topic::PubList)
-				.message(listServer.toString() + ": announcement failed: " + error)
+				.message(tr("%1: announcement failed: %2").arg(listServer.toString()).arg(error))
 				.to(m_config->logger());
 
 			unlistSession(listing->session, listing->listServer, false);
@@ -94,7 +94,7 @@ void Announcements::announceSession(Announcable *session, const QUrl &listServer
 
 		server::Log()
 			.about(server::Log::Level::Info, server::Log::Topic::PubList)
-			.message("Announced at: " + listServer.toString())
+			.message(tr("Announced at: %1").arg(listServer.toString()))
 			.to(m_config->logger());
 	});
 }
@@ -116,7 +116,7 @@ void Announcements::unlistSession(Announcable *session, const QUrl &listServer, 
 			server::Log()
 				.about(server::Log::Level::Info, server::Log::Topic::PubList)
 				.session(listing.announcement.id)
-				.message("Unlisting from " + listing.listServer.toString())
+				.message(tr("Unlisting from %1").arg(listing.listServer.toString()))
 				.to(m_config->logger());
 
 			if(listing.mode != PrivacyMode::Undefined && delist) {
@@ -200,7 +200,7 @@ void Announcements::refreshListings()
 	// Bulk refresh
 	server::Log()
 		.about(server::Log::Level::Info, server::Log::Topic::PubList)
-		.message(QStringLiteral("Refreshing %1 announcements at %2").arg(updates.size()).arg(updates.first().first.apiUrl.toString()))
+		.message(tr("Refreshing %1 announcements at %2").arg(updates.size()).arg(updates.first().first.apiUrl.toString()))
 		.to(m_config->logger());
 
 	auto *response = sessionlisting::refreshSessions(updates);
@@ -220,7 +220,7 @@ void Announcements::refreshListings()
 			// with the server. Remove all listings.
 			server::Log()
 				.about(server::Log::Level::Warn, server::Log::Topic::PubList)
-				.message(refreshServer.toString() + ": bulk refresh error: " + error)
+				.message(tr("%1: bulk refresh error: %2").arg(refreshServer.toString()).arg(error))
 				.to(m_config->logger());
 
 			unlistSession(nullptr, refreshServer, false);
@@ -244,7 +244,7 @@ void Announcements::refreshListings()
 				server::Log()
 					.about(server::Log::Level::Warn, server::Log::Topic::PubList)
 					.session(listing->announcement.id)
-					.message(listing->listServer.toString() + ": " + resultValue)
+					.message(tr("%1: %2").arg(listing->listServer.toString()).arg(resultValue))
 					.to(m_config->logger());
 
 				unlistSession(listing->session, listing->listServer, false);

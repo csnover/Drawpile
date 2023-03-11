@@ -6,6 +6,8 @@
 #include "libclient/net/login.h"
 #include "libclient/net/envelope.h"
 #include "libclient/net/servercmd.h"
+#include "libshared/net/chat.h"
+#include "libshared/net/error.h"
 
 #include <QDebug>
 
@@ -56,7 +58,7 @@ void Client::connectToServer(LoginHandler *loginhandler)
 		}
 
 		if(!message.isEmpty())
-			chat = QString("%1 (%2)").arg(chat, message);
+			chat = tr("%1 (%2)").arg(chat, message);
 
 		emit serverMessage(chat, true);
 	});
@@ -196,11 +198,17 @@ void Client::handleServerReply(const ServerReply &reply)
 		qWarning("got login message while in session!");
 		break;
 	case ServerReply::ReplyType::Message:
-	case ServerReply::ReplyType::Alert:
-	case ServerReply::ReplyType::Error:
-	case ServerReply::ReplyType::Result:
-		emit serverMessage(reply.message, reply.type == ServerReply::ReplyType::Alert);
+	case ServerReply::ReplyType::Alert: {
+		QString message = protocol::SystemChat::fromJson(reply.reply, reply.message).message();
+		emit serverMessage(message, reply.type == ServerReply::ReplyType::Alert);
 		break;
+	}
+	case ServerReply::ReplyType::Error:
+	case ServerReply::ReplyType::Result: {
+		QString message = protocol::Error::fromJson(reply.reply, reply.message).message();
+		emit serverMessage(message, false);
+		break;
+	}
 	case ServerReply::ReplyType::Log: {
 		QString time = QDateTime::fromString(reply.reply["timestamp"].toString(), Qt::ISODate).toLocalTime().toString(Qt::ISODate);
 		QString user = reply.reply["user"].toString();

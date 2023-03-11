@@ -4,11 +4,13 @@
 #ifndef DP_NET_CTRL_H
 #define DP_NET_CTRL_H
 
+#include "libshared/net/error.h"
 #include "libshared/net/message.h"
 
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <utility>
 
 namespace protocol {
 
@@ -31,8 +33,8 @@ struct ServerReply {
 	enum {
 		UNKNOWN,
 		LOGIN,   // used during the login phase
-		MESSAGE, // general chat type notifcation message
-		ALERT,   // urgen notification message
+		MESSAGE, // general chat type notification message
+		ALERT,   // urgent notification message
 		ERROR,   // error occurred
 		RESULT,  // comand result
 		LOG,     // server log message
@@ -68,7 +70,12 @@ public:
 	static Command *deserialize(uint8_t ctxid, const uchar *data, uint len);
 
 	//! Convenience function: make an ERROR type reply message
-	static MessagePtr error(const QString &message);
+	static MessagePtr error(Error::Kind kind, const QStringList &&args = {}) {
+		return error(Error(kind, std::move(args)));
+	}
+
+	//! Convenience function: make an ERROR type reply message
+	static MessagePtr error(const Error &message);
 
 	//! Check is message payload is too big to be sent
 	bool isOversize() const { return m_msg.length() > 0xffff; }

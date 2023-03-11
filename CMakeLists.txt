@@ -153,7 +153,10 @@ if(CLIENT OR SERVER)
 	include_directories(${CMAKE_SOURCE_DIR}/src)
 
 	find_package(${QT_PACKAGE_NAME} ${QT_MIN_VERSION_SERVER} REQUIRED COMPONENTS Core Network)
+	find_package(${QT_PACKAGE_NAME} ${QT_MIN_VERSION_SERVER} QUIET COMPONENTS LinguistTools)
 	find_package(libsodium QUIET)
+
+	add_feature_info("Translations" ${QT_PACKAGE_NAME}LinguistTools_FOUND "")
 
 	if(libsodium_FOUND)
 		add_compile_definitions(HAVE_LIBSODIUM)

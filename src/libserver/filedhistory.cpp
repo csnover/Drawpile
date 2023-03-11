@@ -115,8 +115,8 @@ bool FiledHistory::create()
 		return false;
 
 	if(!m_alias.isEmpty())
-		m_journal->write(QString("ALIAS %1\n").arg(m_alias).toUtf8());
-	m_journal->write(QString("FOUNDER %1\n").arg(m_founder).toUtf8());
+		m_journal->write(QStringLiteral("ALIAS %1\n").arg(m_alias).toUtf8());
+	m_journal->write(QStringLiteral("FOUNDER %1\n").arg(m_founder).toUtf8());
 	m_journal->flush();
 
 	return true;
@@ -140,7 +140,7 @@ bool FiledHistory::initRecording()
 
 	m_recording->flush();
 
-	m_journal->write(QString("FILE %1\n").arg(filename).toUtf8());
+	m_journal->write(QStringLiteral("FILE %1\n").arg(filename).toUtf8());
 	m_journal->flush();
 
 	m_blocks << Block {
@@ -468,7 +468,7 @@ void FiledHistory::setMaxUsers(int max)
 	const int newMax = qBound(1, max, 254);
 	if(newMax != m_maxUsers) {
 		m_maxUsers = newMax;
-		m_journal->write(QString("MAXUSERS %1\n").arg(newMax).toUtf8());
+		m_journal->write(QStringLiteral("MAXUSERS %1\n").arg(newMax).toUtf8());
 		m_journal->flush();
 	}
 }
@@ -478,7 +478,7 @@ void FiledHistory::setAutoResetThreshold(uint limit)
 	const uint newLimit = sizeLimit() == 0 ? limit : qMin(uint(sizeLimit() * 0.9), limit);
 	if(newLimit != m_autoResetThreshold) {
 		m_autoResetThreshold = newLimit;
-		m_journal->write(QString("AUTORESET %1\n").arg(newLimit).toUtf8());
+		m_journal->write(QStringLiteral("AUTORESET %1\n").arg(newLimit).toUtf8());
 		m_journal->flush();
 	}
 }
@@ -487,7 +487,7 @@ void FiledHistory::setTitle(const QString &title)
 {
 	if(title != m_title) {
 		m_title = title;
-		m_journal->write(QString("TITLE %1\n").arg(title).toUtf8());
+		m_journal->write(QStringLiteral("TITLE %1\n").arg(title).toUtf8());
 		m_journal->flush();
 	}
 }
@@ -507,7 +507,7 @@ void FiledHistory::setFlags(Flags f)
 			fstr << "deputies";
 		if(f.testFlag(AuthOnly))
 			fstr << "authonly";
-		m_journal->write(QString("FLAGS %1\n").arg(fstr.join(' ')).toUtf8());
+		m_journal->write(QStringLiteral("FLAGS %1\n").arg(fstr.join(' ')).toUtf8());
 		m_journal->flush();
 	}
 }
@@ -648,7 +648,7 @@ void FiledHistory::addAnnouncement(const QString &url)
 {
 	if(!m_announcements.contains(url)) {
 		m_announcements << url;
-		m_journal->write(QString("ANNOUNCE %1\n").arg(url).toUtf8());
+		m_journal->write(QStringLiteral("ANNOUNCE %1\n").arg(url).toUtf8());
 		m_journal->flush();
 	}
 }
@@ -657,7 +657,7 @@ void FiledHistory::removeAnnouncement(const QString &url)
 {
 	if(m_announcements.contains(url)) {
 		m_announcements.removeAll(url);
-		m_journal->write(QString("UNANNOUNCE %1\n").arg(url).toUtf8());
+		m_journal->write(QStringLiteral("UNANNOUNCE %1\n").arg(url).toUtf8());
 		m_journal->flush();
 	}
 }

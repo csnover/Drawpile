@@ -1,5 +1,4 @@
 find_package(${QT_PACKAGE_NAME} ${DP_MIN_QT_VERSION_GUI} REQUIRED COMPONENTS Gui Sql)
-find_package(${QT_PACKAGE_NAME} ${DP_MIN_QT_VERSION_GUI} QUIET COMPONENTS LinguistTools)
 
 add_library(dpclient STATIC
 	brushes/brush.cpp
@@ -155,7 +154,6 @@ target_link_libraries(dpclient
 if(${QT_PACKAGE_NAME}LinguistTools_FOUND)
 	add_subdirectory(i18n)
 endif()
-add_feature_info("Client translations" ${QT_PACKAGE_NAME}LinguistTools_FOUND "")
 
 if(TESTS)
 	add_subdirectory(tests)

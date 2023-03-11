@@ -4,6 +4,7 @@
 #ifndef DP_SERVER_LOGINHANDLER_H
 #define DP_SERVER_LOGINHANDLER_H
 
+#include "libshared/net/error.h"
 #include "libshared/net/message.h"
 
 #include <QObject>
@@ -96,7 +97,7 @@ private:
 	void guestLogin(const QString &username);
 	void authLoginOk(const QString &username, const QString &authId, const QStringList &flags, const QByteArray &avatar, bool allowMod, bool allowHost);
 	bool send(const protocol::ServerReply &cmd);
-	void sendError(const QString &code, const QString &message);
+	void sendError(const protocol::Error &error);
 	void extAuthGuestLogin(const QString &username);
 
 	Client *m_client;

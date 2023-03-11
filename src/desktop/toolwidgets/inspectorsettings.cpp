@@ -40,7 +40,7 @@ void InspectorSettings::onCanvasInspected(int lastEditedBy)
 		m_ui->lblUsername->setText(u.name);
 
 	} else {
-		m_ui->lblUsername->setText(QString("User %1").arg(lastEditedBy));
+		m_ui->lblUsername->setText(tr("User %1").arg(lastEditedBy));
 	}
 }
 

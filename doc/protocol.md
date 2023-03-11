@@ -93,10 +93,15 @@ are also used to determine whether a session recording is compatible with the us
 Protocol stability promises:
 
 * No breaking changes between patch releases (e.g. 2.0.0 and 2.0.1)
-* Client compatability may only be broken between minor number bumps (e.g. 2.0.0 and 2.1.0)
+* Client compatibility may only be broken between minor number bumps (e.g. 2.0.0 and 2.1.0)
 * Server compatibility may only be broken between major number bumps (e.g. 2.0.0 and 3.0.0)
 * New server features may be added at any time, but they should not break older clients,
   nor should a missing feature break newer clients.
+
+### Protocol dp:4.22.2 (2.2.0-beta.4)
+
+* Added message codes to errors and system-generated chat messages for
+  client-side translation
 
 ### Protocol dp:4.22.2 (2.2.0)
 

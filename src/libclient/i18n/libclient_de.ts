@@ -19,7 +19,7 @@
 <context>
     <name>AvatarListModel</name>
     <message>
-        <location filename="../utils/avatarlistmodel.cpp" line="+90"/>
+        <location filename="../utils/avatarlistmodel.cpp" line="+99"/>
         <source>No avatar</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Kein Avatar</translation>
@@ -116,9 +116,18 @@
     </message>
 </context>
 <context>
+    <name>NewVersionCheck</name>
+    <message>
+        <location filename="../utils/newversion.cpp" line="+482"/>
+        <source>Failed to parse version list</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>Fehler beim Parsen der Versionsliste</translation>
+    </message>
+</context>
+<context>
     <name>QFileDialog</name>
     <message>
-        <location line="+6"/>
+        <location filename="../utils/images.cpp" line="+6"/>
         <source>All Files (*)</source>
         <translation>Alle Dateien (*)</translation>
     </message>
@@ -524,7 +533,7 @@
 <context>
     <name>net::Client</name>
     <message>
-        <location filename="../net/client.cpp" line="+49"/>
+        <location filename="../net/client.cpp" line="+51"/>
         <source>A server error occurred!</source>
         <translation>Ein Serverfehler ist aufgetreten!</translation>
     </message>
@@ -538,6 +547,12 @@
         <source>Unknown error</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Unbekannter Fehler</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>%1 (%2)</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>%1 (%2)</translation>
     </message>
 </context>
 <context>
@@ -655,77 +670,33 @@
         <source>Cancelled</source>
         <translation>Abgebrochen</translation>
     </message>
-    <message>
-        <location line="+9"/>
-        <source>Session not found!</source>
-        <translation>Sitzung nicht gefunden!</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Incorrect password!</source>
-        <translation>Falsches Passwort!</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Invalid username!</source>
-        <translation>Benutzername ungültig!</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>This username has been locked</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>Dieser Benutzername wurde gesperrt</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Username already taken!</source>
-        <translation>Benutzername bereits vergeben!</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Session is closed!</source>
-        <translation>Die Sitzung wurde beendet!</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Server is full!</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>Der Server ist voll!</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Hosting not authorized</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>Hosting nicht autorisiert</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>You have been banned from this session!</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>Du wurdest von dieser Sitzung ausgeschlossen!</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Session alias is reserved!</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>Sitzungsalias ist reserviert!</translation>
-    </message>
 </context>
 <context>
     <name>net::LoginSessionModel</name>
     <message>
-        <location filename="../net/loginsessions.cpp" line="+57"/>
+        <location filename="../net/loginsessions.cpp" line="+66"/>
         <source>(untitled)</source>
         <translation>(unbenannt)</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+2"/>
+        <source>%1 [%2]</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>%1 [%2]</translation>
+    </message>
+    <message>
+        <location line="+25"/>
         <source>Incompatible version (%1)</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Inkompatible Version (%1)</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+47"/>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
@@ -746,6 +717,63 @@
         <location filename="../net/tcpserver.cpp" line="+102"/>
         <source>Received invalid data</source>
         <translation>Ungültige Daten empfangen</translation>
+    </message>
+</context>
+<context>
+    <name>sessionlisting::ListServerModel</name>
+    <message>
+        <location filename="../utils/listservermodel.cpp" line="+37"/>
+        <source>%1
+
+%2
+
+URL: %3
+Read-only: %4, public: %5, private: %6</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>%1
+
+%2
+
+URL: %3
+Schreibgeschützt: %4, öffentlich: %5, privat: %6</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>yes</source>
+        <comment>readonly</comment>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>ja</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>no</source>
+        <comment>readonly</comment>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>nein</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>yes</source>
+        <comment>public</comment>
+        <translation>ja</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>no</source>
+        <comment>public</comment>
+        <translation>nein</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>yes</source>
+        <comment>private</comment>
+        <translation>ja</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>no</source>
+        <comment>private</comment>
+        <translation>nein</translation>
     </message>
 </context>
 </TS>

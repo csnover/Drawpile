@@ -355,7 +355,8 @@ void BrushPalette::importMyPaintBrushes()
 {
 	QStringList files = QFileDialog::getOpenFileNames(this,
 		tr("Select one or more MyPaint brushes to import"), QString(),
-		"MyPaint Brush (*.myb)");
+		tr("MyPaint Brush (%1)").arg("*.myb")
+	);
 
 	if(!files.isEmpty()) {
 		int tagId = d->currentTag.id;

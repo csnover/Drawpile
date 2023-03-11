@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "libshared/net/control.h"
+#include "libshared/net/error.h"
 
 #include <cstring>
 
@@ -95,11 +96,15 @@ QJsonDocument ServerReply::toJson() const
 	return QJsonDocument(o);
 }
 
-MessagePtr Command::error(const QString &message)
+MessagePtr Command::error(const Error &error)
 {
 	ServerReply sr;
 	sr.type = ServerReply::ERROR;
-	sr.message = message;
+	sr.message = error.message();
+	sr.reply = {{
+		{ "kind", int(error.kind()) },
+		{ "args", QJsonArray::fromStringList(error.args()) }
+	}};
 	return MessagePtr(new Command(0, sr));
 }
 

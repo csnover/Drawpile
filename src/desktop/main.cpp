@@ -278,7 +278,7 @@ void DrawpileApp::setLanguage(QString preferredLang)
 		delete translator;
 	}
 
-	for(auto &bundle : { "libclient_", "drawpile_" }) {
+	for(auto &bundle : { "libshared_", "libclient_", "drawpile_" }) {
 		QTranslator *translator = new QTranslator(this);
 		for(const QString &datapath : utils::paths::dataPaths()) {
 			if(translator->load(bundle + preferredLang, datapath + "/i18n"))
@@ -303,15 +303,15 @@ static QStringList initApp(DrawpileApp &app)
 	parser.addVersionOption();
 
 	// --data-dir
-	QCommandLineOption dataDir("data-dir", "Override read-only data directory.", "path");
+	QCommandLineOption dataDir("data-dir", DrawpileApp::tr("Override read-only data directory."), "path");
 	parser.addOption(dataDir);
 
 	// --portable-data-dir
-	QCommandLineOption portableDataDir("portable-data-dir", "Override settings directory.", "path");
+	QCommandLineOption portableDataDir("portable-data-dir", DrawpileApp::tr("Override settings directory."), "path");
 	parser.addOption(portableDataDir);
 
 	// URL
-	parser.addPositionalArgument("url", "Filename or URL.");
+	parser.addPositionalArgument("url", DrawpileApp::tr("Filename or URL."));
 
 	parser.process(app);
 

@@ -688,7 +688,7 @@ void ChatWidget::sendMessage(const QString &msg)
 			}
 
 		} else if(cmd == QStringLiteral("help")) {
-			const QString text = QStringLiteral(
+			const QString text = tr(
 				"Available client commands:\n"
 				"/help - show this message\n"
 				"/clear - clear chat window\n"

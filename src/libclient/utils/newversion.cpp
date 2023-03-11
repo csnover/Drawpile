@@ -479,7 +479,7 @@ void NewVersionCheck::queryVersions(QUrl url)
 		if(parseAppDataFile(reader))
 			querySuccess();
 		else
-			queryFail("Failed to parse version list");
+			queryFail(tr("Failed to parse version list"));
 	});
 	// Handle deletion in a separate connection so the reply object
 	// won't get orphaned if this object is deleted before it finishes

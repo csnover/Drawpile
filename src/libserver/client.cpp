@@ -8,6 +8,7 @@
 #include "libserver/serverconfig.h"
 
 #include "libshared/net/messagequeue.h"
+#include "libshared/net/chat.h"
 #include "libshared/net/control.h"
 #include "libshared/net/meta.h"
 #include "libshared/util/qtcompat.h"
@@ -120,14 +121,14 @@ JsonApiResult Client::callJsonApi(JsonApiMethod method, const QStringList &path,
 		if(request.contains("op")) {
 			const bool op = request["op"].toBool();
 			if(d->isOperator != op && d->session) {
-				d->session->changeOpStatus(id(), op, "the server administrator");
+				d->session->changeOpStatus(id(), op, protocol::ChatActor::ServerAdmin);
 			}
 		}
 
 		if(request.contains("trusted")) {
 			const bool trusted = request["trusted"].toBool();
 			if(d->isTrusted != trusted && d->session) {
-				d->session->changeTrustedStatus(id(), trusted, "the server administrator");
+				d->session->changeTrustedStatus(id(), trusted, protocol::ChatActor::ServerAdmin);
 			}
 		}
 
@@ -313,7 +314,7 @@ void Client::receiveMessages()
 				emit loginMessage(msg);
 			else
 				log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(
-					QString("Got non-login message (type=%1) in login state").arg(msg->type())
+					tr("Got non-login message (type=%1) in login state").arg(msg->type())
 					));
 
 		} else {
@@ -333,7 +334,7 @@ void Client::receiveMessages()
 void Client::gotBadData(int len, int type)
 {
 	log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(
-		QString("Received unknown message type %1 of length %2").arg(type).arg(len)
+		tr("Received unknown message type %1 of length %2").arg(type).arg(len)
 		));
 	d->socket->abort();
 }
@@ -341,7 +342,7 @@ void Client::gotBadData(int len, int type)
 void Client::socketError(QAbstractSocket::SocketError error)
 {
 	if(error != QAbstractSocket::RemoteHostClosedError) {
-		log(Log().about(Log::Level::Warn, Log::Topic::Status).message("Socket error: " + d->socket->errorString()));
+		log(Log().about(Log::Level::Warn, Log::Topic::Status).message(tr("Socket error: %1").arg(d->socket->errorString())));
 		d->socket->abort();
 	}
 }
