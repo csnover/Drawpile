@@ -880,6 +880,14 @@ void CanvasView::wheelEvent(QWheelEvent *event)
 		qWarning("Unhandled mouse wheel canvas shortcut %u", match.action());
 		break;
 	}
+
+	const auto mousePos = mapToScene(mapFromGlobal(QCursor::pos()));
+	updateOutline({
+		QDateTime::currentMSecsSinceEpoch(),
+		mousePos.x(),
+		mousePos.y(),
+		0.
+	});
 }
 
 void CanvasView::keyPressEvent(QKeyEvent *event) {
