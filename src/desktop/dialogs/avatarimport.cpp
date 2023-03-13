@@ -4,6 +4,7 @@
 #include "desktop/dialogs/avatarimport.h"
 #include "desktop/utils/dynamicui.h"
 #include "libclient/utils/avatarlistmodel.h"
+#include "libclient/utils/images.h"
 
 #include "ui_avatarimport.h"
 
@@ -51,14 +52,8 @@ QImage AvatarImport::croppedAvatar() const
 
 void AvatarImport::importAvatar(AvatarListModel *avatarList, QPointer<QWidget> parentWindow)
 {
-	QString formats;
-	for(const auto &format : QImageReader::supportedImageFormats()) {
-		formats += "*." + format + " ";
-	}
-
 	QString path = QFileDialog::getOpenFileName(parentWindow, tr("Import Avatar"), QString(),
-		QCoreApplication::translate("FileFormatOptions", "Images (%1)").arg(formats) + ";;" +
-		QFileDialog::tr("All Files (*)")
+		utils::fileFormatFilter(utils::Images | utils::QtImagesOnly | utils::AllFiles)
 	);
 
 	if(path.isEmpty())

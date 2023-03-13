@@ -3,6 +3,7 @@
 
 #include "desktop/dialogs/brushpresetproperties.h"
 #include "desktop/utils/dynamicui.h"
+#include "libclient/utils/images.h"
 
 #include "ui_brushpresetproperties.h"
 
@@ -40,7 +41,8 @@ void BrushPresetProperties::chooseThumbnailFile()
 {
 	QString file = QFileDialog::getOpenFileName(this,
 		tr("Select brush thumbnail"), QString(),
-		"Images (*.png *.jpg *.jpeg)");
+		utils::fileFormatFilter(utils::Images | utils::QtImagesOnly)
+	);
 
 	QPixmap pixmap;
 	if(!file.isEmpty() && pixmap.load(file)) {
