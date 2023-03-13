@@ -5,6 +5,7 @@
 #include "libshared/util/paths.h"
 
 #include <QSoundEffect>
+#include <QThread>
 #include <QMap>
 #include <QFileInfo>
 #include <QDir>
@@ -14,8 +15,40 @@
 
 namespace notification {
 
-static QMap<Event,QSoundEffect*> sounds;
+class Sound;
+static QMap<Event, Sound*> sounds;
 static qint64 lasttime = 0;
+static QThread soundThread;
+
+class Sound : public QObject {
+	Q_OBJECT
+public:
+	Sound(const QUrl &source)
+		: QObject()
+	{
+		m_sound.setSource(source);
+		connect(this, &Sound::playSound, &m_sound, &QSoundEffect::play);
+		m_sound.moveToThread(&soundThread);
+
+		if (!soundThread.isRunning()) {
+			soundThread.start();
+		}
+	}
+
+	void play(int volume)
+	{
+		if (!m_sound.isPlaying()) {
+			m_sound.setVolume(volume / 100.0f);
+			emit playSound();
+		}
+	}
+
+signals:
+	void playSound();
+
+private:
+	QSoundEffect m_sound;
+};
 
 void playSound(Event event)
 {
@@ -72,14 +105,13 @@ void playSound(Event event)
 			return;
 		}
 
-		QSoundEffect *fx = new QSoundEffect;
-		fx->setSource(QUrl::fromLocalFile(fullpath));
-		sounds[event] = fx;
+		sounds[event] = new Sound(QUrl::fromLocalFile(fullpath));
 	}
 
 	// We have a sound effect... play it now
-	sounds[event]->setVolume(volume / 100.0);
-	sounds[event]->play();
+	sounds[event]->play(volume);
 }
 
 }
+
+#include "notifications.moc"
