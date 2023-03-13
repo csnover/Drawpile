@@ -682,6 +682,8 @@ void CanvasView::wheelEvent(QWheelEvent *event)
 	default:
 		QGraphicsView::wheelEvent(event);
 	}
+
+	updateOutline(mapToScene(mapFromGlobal(QCursor::pos()), 1.0));
 }
 
 void CanvasView::keyPressEvent(QKeyEvent *event) {
