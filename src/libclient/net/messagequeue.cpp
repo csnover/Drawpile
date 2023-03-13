@@ -3,6 +3,7 @@
 
 #include "libclient/net/messagequeue.h"
 #include "libclient/net/envelopebuilder.h"
+#include "libshared/net/message.h"
 #include "rustpile/rustpile.h"
 
 #include <QTcpSocket>
@@ -14,10 +15,6 @@ namespace net {
 
 // Reserve enough buffer space for one complete message
 static const int MAX_BUF_LEN = 0xffff + Envelope::HEADER_LEN;
-
-// Special message types handled internally by this class
-static const int MSG_TYPE_DISCONNECT = 1;
-static const int MSG_TYPE_PING = 2;
 
 MessageQueue::MessageQueue(QTcpSocket *socket, QObject *parent)
 	: QObject(parent), m_socket(socket),
@@ -114,12 +111,17 @@ void MessageQueue::sendPingMsg(bool pong)
 	send(eb.toEnvelope());
 }
 
-void MessageQueue::sendDisconnect(GracefulDisconnect reason, const QString &message)
+void MessageQueue::sendDisconnect(const protocol::DisconnectExt &payload)
 {
 	if(m_gracefullyDisconnecting)
 		qWarning("sendDisconnect: already disconnecting.");
 
+	const auto reason = payload.reason();
+	const auto message = payload.message();
+	const auto json = QJsonDocument(payload.toJson()).toJson(QJsonDocument::Compact);
+
 	EnvelopeBuilder eb;
+	rustpile::write_disconnectext(eb, 0, reinterpret_cast<const uchar*>(json.constData()), json.length());
 	rustpile::write_disconnect(eb, 0, uint8_t(reason), reinterpret_cast<const uint16_t*>(message.constData()), message.length());
 
 	qInfo("Sending disconnect message (reason=%d), will disconnect after queue (%lld messages) is empty.", int(reason), static_cast<long long>(m_outbox.size()));
@@ -187,30 +189,48 @@ void MessageQueue::readData() {
 		while(m_recvbytes >= Envelope::HEADER_LEN && m_recvbytes >= (messageLength=Envelope::sniffLength(m_recvbuffer))) {
 			// Whole message received!
 
-			if(Envelope::sniffType(m_recvbuffer) == MSG_TYPE_PING) {
+			const auto type = Envelope::sniffType(m_recvbuffer);
+
+			if(type == protocol::MSG_PING) {
 				// Pings are handled internally
 				if(messageLength != Envelope::HEADER_LEN + 1) {
 					// Not a valid Ping message!
-					emit badData(messageLength, MSG_TYPE_PING, 0);
+					emit badData(messageLength, protocol::MSG_PING, 0);
 
 				} else {
 					handlePing(m_recvbuffer[Envelope::HEADER_LEN]);
 
 				}
-
-			} else if(Envelope::sniffType(m_recvbuffer) == MSG_TYPE_DISCONNECT) {
+			} else if(type == protocol::MSG_DISCONNECT_EXT || type == protocol::MSG_DISCONNECT) {
 				// Graceful disconnects are also handled internally
 				if(messageLength < Envelope::HEADER_LEN + 1) {
 					// We expected at least a reason!
-					emit badData(messageLength, MSG_TYPE_DISCONNECT, 0);
-
+					emit badData(messageLength, type, 0);
 				} else {
-					emit gracefulDisconnect(
-						GracefulDisconnect(m_recvbuffer[Envelope::HEADER_LEN]),
-							QString::fromUtf8(m_recvbuffer+Envelope::HEADER_LEN+1, messageLength - Envelope::HEADER_LEN - 1)
-					);
+					if (type == protocol::MSG_DISCONNECT_EXT) {
+						std::unique_ptr<protocol::DisconnectExt> msg{
+							protocol::DisconnectExt::deserialize(
+								0,
+								reinterpret_cast<const uchar *>(m_recvbuffer) + Envelope::HEADER_LEN,
+								messageLength - Envelope::HEADER_LEN
+							)
+						};
+						emit gracefulDisconnect(msg->reason(), msg->message());
+						m_gracefullyDisconnecting = true;
+					} else if (!m_gracefullyDisconnecting) {
+						// For backward compatibility with servers that do not
+						// send the MSG_DISCONNECT_EXT message, also use the
+						// MSG_DISCONNECT message for disconnection
+						std::unique_ptr<protocol::Disconnect> msg{
+							protocol::Disconnect::deserialize(
+								0,
+								reinterpret_cast<const uchar *>(m_recvbuffer) + Envelope::HEADER_LEN,
+								messageLength - Envelope::HEADER_LEN
+							)
+						};
+						emit gracefulDisconnect(msg->reason(), msg->message());
+					}
 				}
-
 			} else {
 				// The rest are normal messages
 				m_inbox.append(m_recvbuffer, messageLength);

@@ -197,7 +197,7 @@ void SessionServer::stopAll()
 {
 	for(ThinServerClient *c : m_clients) {
 		// Note: this just sends the disconnect command, clients don't self-delete immediately
-		c->disconnectClient(Client::DisconnectionReason::Shutdown, "Server shutting down");
+		c->disconnectClient(protocol::Shutdown::Server);
 	}
 
 	for(Session *s : m_sessions)

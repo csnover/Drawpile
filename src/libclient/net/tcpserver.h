@@ -42,7 +42,7 @@ public:
 signals:
 	void loggedIn(const QUrl &url, uint8_t userid, bool join, bool auth, bool moderator, bool hasAutoreset);
 	void loggingOut();
-	void gracefullyDisconnecting(MessageQueue::GracefulDisconnect, const QString &message);
+	void gracefullyDisconnecting(protocol::DisconnectExt::Reason reason, const QString &message);
 	void serverDisconnected(const QString &message, const QString &errorcode, bool localDisconnect);
 
 	void bytesReceived(int);

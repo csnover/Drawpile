@@ -44,6 +44,20 @@ Disconnect:
         - reason u8
         - message utf8
 
+DisconnectExt:
+    id: 3
+    comment: |
+             Disconnect notification with structured data
+
+             This message is sent before a Disconnect message and contains structured
+             data about the disconnection.
+
+             This message type augments the existing Disconnect for backward-compatibility
+             with earlier clients. The Disconnect message is deprecated and will be
+             replaced in a future version of the protocol.
+    fields:
+        - msg bytes
+
 Internal:
     id: 31
     comment: Reserved for internal use

@@ -108,7 +108,7 @@ JsonApiResult Client::callJsonApi(JsonApiMethod method, const QStringList &path,
 		return JsonApiNotFound();
 
 	if(method == JsonApiMethod::Delete) {
-		disconnectClient(Client::DisconnectionReason::Kick, "server operator");
+		disconnectClient(protocol::ChatActor::ServerAdmin);
 		QJsonObject o;
 		o["status"] = "ok";
 		return JsonApiResult{JsonApiResult::Ok, QJsonDocument(o)};
@@ -353,25 +353,16 @@ void Client::socketDisconnect()
 	this->deleteLater();
 }
 
-void Client::disconnectClient(DisconnectionReason reason, const QString &message)
+void Client::disconnectClient(const protocol::DisconnectExt &reason)
 {
-	protocol::Disconnect::Reason pr { protocol::Disconnect::OTHER };
 	Log::Topic topic { Log::Topic::Leave };
-	switch(reason) {
-	case DisconnectionReason::Kick:
-		pr = protocol::Disconnect::KICK;
+	if (reason.reason() == protocol::Disconnect::KICK)
 		topic = Log::Topic::Kick;
-		break;
-	case DisconnectionReason::Error: pr = protocol::Disconnect::ERROR; break;
-	case DisconnectionReason::Shutdown: pr = protocol::Disconnect::SHUTDOWN; break;
-	}
-	log(Log()
-		.about(Log::Level::Info, topic)
-		.message(message)
-		);
+
+	log(Log().about(Log::Level::Info, topic).message(reason.message()));
 
 	emit loggedOff(this);
-	d->msgqueue->sendDisconnect(pr, message);
+	d->msgqueue->sendDisconnect(reason);
 }
 
 void Client::setHoldLocked(bool lock)

@@ -33,15 +33,69 @@
     </message>
 </context>
 <context>
+    <name>protocol::ChatActor</name>
+    <message>
+        <location filename="../net/chat.h" line="+48"/>
+        <source>unknown</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>unbekannt</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>the server</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>der Server</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>the server admin</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>der Server-Administrator</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>password</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>passwort</translation>
+    </message>
+</context>
+<context>
+    <name>protocol::DisconnectExt</name>
+    <message>
+        <location filename="../net/control.h" line="+267"/>
+        <source>Kicked by %1</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>Gekickt von %1</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Server error: %1</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>Serverfehler: %1</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Closing session: %1</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>Abschluss der Sitzung: %1</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Unknown error: %1</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>Unbekannter Fehler: %1</translation>
+    </message>
+</context>
+<context>
     <name>protocol::Error</name>
     <message>
-        <location filename="../net/error.h" line="+147"/>
+        <location filename="../net/error.h" line="+193"/>
         <source>Unknown error</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Unbekannter Fehler</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+4"/>
         <source>Expected one argument: opword</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Erwartet ein Argument: opword</translation>
@@ -327,11 +381,62 @@
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Dieser Server ist voll.</translation>
     </message>
+    <message>
+        <location line="+1"/>
+        <source>invalid message</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>ungültige Nachricht</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>De-opped while resetting</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>Beim Zurücksetzen entkoppelt</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>History limit exceeded</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>Historisches Limit überschritten</translation>
+    </message>
+</context>
+<context>
+    <name>protocol::Shutdown</name>
+    <message>
+        <location line="-210"/>
+        <source>Unknown</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>Unbekannt</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Logged out</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>Ausgeloggt</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Session terminated</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>Sitzung beendet</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Server shutting down</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>Server wird heruntergefahren</translation>
+    </message>
 </context>
 <context>
     <name>protocol::SystemChat</name>
     <message>
-        <location filename="../net/chat.h" line="+40"/>
+        <location filename="../net/chat.h" line="+47"/>
+        <source>Unknown message received from server</source>
+        <translatorcomment>machine-translated</translatorcomment>
+        <translation>Unbekannte Nachricht vom Server erhalten</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Session reset failed!</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Sitzungsrücksetzung fehlgeschlagen!</translation>
@@ -355,43 +460,43 @@
         <translation>%1 enbannt von %2</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>%1 kicked by %2</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>%1 wurde von %2 rausgeworfen</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>Session shut down by moderator (%1)</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Sitzung vom Moderator geschlossen (%1)</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>%1 trusted by %2</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>%1 vertraut auf %2</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>%1 untrusted by %2</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>%1 nicht vertraut von %2</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>%1 made operator by %2</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>%1 wurde von %2 zum Operator gemacht</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>%1 deopped by %2</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>%1 von %2 abgemeldet</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>History size limit reached! Session must be reset to continue.</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Größenlimit der Historie erreicht! Sitzung muss zurückgesetzt werden, um fortzufahren.</translation>

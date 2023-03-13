@@ -443,7 +443,7 @@ QList<uint8_t> Session::updateOwnership(QList<uint8_t> ids, const protocol::Chat
 	}
 
 	if(kickResetter)
-		kickResetter->disconnectClient(Client::DisconnectionReason::Error, "De-opped while resetting");
+		kickResetter->disconnectClient(protocol::Error::DeoppedWhileResetting);
 
 	return truelist;
 }
@@ -611,6 +611,7 @@ void Session::handleClientMessage(Client &client, protocol::MessagePtr msg)
 		client.log(Log().about(Log::Level::Warn, Log::Topic::RuleBreak).message(tr("Received server-to-user only command %1").arg(msg->messageName())));
 		return;
 	case MSG_DISCONNECT:
+	case MSG_DISCONNECT_EXT:
 		// we don't do anything with disconnect notifications from the client
 		return;
 	default: break;
@@ -691,7 +692,7 @@ void Session::addToInitStream(protocol::MessagePtr msg)
 		if(m_history->sizeLimit()>0 && m_resetstreamsize > m_history->sizeLimit()) {
 			Client *resetter = getClientById(m_initUser);
 			if(resetter)
-				resetter->disconnectClient(Client::DisconnectionReason::Error, "History limit exceeded");
+				resetter->disconnectClient(protocol::Error::HistoryLimitExceeded);
 		}
 	}
 }
@@ -786,7 +787,7 @@ void Session::killSession(bool terminate)
 	stopRecording();
 
 	for(Client *c : m_clients) {
-		c->disconnectClient(Client::DisconnectionReason::Shutdown, "Session terminated");
+		c->disconnectClient(protocol::Shutdown::Session);
 		c->setSession(nullptr);
 	}
 	m_clients.clear();

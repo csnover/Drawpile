@@ -4,6 +4,7 @@
 #ifndef DP_NET_CTRL_H
 #define DP_NET_CTRL_H
 
+#include "libshared/net/chat.h"
 #include "libshared/net/error.h"
 #include "libshared/net/message.h"
 
@@ -104,11 +105,14 @@ private:
  */
 class Disconnect : public Message {
 public:
+	// These values are sent on the wire so should not be reordered
 	enum Reason {
 		ERROR,    // client/server error
 		KICK,     // user kicked by session operator
 		SHUTDOWN, // client/server closed
-		OTHER     // other unspecified error
+		OTHER,    // other unspecified error
+
+		_Last
 	};
 
 	Disconnect(uint8_t ctx, Reason reason, const QString &message) : Message(MSG_DISCONNECT, ctx),
@@ -167,6 +171,146 @@ protected:
 
 private:
 	bool m_isPong;
+};
+
+class DisconnectExt : public Message {
+	Q_DECLARE_TR_FUNCTIONS(protocol::DisconnectExt)
+public:
+	using Reason = Disconnect::Reason;
+
+	DisconnectExt(const ChatActor &actor, uint8_t ctx = 0)
+		: Message(MSG_DISCONNECT_EXT, ctx)
+		, m_reason(Reason::KICK)
+		, m_actor(actor) {}
+
+	DisconnectExt(const ChatActor::Kind &actor, uint8_t ctx = 0)
+		: Message(MSG_DISCONNECT_EXT, ctx)
+		, m_reason(Reason::KICK)
+		, m_actor(actor) {}
+
+	DisconnectExt(const Error &error, uint8_t ctx = 0)
+		: Message(MSG_DISCONNECT_EXT, ctx)
+		, m_reason(Reason::ERROR)
+		, m_error(error) {}
+
+	DisconnectExt(const Error::Kind &error, uint8_t ctx = 0)
+		: Message(MSG_DISCONNECT_EXT, ctx)
+		, m_reason(Reason::ERROR)
+		, m_error(error) {}
+
+	DisconnectExt(const Shutdown &shutdown, uint8_t ctx = 0)
+		: Message(MSG_DISCONNECT_EXT, ctx)
+		, m_reason(Reason::SHUTDOWN)
+		, m_shutdown(shutdown) {}
+
+	DisconnectExt(const Shutdown::Kind &shutdown, uint8_t ctx = 0)
+		: Message(MSG_DISCONNECT_EXT, ctx)
+		, m_reason(Reason::SHUTDOWN)
+		, m_shutdown(shutdown) {}
+
+	DisconnectExt(const QString &message, uint8_t ctx = 0)
+		: Message(MSG_DISCONNECT_EXT, ctx)
+		, m_reason(Reason::OTHER)
+		, m_raw(message) {}
+
+	DisconnectExt(const DisconnectExt &other)
+		: Message(other)
+		, m_reason(other.m_reason)
+	{
+		switch (m_reason) {
+		case Reason::KICK: new (&m_actor) auto(other.m_actor); break;
+		case Reason::ERROR: new (&m_error) auto(other.m_error); break;
+		case Reason::SHUTDOWN: new (&m_shutdown) auto(other.m_shutdown); break;
+		case Reason::OTHER: new (&m_raw) auto(other.m_raw); break;
+		case Reason::_Last: Q_UNREACHABLE(); break;
+		}
+	}
+
+	DisconnectExt(DisconnectExt &&other)
+		: Message(other)
+		, m_reason(other.m_reason)
+	{
+		switch (m_reason) {
+		case Reason::KICK: new (&m_actor) auto(std::move(other.m_actor)); break;
+		case Reason::ERROR: new (&m_error) auto(std::move(other.m_error)); break;
+		case Reason::SHUTDOWN: new (&m_shutdown) auto(std::move(other.m_shutdown)); break;
+		case Reason::OTHER: new (&m_raw) auto(std::move(other.m_raw)); break;
+		case Reason::_Last: Q_UNREACHABLE(); break;
+		}
+	}
+
+	~DisconnectExt()
+	{
+		switch(m_reason) {
+		case Reason::KICK: m_actor.~ChatActor(); break;
+		case Reason::ERROR: m_error.~Error(); break;
+		case Reason::SHUTDOWN: m_shutdown.~Shutdown(); break;
+		case Reason::OTHER: m_raw.~QString(); break;
+		case Reason::_Last: Q_UNREACHABLE();
+		}
+	}
+
+	Disconnect *toDisconnect() const
+	{
+		return new Disconnect(contextId(), m_reason, message());
+	}
+
+	static DisconnectExt *deserialize(uint8_t ctx, const uchar *data, uint len);
+
+	Reason reason() const { return m_reason; }
+
+	QString message() const
+	{
+		switch (m_reason) {
+		case Reason::KICK:
+			return tr("Kicked by %1").arg(m_actor.name());
+		case Reason::ERROR:
+			return tr("Server error: %1").arg(m_error.message());
+		case Reason::SHUTDOWN:
+			return tr("Closing session: %1").arg(m_shutdown.message());
+		case Reason::OTHER:
+			return tr("Unknown error: %1").arg(m_raw);
+		case Reason::_Last: {}
+		}
+
+		Q_UNREACHABLE();
+	}
+
+	QJsonObject toJson() const
+	{
+		QJsonObject detail;
+		switch(m_reason) {
+		case Reason::KICK: detail = m_actor.toJson(); break;
+		case Reason::ERROR: detail = m_error.toJson(); break;
+		case Reason::SHUTDOWN: detail = m_shutdown.toJson(); break;
+		case Reason::OTHER: break;
+		case Reason::_Last: Q_UNREACHABLE(); break;
+		}
+
+		return {{
+			{ "type", m_reason },
+			// Message included for forward-compatibility
+			{ "message", message() },
+			{ "detail", detail }
+		}};
+	}
+
+	QString toString() const override;
+	QString messageName() const override { return QStringLiteral("disconnectext"); }
+
+protected:
+	int payloadLength() const override;
+	int serializePayload(uchar *data) const override;
+	Kwargs kwargs() const override { return Kwargs(); }
+
+private:
+	Reason m_reason;
+	union {
+		ChatActor m_actor;
+		Error m_error;
+		Shutdown m_shutdown;
+		QString m_raw;
+	};
 };
 
 }

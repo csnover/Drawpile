@@ -531,31 +531,6 @@
     </message>
 </context>
 <context>
-    <name>net::Client</name>
-    <message>
-        <location filename="../net/client.cpp" line="+51"/>
-        <source>A server error occurred!</source>
-        <translation>Ein Serverfehler ist aufgetreten!</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>The server is shutting down!</source>
-        <translation>Der Serverprozess wird heruntergefahren!</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Unknown error</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>Unbekannter Fehler</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>%1 (%2)</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>%1 (%2)</translation>
-    </message>
-</context>
-<context>
     <name>net::LoginHandler</name>
     <message>
         <location filename="../net/login.cpp" line="+98"/>
@@ -714,7 +689,7 @@
 <context>
     <name>net::TcpServer</name>
     <message>
-        <location filename="../net/tcpserver.cpp" line="+102"/>
+        <location filename="../net/tcpserver.cpp" line="+105"/>
         <source>Received invalid data</source>
         <translation>Ungültige Daten empfangen</translation>
     </message>

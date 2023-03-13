@@ -158,7 +158,7 @@ void LoginHandler::handleLoginMessage(protocol::MessagePtr msg)
 			handleIdentMessage(cmd);
 		} else {
 			m_client->log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(tr("Invalid login command (while waiting for ident): %1").arg(cmd.cmd)));
-			m_client->disconnectClient(Client::DisconnectionReason::Error, "invalid message");
+			m_client->disconnectClient(protocol::Error::InvalidMessage);
 		}
 	} else {
 		if(cmd.cmd == "host") {
@@ -169,7 +169,7 @@ void LoginHandler::handleLoginMessage(protocol::MessagePtr msg)
 			handleAbuseReport(cmd);
 		} else {
 			m_client->log(Log().about(Log::Level::Error, Log::Topic::RuleBreak).message(tr("Invalid login command (while waiting for join/host): %1").arg(cmd.cmd)));
-			m_client->disconnectClient(Client::DisconnectionReason::Error, "invalid message");
+			m_client->disconnectClient(protocol::Error::InvalidMessage);
 		}
 	}
 }
@@ -681,7 +681,7 @@ void LoginHandler::sendError(const protocol::Error &error)
 	r.message = error.message();
 	r.reply = error.toJson();
 	send(r);
-	m_client->disconnectClient(Client::DisconnectionReason::Error, "Login error");
+	m_client->disconnectClient(error);
 }
 
 }

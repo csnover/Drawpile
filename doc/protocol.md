@@ -102,6 +102,9 @@ Protocol stability promises:
 
 * Added message codes to errors and system-generated chat messages for
   client-side translation
+* Added DisconnectExt command. This command deprecates the Disconnect command,
+  which could not be extended to support the structured data required for
+  client-side translation.
 
 ### Protocol dp:4.22.2 (2.2.0)
 

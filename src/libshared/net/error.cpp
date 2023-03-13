@@ -31,4 +31,23 @@ QJsonObject Error::toJson() const
 	}};
 }
 
+Shutdown Shutdown::fromJson(const QJsonObject &data)
+{
+	if (!data.contains("kind"))
+		return { Unknown };
+
+	auto kind = data["kind"].toInt();
+	if (kind < 0 || kind >= _Last)
+		return { Unknown };
+
+	return { static_cast<Shutdown::Kind>(kind) };
+}
+
+QJsonObject Shutdown::toJson() const
+{
+	return {{
+		{ "kind", int(m_kind) }
+	}};
+}
+
 } // namespace protocol

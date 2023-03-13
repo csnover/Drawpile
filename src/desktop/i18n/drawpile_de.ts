@@ -879,7 +879,7 @@ to 64x64 pixels.</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../mainwindow.cpp" line="+438"/>
+        <location filename="../mainwindow.cpp" line="+443"/>
         <location line="+1012"/>
         <source>Untitled</source>
         <translation>Unbenannt</translation>
@@ -1058,13 +1058,13 @@ to 64x64 pixels.</source>
         <translation>Aufzeichnen...</translation>
     </message>
     <message>
-        <location line="-2139"/>
+        <location line="-2144"/>
         <source>Server out of space</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Server hat keinen Speicherplatz mehr</translation>
     </message>
     <message>
-        <location line="+1228"/>
+        <location line="+1233"/>
         <source>Become Operator</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Operator werden</translation>
@@ -1641,7 +1641,7 @@ to 64x64 pixels.</source>
         <translation>🙋 %1 beigetreten!</translation>
     </message>
     <message>
-        <location line="-222"/>
+        <location line="-227"/>
         <source>Server is running out of history space and session has grown too large to automatically reset! (Limit is %1)
 Simplify the canvas and reset manually before space runs out.</source>
         <translatorcomment>machine-translated</translatorcomment>
@@ -1656,7 +1656,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>%1MiB</translation>
     </message>
     <message>
-        <location line="+885"/>
+        <location line="+890"/>
         <source>Export Animated GIF</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Animiertes GIF exportieren</translation>
@@ -1710,8 +1710,8 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Bild konnte nicht entschlüsselt werden</translation>
     </message>
     <message>
-        <location line="-1598"/>
-        <location line="+1601"/>
+        <location line="-1603"/>
+        <location line="+1606"/>
         <source>Paint engine has crashed! Save your work and restart the application.</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Das Malprogramm ist abgestürzt! Speichern Sie Ihre Arbeit und starten Sie die Anwendung neu.</translation>

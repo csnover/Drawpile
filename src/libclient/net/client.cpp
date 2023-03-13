@@ -35,32 +35,13 @@ void Client::connectToServer(LoginHandler *loginhandler)
 	connect(server, &TcpServer::bytesSent, this, &Client::bytesSent);
 	connect(server, &TcpServer::lagMeasured, this, &Client::lagMeasured);
 
-	connect(server, &TcpServer::gracefullyDisconnecting, this, [this](MessageQueue::GracefulDisconnect reason, const QString &message)
+	connect(server, &TcpServer::gracefullyDisconnecting, this, [this](protocol::DisconnectExt::Reason reason, const QString &message)
 	{
-		if(reason == MessageQueue::GracefulDisconnect::Kick) {
+		if (reason == protocol::DisconnectExt::Reason::KICK) {
 			emit youWereKicked(message);
-			return;
+		} else {
+			emit serverMessage(message, true);
 		}
-
-		QString chat;
-		switch(reason) {
-		case MessageQueue::GracefulDisconnect::Kick:
-			emit youWereKicked(message);
-			return;
-		case MessageQueue::GracefulDisconnect::Error:
-			chat = tr("A server error occurred!");
-			break;
-		case MessageQueue::GracefulDisconnect::Shutdown:
-			chat = tr("The server is shutting down!");
-			break;
-		default:
-			chat = tr("Unknown error");
-		}
-
-		if(!message.isEmpty())
-			chat = tr("%1 (%2)").arg(chat, message);
-
-		emit serverMessage(chat, true);
 	});
 
 	if(loginhandler->mode() == LoginHandler::Mode::HostRemote)

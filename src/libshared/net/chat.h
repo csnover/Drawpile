@@ -53,8 +53,7 @@ public:
 		case _Last: {}
 		}
 
-		Q_ASSERT(false);
-		return QString();
+		Q_UNREACHABLE();
 	}
 
 	QJsonObject toJson() const;
@@ -127,8 +126,7 @@ public:
 		case _Last: {}
 		}
 
-		Q_ASSERT(false);
-		return QString();
+		Q_UNREACHABLE();
 	}
 
 	Kind kind() const { return m_kind; }

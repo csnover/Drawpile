@@ -1613,6 +1613,17 @@ pub enum ControlMessage {
     /// The server should return a Ping with the is_pong flag set
     ///
     Ping(u8, bool),
+
+    /// Disconnect notification with structured data
+    ///
+    /// This message is sent before a Disconnect message and contains structured
+    /// data about the disconnection.
+    ///
+    /// This message type augments the existing Disconnect for backward-compatibility
+    /// with earlier clients. The Disconnect message is deprecated and will be
+    /// replaced in a future version of the protocol.
+    ///
+    DisconnectExt(u8, Vec<u8>),
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -2018,6 +2029,7 @@ impl ControlMessage {
             ServerCommand(user_id, b) => w.single(0, *user_id, b),
             Disconnect(user_id, b) => b.serialize(w, *user_id),
             Ping(user_id, b) => w.single(2, *user_id, *b),
+            DisconnectExt(user_id, b) => w.single(3, *user_id, b),
         }
     }
 
@@ -2029,6 +2041,9 @@ impl ControlMessage {
             }
             Disconnect(user_id, b) => b.to_text(TextMessage::new(*user_id, "disconnect")),
             Ping(user_id, b) => TextMessage::new(*user_id, "ping").set("is_pong", b.to_string()),
+            DisconnectExt(user_id, b) => {
+                TextMessage::new(*user_id, "disconnectext").set_bytes("msg", &b)
+            }
         }
     }
 
@@ -2038,6 +2053,7 @@ impl ControlMessage {
             ServerCommand(user_id, _) => *user_id,
             Disconnect(user_id, _) => *user_id,
             Ping(user_id, _) => *user_id,
+            DisconnectExt(user_id, _) => *user_id,
         }
     }
 }
@@ -2327,6 +2343,10 @@ impl Message {
                 DisconnectMessage::deserialize(r)?,
             )),
             2 => Control(ControlMessage::Ping(u, r.validate(1, 1)?.read::<bool>())),
+            3 => Control(ControlMessage::DisconnectExt(
+                u,
+                r.validate(0, 65535)?.read_remaining_vec::<u8>(),
+            )),
             32 => ServerMeta(ServerMetaMessage::Join(u, JoinMessage::deserialize(r)?)),
             33 => ServerMeta(ServerMetaMessage::Leave(u)),
             34 => ServerMeta(ServerMetaMessage::SessionOwner(
@@ -2510,6 +2530,10 @@ impl Message {
             "ping" => Control(ControlMessage::Ping(
                 tm.user_id,
                 tm.get_str("is_pong") == "true",
+            )),
+            "disconnectext" => Control(ControlMessage::DisconnectExt(
+                tm.user_id,
+                tm.get_bytes("msg"),
             )),
             "join" => ServerMeta(ServerMetaMessage::Join(
                 tm.user_id,

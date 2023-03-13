@@ -183,7 +183,7 @@ private slots:
 
 		// Note: because the connection is cut just after the disconnect message
 		// is sent, we can't test the reception of the message with an echo server.
-		mq.sendDisconnect(0, "test");
+		mq.sendDisconnect(protocol::Shutdown::Logout);
 
 		loopUntil(disconnected);
 	}

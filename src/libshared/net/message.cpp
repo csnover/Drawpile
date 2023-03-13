@@ -85,6 +85,7 @@ NullableMessageRef Message::deserialize(const uchar *data, int buflen, bool deco
 	// Control messages
 	case MSG_COMMAND: msg = Command::deserialize(ctx, data, len); break;
 	case MSG_DISCONNECT: msg = Disconnect::deserialize(ctx, data, len); break;
+	case MSG_DISCONNECT_EXT: msg = DisconnectExt::deserialize(ctx, data, len); break;
 	case MSG_PING: msg = Ping::deserialize(ctx, data, len); break;
 	case MSG_INTERNAL:
 	   qWarning("Tried to deserialize MSG_INTERVAL");

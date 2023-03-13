@@ -43,6 +43,9 @@ TcpServer::TcpServer(QObject *parent) :
 	connect(m_msgqueue, &MessageQueue::badData, this, &TcpServer::handleBadData);
 	connect(m_msgqueue, &MessageQueue::pingPong, this, &TcpServer::lagMeasured);
 	connect(m_msgqueue, &MessageQueue::gracefulDisconnect, this, &TcpServer::gracefullyDisconnecting);
+	connect(m_msgqueue, &MessageQueue::gracefulDisconnect, [=](protocol::DisconnectExt::Reason, const QString &message) {
+		m_error = message;
+	});
 }
 
 void TcpServer::login(LoginHandler *login)
@@ -56,7 +59,7 @@ void TcpServer::login(LoginHandler *login)
 void TcpServer::logout()
 {
 	m_localDisconnect = true;
-	m_msgqueue->sendDisconnect(MessageQueue::GracefulDisconnect::Shutdown, QString());
+	m_msgqueue->sendDisconnect(protocol::Shutdown::Logout);
 }
 
 int TcpServer::uploadQueueBytes() const

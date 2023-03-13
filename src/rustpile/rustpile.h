@@ -472,6 +472,8 @@ void write_disconnect(MessageWriter *writer,
 
 void write_ping(MessageWriter *writer, UserID ctx, bool is_pong);
 
+void write_disconnectext(MessageWriter *writer, UserID ctx, const uint8_t *msg, uintptr_t msg_len);
+
 void write_sessionowner(MessageWriter *writer,
                         UserID ctx,
                         const uint8_t *users,

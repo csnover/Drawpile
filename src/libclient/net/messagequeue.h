@@ -5,6 +5,7 @@
 #define DP_CLIENT_MSGQUEUE_H
 
 #include "libclient/net/envelope.h"
+#include "libshared/net/control.h"
 
 #include <QQueue>
 #include <QObject>
@@ -20,13 +21,6 @@ namespace net {
 class MessageQueue : public QObject {
 Q_OBJECT
 public:
-	enum class GracefulDisconnect {
-		Error, // An error occurred
-		Kick, // client was kicked by the session operator
-		Shutdown, // server is shutting down
-		Other, // other unspecified error
-	};
-
 	/**
 	 * @brief Create a message queue that wraps a TCP socket.
 	 *
@@ -60,9 +54,8 @@ public:
 	 * for sending.
 	 *
 	 * @param reason
-	 * @param message
 	 */
-	void sendDisconnect(GracefulDisconnect reason, const QString &message);
+	void sendDisconnect(const protocol::DisconnectExt &reason);
 
 	/**
 	 * @brief Get the number of bytes in the upload queue
@@ -149,7 +142,7 @@ signals:
 	/**
 	 * The server sent a graceful disconnect notification
 	 */
-	void gracefulDisconnect(GracefulDisconnect reason, const QString &message);
+	void gracefulDisconnect(protocol::DisconnectExt::Reason reason, const QString &message);
 
 private slots:
 	void readData();

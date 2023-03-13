@@ -4,6 +4,7 @@
 #ifndef DP_SERVER_CLIENT_H
 #define DP_SERVER_CLIENT_H
 
+#include "libshared/net/control.h"
 #include "libshared/net/message.h"
 #include "libserver/jsonapi.h"
 
@@ -164,9 +165,8 @@ public:
 	 * disconnect command is added to the client's upload queue.
 	 *
 	 * @param reason
-	 * @param message
 	 */
-	void disconnectClient(DisconnectionReason reason, const QString &message);
+	void disconnectClient(const protocol::DisconnectExt &reason);
 
 	/**
 	 * @brief Send a message directly to this client

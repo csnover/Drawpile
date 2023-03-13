@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // SPDX-FileCopyrightText: Calle Laakkonen
 
+#include "libshared/net/chat.h"
 #include "libshared/net/control.h"
 #include "libshared/net/error.h"
 
@@ -187,6 +188,71 @@ int Ping::serializePayload(uchar *data) const
 QString Ping::toString() const
 {
 	return QStringLiteral("# ") + messageName();
+}
+
+DisconnectExt *DisconnectExt::deserialize(uint8_t ctx, const uchar *data, uint len)
+{
+	QJsonParseError error;
+	const auto doc = QJsonDocument::fromJson(QByteArray(reinterpret_cast<const char *>(data), len), &error).object();
+	if (error.error != QJsonParseError::NoError) {
+		qWarning() << "JSON parse error:" << error.errorString();
+		return new DisconnectExt(Error::InvalidMessage);
+	}
+
+	int kind;
+	if (!doc.contains("type") || !doc.contains("detail")) {
+		kind = Reason::OTHER;
+	} else {
+		kind = doc["type"].toInt();
+		if (kind < 0 || kind >= Reason::_Last) {
+			kind = Reason::OTHER;
+		}
+	}
+
+	switch (kind) {
+	case Reason::KICK: {
+		const auto actor = ChatActor::fromJson(doc["detail"].toObject());
+		if (actor.kind() != ChatActor::Unknown) {
+			return new DisconnectExt(actor, ctx);
+		}
+		break;
+	}
+	case Reason::ERROR:
+		return new DisconnectExt(
+			Error::fromJson(
+				doc["detail"].toObject(),
+				doc["message"].toString()
+			),
+			ctx
+		);
+	case Reason::SHUTDOWN: {
+		const auto shutdown = Shutdown::fromJson(doc["detail"].toObject());
+		if (shutdown.kind() != Shutdown::Unknown) {
+			return new DisconnectExt(shutdown, ctx);
+		}
+		break;
+	}
+	default: {}
+	}
+
+	return new DisconnectExt(doc["message"].toString(), ctx);
+}
+
+QString DisconnectExt::toString() const
+{
+	return QStringLiteral("# Disconnected (structured): ") + message();
+}
+
+int DisconnectExt::payloadLength() const
+{
+	return QJsonDocument(toJson()).toJson(QJsonDocument::Compact).size();
+}
+
+int DisconnectExt::serializePayload(uchar *data) const
+{
+	const auto json = QJsonDocument(toJson()).toJson(QJsonDocument::Compact);
+	memcpy(data, json.constData(), json.size());
+	return json.size();
 }
 
 }

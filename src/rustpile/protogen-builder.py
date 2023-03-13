@@ -117,6 +117,7 @@ if __name__ == '__main__':
         'ServerCommand',
         'Ping',
         'Disconnect',
+        'DisconnectExt',
         'SessionOwner',
         'Chat',
         'TrustedUsers',

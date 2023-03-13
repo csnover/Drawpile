@@ -19,6 +19,7 @@ enum MessageType {
 	MSG_COMMAND=0,
 	MSG_DISCONNECT,
 	MSG_PING,
+	MSG_DISCONNECT_EXT,
 
 	// Reserved ID for internal use (not serializable)
 	MSG_INTERNAL=31,

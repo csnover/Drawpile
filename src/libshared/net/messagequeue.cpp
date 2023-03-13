@@ -128,9 +128,12 @@ void MessageQueue::sendNow(MessagePtr msg)
 	}
 }
 
-void MessageQueue::sendDisconnect(int reason, const QString &message)
+void MessageQueue::sendDisconnect(const DisconnectExt &reason)
 {
-	send(MessagePtr(new protocol::Disconnect(0, protocol::Disconnect::Reason(reason), message)));
+	send({
+		MessagePtr(new DisconnectExt(reason)),
+		MessagePtr(reason.toDisconnect())
+	});
 	m_ignoreIncoming = true;
 	m_recvbytes = 0;
 }
@@ -268,6 +271,9 @@ void MessageQueue::writeData() {
 			Q_ASSERT(m_sendbuflen>0);
 			Q_ASSERT(m_sendbuflen <= MAX_BUF_LEN);
 
+			// This can only be changed to MSG_DISCONNECT_EXT after the
+			// MSG_DISCONNECT is obsoleted, otherwise it will drop the
+			// MSG_DISCONNECT and old clients will not get graceful shutdowns
 			if(msg->type() == protocol::MSG_DISCONNECT) {
 				// Automatically disconnect after Disconnect notification is sent
 				m_closeWhenReady = true;

@@ -4,6 +4,7 @@
 #ifndef DP_NET_MSGQUEUE_H
 #define DP_NET_MSGQUEUE_H
 
+#include "libshared/net/control.h"
 #include "libshared/net/message.h"
 
 #include <QQueue>
@@ -63,9 +64,8 @@ public:
 	 * causes all incoming messages to be ignored.
 	 *
 	 * @param reason
-	 * @param message
 	 */
-	void sendDisconnect(int reason, const QString &message);
+	void sendDisconnect(const DisconnectExt &reason);
 
 	/**
 	 * @brief Get the number of bytes in the upload queue

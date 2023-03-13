@@ -177,7 +177,7 @@ void kickUser(Client *client, const QJsonArray &args, const QJsonObject &kwargs)
 		false
 	);
 
-	target->disconnectClient(Client::DisconnectionReason::Kick, client->username());
+	target->disconnectClient(protocol::ChatActor(client->username()));
 }
 
 void removeBan(Client *client, const QJsonArray &args, const QJsonObject &kwargs)

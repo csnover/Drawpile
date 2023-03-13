@@ -62,6 +62,17 @@ pub extern "C" fn write_ping(writer: &mut MessageWriter, ctx: UserID, is_pong: b
 }
 
 #[no_mangle]
+pub extern "C" fn write_disconnectext(
+    writer: &mut MessageWriter,
+    ctx: UserID,
+    msg: *const u8,
+    msg_len: usize,
+) {
+    ControlMessage::DisconnectExt(ctx, unsafe { slice::from_raw_parts(msg, msg_len) }.into())
+        .write(writer);
+}
+
+#[no_mangle]
 pub extern "C" fn write_sessionowner(
     writer: &mut MessageWriter,
     ctx: UserID,

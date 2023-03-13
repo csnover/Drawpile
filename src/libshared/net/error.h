@@ -13,6 +13,43 @@ class QJsonObject;
 
 namespace protocol {
 
+class Shutdown {
+	Q_DECLARE_TR_FUNCTIONS(protocol::Shutdown)
+public:
+	enum Kind {
+		Unknown,
+		Logout,
+		Session,
+		Server,
+
+		_Last
+	};
+
+	Shutdown(Kind kind) : m_kind(kind) {}
+
+	static Shutdown fromJson(const QJsonObject &data);
+
+	Kind kind() const { return m_kind; }
+
+	QString message() const
+	{
+		switch(m_kind) {
+		case Unknown: return tr("Unknown");
+		case Logout: return tr("Logged out");
+		case Session: return tr("Session terminated");
+		case Server: return tr("Server shutting down");
+		case _Last: {}
+		}
+
+		Q_UNREACHABLE();
+	}
+
+	QJsonObject toJson() const;
+
+private:
+	Kind m_kind;
+};
+
 class Error {
 	Q_DECLARE_TR_FUNCTIONS(protocol::Error)
 
@@ -72,6 +109,9 @@ public:
 		NotSessionOwner,
 		NotSessionOwnerOrDeputy,
 		UnknownCommand,
+		InvalidMessage,
+		DeoppedWhileResetting,
+		HistoryLimitExceeded,
 
 		_Last
 	};
@@ -201,11 +241,13 @@ public:
 		case IdInUse: return tr("An internal server error occurred.");
 		case BadProtocol: return tr("This server does not support this protocol version.");
 		case ServerFull: return tr("This server is full.");
+		case InvalidMessage: return tr("invalid message");
+		case DeoppedWhileResetting: return tr("De-opped while resetting");
+		case HistoryLimitExceeded: return tr("History limit exceeded");
 		case _Last: {}
 		}
 
-		Q_ASSERT(false);
-		return QString();
+		Q_UNREACHABLE();
 	}
 
 	QJsonObject toJson() const;
