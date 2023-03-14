@@ -29,13 +29,9 @@ signals:
 	void toggleVisibility(int layerId, bool visible);
 	void editProperties(QModelIndex index);
 
-private:
-	void drawOpacityGlyph(const QRect &rect, QPainter *painter, float value, bool hidden, bool censored, bool group) const;
-
-	QIcon m_visibleIcon;
-	QIcon m_groupIcon;
-	QIcon m_censoredIcon;
-	QIcon m_hiddenIcon;
+protected:
+	void drawDecoration(QPainter *painter, const QStyleOptionViewItem &option, const QRect &rect, const QPixmap &pixmap) const override;
+	void drawDisplay(QPainter *painter, const QStyleOptionViewItem &option, const QRect &rect, const QString &text) const override;
 };
 
 }

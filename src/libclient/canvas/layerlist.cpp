@@ -6,8 +6,12 @@
 #include "rustpile/rustpile.h"
 #include "libshared/util/qtcompat.h"
 
+#include <QBrush>
 #include <QDebug>
+#include <QFont>
+#include <QIcon>
 #include <QImage>
+#include <QPalette>
 #include <QStringList>
 #include <QRegularExpression>
 
@@ -34,6 +38,22 @@ QVariant LayerListModel::data(const QModelIndex &index, int role) const
 	case Qt::DisplayRole:
 	case Qt::EditRole:
 		return item.title;
+	case Qt::DecorationRole:
+		if (item.hidden)
+			return QIcon::fromTheme("layer-visible-off");
+		else if (item.attributes.censored)
+			return QIcon(":/icons/censored.svg");
+		else if (item.group)
+			return QIcon::fromTheme("folder");
+		else
+			return QIcon::fromTheme("layer-visible-on");
+	case Qt::FontRole:
+		if (item.id == m_defaultLayer) {
+			auto font = QFont();
+			font.setUnderline(true);
+			return font;
+		}
+		break;
 	case IdRole:
 		return item.id;
 	case IsDefaultRole:
@@ -45,9 +65,10 @@ QVariant LayerListModel::data(const QModelIndex &index, int role) const
 		return item.group;
 	case ItemRole:
 		return QVariant::fromValue(item);
-	default:
-		return QVariant();
+	default: {}
 	}
+
+	return QVariant();
 }
 
 void LayerListModel::addGroup(int target)
@@ -242,7 +263,7 @@ Qt::ItemFlags LayerListModel::flags(const QModelIndex& index) const
 
 	if(index.isValid()) {
 		const auto isGroup = m_items.at(index.internalId()).group;
-		flags |= Qt::ItemIsEditable | (isGroup ? Qt::ItemIsDropEnabled : Qt::NoItemFlags);
+		flags |= Qt::ItemIsEditable | (isGroup ? Qt::ItemIsDropEnabled : Qt::ItemNeverHasChildren);
 	} else {
 		flags |= Qt::ItemIsDropEnabled;
 	}

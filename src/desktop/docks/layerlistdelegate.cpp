@@ -8,17 +8,14 @@
 #include <QDebug>
 #include <QIcon>
 #include <QMouseEvent>
-#include <QPainter>
 #include <QLineEdit>
+#include <QPainter>
+#include <QTreeView>
 
 namespace docks {
 
 LayerListDelegate::LayerListDelegate(QObject *parent)
-	: QItemDelegate(parent),
-	  m_visibleIcon(QIcon::fromTheme("layer-visible-on")),
-	  m_groupIcon(QIcon::fromTheme("folder")),
-	  m_censoredIcon(QIcon(":/icons/censored.svg")),
-	  m_hiddenIcon(QIcon::fromTheme("layer-visible-off"))
+	: QItemDelegate(parent)
 {
 }
 
@@ -29,10 +26,14 @@ static inline auto &getStyle(const QStyleOptionViewItem &option)
 	return *style;
 }
 
+static inline auto getMetric(QStyle::PixelMetric pm, const QStyleOptionViewItem &option)
+{
+	return getStyle(option).pixelMetric(pm, &option, option.widget);
+}
+
 static QRect calcIconRect(const QStyleOptionViewItem &option)
 {
-	const auto &style = getStyle(option);
-	const auto iconSize = style.pixelMetric(QStyle::PM_ButtonIconSize);
+	const auto iconSize = getMetric(QStyle::PM_ListViewIconSize, option);
 	QRect rect(option.rect);
 	rect.setSize({ iconSize, iconSize });
 	rect.translate({ 0, (option.rect.height() - iconSize) / 2 });
@@ -41,27 +42,48 @@ static QRect calcIconRect(const QStyleOptionViewItem &option)
 
 void LayerListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	const canvas::LayerListItem &layer = index.data(canvas::LayerListModel::ItemRole).value<canvas::LayerListItem>();
+	// Cannot really delegate to QItemDelegate at all because it is not possible
+	// to override the functions it uses
 
-	QStyleOptionViewItem opt = setOptions(index, option);
-	if(index.data(canvas::LayerListModel::IsDefaultRole).toBool()) {
-		opt.font.setUnderline(true);
-	}
-	if(index.data(canvas::LayerListModel::IsLockedRole).toBool()) {
+	auto opt = setOptions(index, option);
+
+	// It is not possible to just set the flags of the model item to be disabled
+	// because then it will be unselectable, but it is desired to draw it in the
+	// special state
+	if (index.data(canvas::LayerListModel::IsLockedRole).toBool()) {
 		opt.state &= ~QStyle::State_Enabled;
+
+		// The parts to the left of the item in a tree have to be redrawn
+		// explicitly, otherwise the colour of the background and the branch
+		// control will be wrong
+		if (auto *widget = qobject_cast<const QTreeView *>(option.widget)) {
+			auto rect = opt.rect;
+			rect.setLeft(0);
+			painter->fillRect(rect, opt.palette.color(QPalette::Disabled,
+				opt.state & QStyle::State_Selected
+				? QPalette::Highlight
+				: QPalette::Window
+			));
+
+			auto treeOpt = opt;
+			const auto expanded = widget->isExpanded(index);
+			const auto children = index.model()->hasChildren(index);
+			const auto moreSiblings = widget->indexBelow(index).isValid();
+
+			treeOpt.state
+				= QStyle::State_Item
+				| (moreSiblings ? QStyle::State_Sibling : QStyle::State_None)
+				| (children ? QStyle::State_Children : QStyle::State_None)
+				| (expanded ? QStyle::State_Open : QStyle::State_None);
+
+			const auto width = getMetric(QStyle::PM_TreeViewIndentation, treeOpt);
+			treeOpt.rect.translate(-width, 0);
+			treeOpt.rect.setWidth(width);
+			getStyle(treeOpt).drawPrimitive(QStyle::PE_IndicatorBranch, &treeOpt, painter, widget);
+		}
 	}
 
-	const auto iconRect = calcIconRect(opt);
-	auto textRect = option.rect;
-	textRect.setLeft(calcIconRect(option).right() + getStyle(option).pixelMetric(QStyle::PM_CheckBoxLabelSpacing));
-
-	painter->save();
-
-	drawBackground(painter, option, index);
-	drawOpacityGlyph(iconRect, painter, layer.attributes.opacity, layer.hidden, layer.attributes.censored, layer.group);
-	drawDisplay(painter, opt, textRect,layer.title);
-
-	painter->restore();
+	QItemDelegate::paint(painter, opt, index);
 }
 
 bool LayerListDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
@@ -92,31 +114,39 @@ bool LayerListDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, co
 
 QSize LayerListDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	const auto &style = getStyle(option);
-	const auto iconHeight = style.pixelMetric(QStyle::PM_ButtonIconSize)
-		+ style.pixelMetric(QStyle::PM_ButtonMargin) * 2;
-	const auto minHeight = qMax(QFontMetrics(option.font).height(), iconHeight);
-	QSize size = QItemDelegate::sizeHint(option, index);
-	if(size.height() < minHeight)
-		size.setHeight(minHeight);
-	return size;
+	const auto iconHeight = getMetric(QStyle::PM_ListViewIconSize, option) + 2 * getMetric(QStyle::PM_ButtonMargin, option);
+	return QItemDelegate::sizeHint(option, index).expandedTo(QSize(0, iconHeight));
 }
 
-void LayerListDelegate::drawOpacityGlyph(const QRect &r, QPainter *painter, float value, bool hidden, bool censored, bool group) const
+void LayerListDelegate::drawDecoration(QPainter *painter, const QStyleOptionViewItem &option, const QRect &rect, const QPixmap &pixmap) const
 {
-	if(hidden) {
-		m_hiddenIcon.paint(painter, r);
-	} else {
-		painter->save();
-		painter->setOpacity(value);
-		if(censored)
-			m_censoredIcon.paint(painter, r);
-		else if(group)
-			m_groupIcon.paint(painter, r);
-		else
-			m_visibleIcon.paint(painter, r);
-		painter->restore();
+	auto cg = option.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
+
+	if (cg == QPalette::Normal && !(option.state & QStyle::State_Active))
+		cg = QPalette::Inactive;
+
+	const auto fill = option.palette.color(cg, (option.state & QStyle::State_Selected) ? QPalette::HighlightedText : QPalette::Text);
+
+	// The hateful Qt CoreGraphics implementation does not work to composite
+	// the pixmap directly and will draw #ececec in all of the areas that are
+	// supposed to be transparent if the pixmap does not start filled with
+	// Qt::transparent for some reason. QTBUG-11142 kinda.
+	auto icon = QPixmap(pixmap);
+	icon.fill(Qt::transparent);
+	{
+		QPainter copier(&icon);
+		copier.fillRect(icon.rect(), fill);
+		copier.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+		copier.drawPixmap(0, 0, pixmap);
 	}
+
+	painter->drawPixmap(rect, icon);
+}
+
+void LayerListDelegate::drawDisplay(QPainter *painter, const QStyleOptionViewItem &option, const QRect &rect, const QString &text) const
+{
+	auto textRect = rect.adjusted(0, 0, -0, 0);
+	QItemDelegate::drawDisplay(painter, option, textRect, text);
 }
 
 }
