@@ -6,7 +6,6 @@
 #include "desktop/main.h"
 #include "desktop/mainwindow.h"
 
-#include "libclient/utils/icon.h"
 #include "libclient/utils/logging.h"
 #include "libclient/utils/colorscheme.h"
 #include "desktop/utils/qtguicompat.h"
@@ -17,6 +16,7 @@
 #include "rustpile/rustpile.h"
 
 #ifdef Q_OS_MACOS
+#include "desktop/utils/macui.h"
 #include "desktop/widgets/macmenu.h"
 #include <QTimer>
 #endif
@@ -27,65 +27,17 @@
 #endif
 
 #include <QDebug>
+#include <QDir>
 #include <QCommandLineParser>
-#include <QPainter>
-#include <QProxyStyle>
 #include <QSettings>
-#include <QStyleOption>
+#include <QStyle>
+#include <QStyleFactory>
 #include <QUrl>
 #include <QTabletEvent>
 #include <QLibraryInfo>
 #include <QTranslator>
 #include <QDateTime>
-#include <QStyle>
 #include <QWidget>
-
-#include <QtColorWidgets/ColorWheel>
-
-#ifdef Q_OS_MACOS
-// The "native" style status bar looks weird because it uses the same gradient
-// as the title bar but is taller than a normal status bar. This makes it look
-// better.
-class MacViewStatusBarProxyStyle : public QProxyStyle {
-	void drawPrimitive(QStyle::PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = nullptr) const override
-	{
-		if (element != QStyle::PE_PanelStatusBar) {
-			return QProxyStyle::drawPrimitive(element, option, painter, widget);
-		}
-
-		static const QColor darkLine(0, 0, 0);
-		static const QColor darkFill(48, 48, 48);
-		static const QLinearGradient darkGradient = [](){
-			QLinearGradient gradient;
-			gradient.setColorAt(0, QColor(67, 67, 67));
-			gradient.setColorAt(1, QColor(48, 48, 48));
-			return gradient;
-		}();
-		static const QColor lightLine(193, 193, 193);
-		static const QColor lightFill(246, 246, 246);
-		static const QLinearGradient lightGradient = [](){
-			QLinearGradient gradient;
-			gradient.setColorAt(0, QColor(240, 240, 240));
-			gradient.setColorAt(1, QColor(224, 224, 224));
-			return gradient;
-		}();
-
-		const bool dark = icon::isDarkThemeSelected();
-
-		if(option->state & QStyle::State_Active) {
-			auto linearGrad = dark ? darkGradient : lightGradient;
-			linearGrad.setStart(0, option->rect.top());
-			linearGrad.setFinalStop(0, option->rect.bottom());
-			painter->fillRect(option->rect, linearGrad);
-		} else {
-			painter->fillRect(option->rect, dark ? darkFill : lightFill);
-		}
-
-		painter->setPen(dark ? darkLine : lightLine);
-		painter->drawLine(option->rect.left(), option->rect.top(), option->rect.right(), option->rect.top());
-	}
-};
-#endif
 
 DrawpileApp::DrawpileApp(int &argc, char **argv)
 	: QApplication(argc, argv)
@@ -128,7 +80,7 @@ bool DrawpileApp::event(QEvent *e) {
 		return true;
 
 	} else if (e->type() == QEvent::ApplicationPaletteChange) {
-		icon::setThemeSearchPaths();
+		updateThemeIcons();
 	}
 #ifdef Q_OS_MACOS
 	else if(e->type() == QEvent::ApplicationStateChange) {
@@ -148,8 +100,43 @@ void DrawpileApp::notifySettingsChanged()
 	emit settingsChanged();
 }
 
-void DrawpileApp::setDarkTheme(bool dark)
+void DrawpileApp::updateThemeIcons()
 {
+	auto *iconTheme = QPalette().color(QPalette::Window).lightness() < 128
+		? "dark"
+		: "light";
+
+	QStringList fallbackIconPaths;
+	for (const auto &path : utils::paths::dataPaths()) {
+		fallbackIconPaths.append(path + "/theme/" + iconTheme);
+	}
+
+	QDir::setSearchPaths("theme", fallbackIconPaths);
+	QIcon::setThemeName(iconTheme);
+}
+
+void DrawpileApp::initTheme()
+{
+	static QStringList defaultThemePaths{QIcon::themeSearchPaths()};
+
+	QStringList themePaths{defaultThemePaths};
+	for (const auto &path : utils::paths::dataPaths()) {
+		themePaths.append(path + "/theme");
+	}
+	QIcon::setThemeSearchPaths(themePaths);
+	setThemeName(QSettings().value("settings/theme").toString());
+	setDarkMode(QSettings().value("settings/darkmode").toBool());
+	updateThemeIcons();
+}
+
+void DrawpileApp::setDarkMode(bool dark)
+{
+#ifdef Q_OS_MACOS
+	if (macui::setNativeAppearance(dark)) {
+		return;
+	}
+#endif
+
 	QPalette pal;
 	if(dark) {
 		const QString paletteFile = utils::paths::locateDataFile("nightmode.colors");
@@ -158,13 +145,11 @@ void DrawpileApp::setDarkTheme(bool dark)
 		} else {
 			pal = colorscheme::loadFromFile(paletteFile);
 		}
-
 	} else {
 		pal = style()->standardPalette();
 	}
 
 	setPalette(pal);
-	QIcon::setThemeName(dark ? "dark" : "light");
 }
 
 void DrawpileApp::openUrl(QUrl url)
@@ -246,6 +231,31 @@ void DrawpileApp::initTranslations()
 		locale = QLocale::system();
 
 	setLanguage(langFromLocale(locale));
+}
+
+void DrawpileApp::setThemeName(const QString &themeName)
+{
+	QStyle *style = nullptr;
+
+#ifdef Q_OS_MACOS
+	if (!themeName.isEmpty() && !themeName.toLower().startsWith("mac")) {
+#else
+	if (!themeName.isEmpty()) {
+#endif
+		style = QStyleFactory::create(themeName);
+
+		if (!style) {
+			qWarning() << "could not find theme" << themeName;
+		}
+	}
+
+#ifdef Q_OS_MACOS
+	if (!style)
+		style = new macui::MacViewStatusBarProxyStyle;
+#endif
+
+	if (style)
+		setStyle(style);
 }
 
 void DrawpileApp::setLanguage(QString preferredLang)
@@ -333,15 +343,7 @@ static QStringList initApp(DrawpileApp &app)
 	// Continue initialization (can use QSettings from now on)
 	utils::initLogging();
 
-	// Override widget theme
-	const int theme = QSettings().value("settings/theme", 0).toInt();
-	if(theme != 0) // choice 0: system theme
-		app.setStyle("fusion");
-
-	if(theme==2) // choice 2: dark theme
-		app.setDarkTheme(true);
-	else
-		icon::setThemeSearchPaths();
+	app.initTheme();
 
 #ifdef Q_OS_MACOS
 	// Mac specific settings
@@ -405,9 +407,6 @@ int main(int argc, char *argv[]) {
 	//QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 	DrawpileApp app(argc, argv);
-#ifdef Q_OS_MAC
-	app.setStyle(new MacViewStatusBarProxyStyle);
-#endif
 
 	{
 		const auto files = initApp(app);

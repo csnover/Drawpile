@@ -4,7 +4,6 @@
 #include "desktop/chat/useritemdelegate.h"
 #include "libclient/canvas/userlist.h"
 #include "libclient/canvas/canvasmodel.h"
-#include "libclient/utils/icon.h"
 #include "libclient/net/servercmd.h"
 #include "libclient/net/envelopebuilder.h"
 #include "libclient/document.h"
@@ -77,8 +76,8 @@ UserItemDelegate::UserItemDelegate(QObject *parent)
 				.onTriggered(this, &UserItemDelegate::pmUser);
 		});
 
-	m_lockIcon = icon::fromTheme("object-locked");
-	m_muteIcon = icon::fromTheme("irc-unvoice");
+	m_lockIcon = QIcon::fromTheme("object-locked");
+	m_muteIcon = QIcon::fromTheme("irc-unvoice");
 }
 
 QSize UserItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const

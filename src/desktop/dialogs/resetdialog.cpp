@@ -4,7 +4,6 @@
 #include "desktop/dialogs/resetdialog.h"
 #include "libclient/canvas/paintengine.h"
 #include "rustpile/rustpile.h"
-#include "libclient/utils/icon.h"
 #include "libclient/net/envelopebuilder.h"
 #include "libclient/utils/images.h"
 
@@ -98,13 +97,13 @@ ResetDialog::ResetDialog(const canvas::PaintEngine *pe, QWidget *parent)
 	auto *newButton = d->ui->buttonBox->addButton(tr("New"), QDialogButtonBox::ActionRole);
 	auto *openButton = d->ui->buttonBox->addButton(tr("Open..."), QDialogButtonBox::ActionRole);
 
-	d->resetButton->setIcon(icon::fromTheme("edit-undo"));
+	d->resetButton->setIcon(QIcon::fromTheme("edit-undo"));
 	connect(d->resetButton, &QPushButton::clicked, this, &ResetDialog::resetSelected);
 
-	newButton->setIcon(icon::fromTheme("document-new"));
+	newButton->setIcon(QIcon::fromTheme("document-new"));
 	connect(newButton, &QPushButton::clicked, this, &ResetDialog::newSelected);
 
-	openButton->setIcon(icon::fromTheme("document-open"));
+	openButton->setIcon(QIcon::fromTheme("document-open"));
 	connect(openButton, &QPushButton::clicked, this, &ResetDialog::onOpenClicked);
 
 	d->ui->snapshotSlider->setMaximum(d->resetPoints.size());

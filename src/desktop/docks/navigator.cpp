@@ -8,7 +8,6 @@
 #include "libclient/canvas/canvasmodel.h"
 #include "libclient/canvas/paintengine.h"
 #include "libclient/canvas/userlist.h"
-#include "libclient/utils/icon.h"
 
 #include <QMouseEvent>
 #include <QTimer>
@@ -328,7 +327,7 @@ Navigator::Navigator(QWidget *parent)
 	connect(m_zoomSlider, &QSlider::valueChanged, this, &Navigator::updateZoom);
 
 	m_resetZoomButton = new QToolButton;
-	m_resetZoomButton->setIcon(icon::fromTheme("zoom-original"));
+	m_resetZoomButton->setIcon(QIcon::fromTheme("zoom-original"));
 	connect(m_resetZoomButton, &QToolButton::clicked, [=] { emit zoomChanged(100.0); });
 
 	m_zoomControls = new QWidget(this);

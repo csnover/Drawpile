@@ -5,7 +5,6 @@
 #define DP_ACTIONBUILDER_H
 
 #include "desktop/utils/dynamicui.h"
-#include "libclient/utils/icon.h"
 #include "libclient/utils/customshortcutmodel.h"
 
 #include <QAction>
@@ -83,7 +82,7 @@ public:
 
 	ActionBuilder &icon(const QString &name)
 	{
-		m_action->setIcon(icon::fromTheme(name));
+		m_action->setIcon(QIcon::fromTheme(name));
 		return *this;
 	}
 
@@ -279,7 +278,7 @@ public:
 
 	MenuBuilder &icon(const QString &name)
 	{
-		m_menu->setIcon(icon::fromTheme(name));
+		m_menu->setIcon(QIcon::fromTheme(name));
 		return *this;
 	}
 

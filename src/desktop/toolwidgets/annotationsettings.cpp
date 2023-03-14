@@ -9,7 +9,6 @@
 #include "desktop/scene/annotationitem.h"
 #include "libclient/net/client.h"
 #include "libclient/net/envelopebuilder.h"
-#include "libclient/utils/icon.h"
 #include "desktop/widgets/groupedtoolbutton.h"
 #include "desktop/utils/actionbuilder.h"
 #include "desktop/utils/dynamicui.h"
@@ -230,10 +229,10 @@ void AnnotationSettings::updateStyleButtons()
 {
 	QTextBlockFormat bf = m_ui->content->textCursor().blockFormat();
 	switch(bf.alignment()) {
-	case Qt::AlignLeft: m_ui->halign->setIcon(icon::fromTheme("format-justify-left")); break;
-	case Qt::AlignCenter: m_ui->halign->setIcon(icon::fromTheme("format-justify-center")); break;
-	case Qt::AlignJustify: m_ui->halign->setIcon(icon::fromTheme("format-justify-fill")); break;
-	case Qt::AlignRight: m_ui->halign->setIcon(icon::fromTheme("format-justify-right")); break;
+	case Qt::AlignLeft: m_ui->halign->setIcon(QIcon::fromTheme("format-justify-left")); break;
+	case Qt::AlignCenter: m_ui->halign->setIcon(QIcon::fromTheme("format-justify-center")); break;
+	case Qt::AlignJustify: m_ui->halign->setIcon(QIcon::fromTheme("format-justify-fill")); break;
+	case Qt::AlignRight: m_ui->halign->setIcon(QIcon::fromTheme("format-justify-right")); break;
 	default: break;
 	}
 
@@ -361,14 +360,14 @@ void AnnotationSettings::setSelectionId(uint16_t id)
 		int align = 0;
 		switch(a->valign()) {
 		case 0:
-			m_ui->valign->setIcon(icon::fromTheme("format-align-vertical-top"));
+			m_ui->valign->setIcon(QIcon::fromTheme("format-align-vertical-top"));
 			break;
 		case 1:
-			m_ui->valign->setIcon(icon::fromTheme("format-align-vertical-center"));
+			m_ui->valign->setIcon(QIcon::fromTheme("format-align-vertical-center"));
 			align = rustpile::AnnotationEditMessage_FLAGS_VALIGN_CENTER;
 			break;
 		case 2:
-			m_ui->valign->setIcon(icon::fromTheme("format-align-vertical-bottom"));
+			m_ui->valign->setIcon(QIcon::fromTheme("format-align-vertical-bottom"));
 			align = rustpile::AnnotationEditMessage_FLAGS_VALIGN_BOTTOM;
 			break;
 		}

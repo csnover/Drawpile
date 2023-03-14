@@ -13,7 +13,6 @@
 #include "libclient/utils/sessionfilterproxymodel.h"
 #include "libclient/utils/usernamevalidator.h"
 #include "libclient/utils/html.h"
-#include "libclient/utils/icon.h"
 
 #include "ui_logindialog.h"
 
@@ -87,9 +86,9 @@ struct LoginDialog::Private {
 
 		{
 			const auto iconSize = m_ui->username->sizeHint().height();
-			m_ui->avatarIcon->setPixmap(icon::fromTheme("photo").pixmap(iconSize));
-			m_ui->usernameIcon->setPixmap(icon::fromTheme("im-user").pixmap(iconSize));
-			m_ui->passwordIcon->setPixmap(icon::fromTheme("object-locked").pixmap(iconSize));
+			m_ui->avatarIcon->setPixmap(QIcon::fromTheme("photo").pixmap(iconSize));
+			m_ui->usernameIcon->setPixmap(QIcon::fromTheme("im-user").pixmap(iconSize));
+			m_ui->passwordIcon->setPixmap(QIcon::fromTheme("object-locked").pixmap(iconSize));
 		}
 
 		// Session list page

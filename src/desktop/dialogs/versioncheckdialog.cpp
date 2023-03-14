@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/dialogs/versioncheckdialog.h"
-#include "libclient/utils/icon.h"
 #include "libshared/util/networkaccess.h"
 #include "libshared/util/paths.h"
 
@@ -90,7 +89,7 @@ void VersionCheckDialog::doVersionCheckIfNeeded()
 			tr("Should Drawpile automatically check for updates?"),
 			QMessageBox::Yes | QMessageBox::No
 		};
-		const auto icon = icon::fromTheme("update-none");
+		const auto icon = QIcon::fromTheme("update-none");
 		const auto iconSize = mb.style()->pixelMetric(QStyle::PM_MessageBoxIconSize, nullptr, &mb);
 		auto pixmap = icon.pixmap(iconSize);
 		mb.setIconPixmap(pixmap);

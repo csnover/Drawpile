@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/widgets/notifbar.h"
-#include "libclient/utils/icon.h"
 
 #include <QBoxLayout>
 #include <QLabel>

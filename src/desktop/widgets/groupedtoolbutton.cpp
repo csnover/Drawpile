@@ -3,7 +3,6 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/widgets/groupedtoolbutton.h"
-#include "libclient/utils/icon.h"
 
 #include <QAction>
 #include <QPainterPath>

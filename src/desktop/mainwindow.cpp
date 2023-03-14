@@ -56,7 +56,6 @@ static constexpr auto CTRL_KEY = Qt::CTRL;
 
 #include "desktop/utils/recentfiles.h"
 #include "libshared/util/whatismyip.h"
-#include "libclient/utils/icon.h"
 #include "libclient/utils/images.h"
 #include "libshared/util/networkaccess.h"
 #include "libshared/util/paths.h"
@@ -189,7 +188,7 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	// when there are unread chat messages.
 	m_statusChatButton = new QToolButton(this);
 	m_statusChatButton->setAutoRaise(true);
-	m_statusChatButton->setIcon(icon::fromTheme("drawpile_chat"));
+	m_statusChatButton->setIcon(QIcon::fromTheme("drawpile_chat"));
 	m_statusChatButton->hide();
 	m_viewStatusBar->addWidget(m_statusChatButton);
 
@@ -1709,7 +1708,7 @@ void MainWindow::updateLockWidget()
 
 	if(locked) {
 		const auto iconSize = m_lockstatus->style()->pixelMetric(QStyle::PM_SmallIconSize, nullptr, m_lockstatus);
-		m_lockstatus->setPixmap(icon::fromTheme("object-locked").pixmap(iconSize));
+		m_lockstatus->setPixmap(QIcon::fromTheme("object-locked").pixmap(iconSize));
 		m_lockstatus->setToolTip(tr("Board is locked"));
 	} else {
 		m_lockstatus->setPixmap(QPixmap());
@@ -2407,13 +2406,13 @@ void MainWindow::setupActions()
 			m_recordAction = makeTranslator(a, [=](bool on) {
 				if (m_playbackDialog) {
 					a->setText(on ? tr("Pause") : tr("Play"));
-					a->setIcon(icon::fromTheme(on
+					a->setIcon(QIcon::fromTheme(on
 						? "media-playback-pause"
 						: "media-playback-start"
 					));
 				} else {
 					a->setText(on ? tr("Stop Recording") : tr("Record..."));
-					a->setIcon(icon::fromTheme(on
+					a->setIcon(QIcon::fromTheme(on
 						? "media-playback-stop"
 						: "media-record"
 					));

@@ -10,7 +10,6 @@
 #include "desktop/utils/dynamicui.h"
 #include "libclient/brushes/brushpresetmodel.h"
 #include "libclient/brushes/brush.h"
-#include "libclient/utils/icon.h"
 #include "desktop/docks/titlewidget.h"
 
 #include <QComboBox>
@@ -82,7 +81,7 @@ BrushPalette::BrushPalette(QWidget *parent)
 	titleWidget->addSpace(space);
 
 	d->menuButton = new widgets::GroupedToolButton(this);
-	d->menuButton->setIcon(icon::fromTheme("application-menu"));
+	d->menuButton->setIcon(QIcon::fromTheme("application-menu"));
 	d->menuButton->setPopupMode(QToolButton::InstantPopup);
 	d->menuButton->setMaximumHeight(d->tagComboBox->height());
 	titleWidget->addCustomWidget(d->menuButton);

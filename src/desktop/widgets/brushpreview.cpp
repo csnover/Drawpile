@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/widgets/brushpreview.h"
-#include "libclient/utils/icon.h"
 
 #include <QPaintEvent>
 #include <QPainter>
@@ -100,7 +99,7 @@ void BrushPreview::paintEvent(QPaintEvent *event)
 void BrushPreview::updateBackground()
 {
 	constexpr int w = 16;
-	const auto dark = icon::isDarkThemeSelected();
+	const auto dark = palette().color(QPalette::Window).lightness() < 128;
 	m_background = QPixmap(w*2, w*2);
 	m_background.fill(dark ? QColor(153, 153, 153) : QColor(204, 204, 204));
 	const auto alt = dark ? QColor(102, 102, 102) : Qt::white;

@@ -4,12 +4,12 @@
 #include "libclient/brushes/brushpresetmodel.h"
 #include "libclient/brushes/brush.h"
 
-#include "libclient/utils/icon.h"
 #include "libshared/util/paths.h"
 
 #include <QBuffer>
 #include <QDebug>
 #include <QDirIterator>
+#include <QIcon>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QPixmap>
@@ -479,9 +479,9 @@ QVariant BrushPresetTagModel::data(const QModelIndex &index, int role) const
 	case Qt::DecorationRole:
 		switch(index.row()) {
 		case ALL_ROW:
-			return icon::fromTheme("folder");
+			return QIcon::fromTheme("folder");
 		case UNTAGGED_ROW:
-			return icon::fromTheme("folder-new");
+			return QIcon::fromTheme("folder-new");
 		default:
 			return QVariant();
 		}

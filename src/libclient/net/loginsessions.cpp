@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "libclient/net/loginsessions.h"
-#include "libclient/utils/icon.h"
 
 #include <QDebug>
+#include <QIcon>
 #include <QPixmap>
 
 namespace net {
@@ -76,11 +76,11 @@ QVariant LoginSessionModel::data(const QModelIndex &index, int role) const
 		switch(index.column()) {
 		case StatusColumn:
 			if(!ls.incompatibleSeries.isEmpty())
-				return icon::fromTheme("dontknow");
+				return QIcon::fromTheme("dontknow");
 			else if(ls.closed)
-				return icon::fromTheme("im-ban-user");
+				return QIcon::fromTheme("im-ban-user");
 			else if(ls.needPassword)
-				return icon::fromTheme("object-locked");
+				return QIcon::fromTheme("object-locked");
 			else
 				return QVariant();
 		case TitleColumn:

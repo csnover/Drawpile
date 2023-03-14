@@ -3,13 +3,13 @@
 
 #include "libclient/brushes/brush.h"
 #include "libclient/canvas/blendmodes.h"
-#include "libclient/utils/icon.h"
 
 #include <cmath>
 #include <mypaint-brush.h>
 #include <mypaint-brush-settings.h>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QPalette>
 
 namespace {
 
@@ -157,7 +157,7 @@ QPixmap ClassicBrush::presetThumbnail() const
 	rustpile::Color c;
 	if(smudge.max > 0.0f) {
 		c = rustpile::Color{0.1f, 0.6f, 0.9f, 1.0};
-	} else if(icon::isDarkThemeSelected()) {
+	} else if(QPalette().color(QPalette::Window).lightness() < 128) {
 		c = rustpile::Color{1.0, 1.0, 1.0, 1.0};
 	} else {
 		c = rustpile::Color{0.0, 0.0, 0.0, 1.0};

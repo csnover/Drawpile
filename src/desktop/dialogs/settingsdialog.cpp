@@ -10,7 +10,6 @@
 #include "desktop/toolwidgets/brushsettings.h"
 #include "desktop/widgets/keysequenceedit.h"
 #include "desktop/scene/canvasviewmodifiers.h"
-#include "libclient/utils/icon.h"
 #include "libclient/utils/customshortcutmodel.h"
 #include "libclient/utils/listservermodel.h"
 #include "desktop/utils/listserverdelegate.h"
@@ -37,6 +36,7 @@
 #include <QSslCertificate>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
+#include <QStyleFactory>
 
 #include <QDebug>
 
@@ -106,6 +106,14 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 		}
 	}
 
+	m_ui->themeChoice->addItems(QStyleFactory::keys());
+	connect(m_ui->themeChoice, &QComboBox::currentTextChanged, [=](const QString &name) {
+		static_cast<DrawpileApp *>(qApp)->setThemeName(name);
+	});
+	connect(m_ui->darkMode, &QCheckBox::stateChanged, [=](int state) {
+		static_cast<DrawpileApp *>(qApp)->setDarkMode(state != 0);
+	});
+
 	// Hide Windows specific stuff on other platforms
 #if !defined(Q_OS_WIN) || !defined(KIS_TABLET)
 	// Can't use this until we no longer support Qt versions older than 5.8:
@@ -159,7 +167,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 	}
 
 	const QDir trustedHostsDir(utils::paths::writablePath("trusted-hosts"));
-	const QIcon trustedIcon = icon::fromTheme("security-high");
+	const QIcon trustedIcon = QIcon::fromTheme("security-high");
 	for(const QString &filename : trustedHostsDir.entryList(pemfilter, QDir::Files)) {
 		auto *i = new QListWidgetItem(trustedIcon, filename.left(filename.length()-4), m_ui->knownHostList);
 		i->setData(Qt::UserRole, true);
@@ -207,7 +215,10 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 	// Settings saving
 	connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::rememberSettings);
 	connect(m_ui->buttonBox, &QDialogButtonBox::rejected, [] {
-		static_cast<DrawpileApp *>(qApp)->setLanguage(QSettings().value("settings/language").toString());
+		auto *app = static_cast<DrawpileApp *>(qApp);
+		app->setLanguage(QSettings().value("settings/language").toString());
+		app->setThemeName(QSettings().value("settings/theme").toString());
+		app->setDarkMode(QSettings().value("settings/darkmode").toBool());
 	});
 	connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::saveCertTrustChanges);
 	connect(m_ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &SettingsDialog::resetSettings);
@@ -266,7 +277,8 @@ void SettingsDialog::restoreSettings()
 		}
 	}
 
-	m_ui->themeChoice->setCurrentIndex(cfg.value("theme", 0).toInt());
+	m_ui->themeChoice->setCurrentText(cfg.value("theme").toString());
+	m_ui->darkMode->setChecked(cfg.value("darkmode").toBool());
 	m_ui->logfile->setChecked(cfg.value("logfile", true).toBool());
 	m_ui->autosaveInterval->setValue(cfg.value("autosave", 5000).toInt() / 1000);
 
@@ -400,7 +412,8 @@ void SettingsDialog::rememberSettings()
 
 	// Remember general settings
 	cfg.setValue("settings/language", m_ui->languageBox->currentData());
-	cfg.setValue("settings/theme", m_ui->themeChoice->currentIndex());
+	cfg.setValue("settings/theme", m_ui->themeChoice->currentText());
+	cfg.setValue("settings/darkmode", m_ui->darkMode->isChecked());
 	cfg.setValue("settings/logfile", m_ui->logfile->isChecked());
 	cfg.setValue("settings/autosave", m_ui->autosaveInterval->value() * 1000);
 	cfg.setValue("settings/brushcursor", m_ui->brushCursorBox->currentIndex());
@@ -576,7 +589,7 @@ void SettingsDialog::certificateSelectionChanged()
 
 void SettingsDialog::markTrustedCertificates()
 {
-	const QIcon trustedIcon = icon::fromTheme("security-high");
+	const QIcon trustedIcon = QIcon::fromTheme("security-high");
 	for(QListWidgetItem *item : m_ui->knownHostList->selectedItems()) {
 		if(!item->data(Qt::UserRole).toBool()) {
 			m_trustCerts.append(item->data(Qt::UserRole+1).toString());
@@ -629,7 +642,7 @@ void SettingsDialog::importTrustedCertificate()
 
 	m_importCerts.append(certs.at(0));
 
-	const QIcon trustedIcon = icon::fromTheme("security-high");
+	const QIcon trustedIcon = QIcon::fromTheme("security-high");
 	auto *i = new QListWidgetItem(trustedIcon, certs.at(0).subjectInfo(QSslCertificate::CommonName).at(0), m_ui->knownHostList);
 	i->setData(Qt::UserRole, true);
 	i->setData(Qt::UserRole+2, path);

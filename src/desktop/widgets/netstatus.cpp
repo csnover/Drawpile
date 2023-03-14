@@ -6,7 +6,6 @@
 #include "desktop/dialogs/certificateview.h"
 #include "desktop/dialogs/netstats.h"
 #include "desktop/utils/actionbuilder.h"
-#include "libclient/utils/icon.h"
 #include "libshared/util/whatismyip.h"
 
 #include <QAction>
@@ -161,7 +160,7 @@ NetStatus::NetStatus(QWidget *parent)
 			m_security->hide();
 		} else {
 			const auto iconSize = m_security->style()->pixelMetric(QStyle::PM_SmallIconSize, nullptr, m_security);
-			m_security->setPixmap(icon::fromTheme(iconname).pixmap(iconSize));
+			m_security->setPixmap(QIcon::fromTheme(iconname).pixmap(iconSize));
 			m_security->setToolTip(tooltip);
 			m_security->show();
 		}

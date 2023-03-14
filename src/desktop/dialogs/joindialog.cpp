@@ -10,7 +10,6 @@
 #include "libclient/utils/sessionfilterproxymodel.h"
 #include "libclient/utils/images.h"
 #include "libclient/utils/newversion.h"
-#include "libclient/utils/icon.h"
 #include "libshared/listings/announcementapi.h"
 #include "libclient/parentalcontrols/parentalcontrols.h"
 
@@ -47,7 +46,7 @@ JoinDialog::JoinDialog(const QUrl &url, QWidget *parent)
 
 	m_addServerButton = new QPushButton(m_ui->buttons);
 	AUTO_TR(m_addServerButton, setText, tr("Add Server"));
-	m_addServerButton->setIcon(icon::fromTheme("list-add"));
+	m_addServerButton->setIcon(QIcon::fromTheme("list-add"));
 	m_ui->buttons->addButton(m_addServerButton, QDialogButtonBox::ActionRole);
 	connect(m_addServerButton, &QPushButton::clicked, this, &JoinDialog::addListServer);
 

@@ -16,9 +16,11 @@ public:
 	DrawpileApp(int & argc, char ** argv);
 
 	void initTranslations();
+	void initTheme();
 
-	void setDarkTheme(bool dark);
-	void setLanguage(QString preferredLang = QString());
+	void setDarkMode(bool dark);
+	void setThemeName(const QString &themeName);
+	void setLanguage(QString preferredLang);
 	void notifySettingsChanged();
 
 	void openUrl(QUrl url);
@@ -30,7 +32,10 @@ signals:
 	void eraserNear(bool near);
 
 protected:
-	bool event(QEvent *e);
+	bool event(QEvent *e) override;
+
+private:
+	void updateThemeIcons();
 
 	QList<QTranslator *> m_translators;
 	QString m_currentLang;

@@ -177,7 +177,7 @@ QWidget *BrushSettings::createUiWidget(QWidget *parent)
 
 	d->brushSlotButton[0]->setGroupPosition(widgets::GroupedToolButton::GroupLeft);
 	d->brushSlotButton[BRUSH_COUNT-1]->setGroupPosition(widgets::GroupedToolButton::GroupRight);
-	d->brushSlotButton[ERASER_SLOT]->setIcon(icon::fromTheme("draw-eraser"));
+	d->brushSlotButton[ERASER_SLOT]->setIcon(QIcon::fromTheme("draw-eraser"));
 
 	QWidget *widget = new QWidget(parent);
 	d->ui.setupUi(widget);

@@ -105,8 +105,6 @@ add_library(dpclient STATIC
 	utils/funstuff.h
 	utils/html.cpp
 	utils/html.h
-	utils/icon.cpp
-	utils/icon.h
 	utils/identicon.cpp
 	utils/identicon.h
 	utils/images.cpp

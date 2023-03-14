@@ -13,7 +13,6 @@
 #include "desktop/docks/titlewidget.h"
 #include "desktop/dialogs/layerproperties.h"
 #include "desktop/utils/dynamicui.h"
-#include "libclient/utils/icon.h"
 #include "libclient/net/envelopebuilder.h"
 
 #include "rustpile/rustpile.h"
@@ -106,7 +105,7 @@ void LayerList::setLayerEditActions(QAction *addLayer, QAction *addGroup, QActio
 	Q_ASSERT(titlebar);
 
 	m_lockButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::NotGrouped, titlebar);
-	m_lockButton->setIcon(icon::fromTheme("object-locked"));
+	m_lockButton->setIcon(QIcon::fromTheme("object-locked"));
 	m_lockButton->setCheckable(true);
 	m_lockButton->setPopupMode(QToolButton::InstantPopup);
 	// To make the edit action buttons centred

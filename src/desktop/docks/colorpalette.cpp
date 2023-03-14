@@ -10,7 +10,6 @@
 #include "desktop/utils/actionbuilder.h"
 #include "desktop/utils/dynamicui.h"
 #include "desktop/widgets/groupedtoolbutton.h"
-#include "libclient/utils/icon.h"
 #include "libshared/util/paths.h"
 
 #include <QEvent>
@@ -104,7 +103,7 @@ ColorPaletteDock::ColorPaletteDock(QWidget *parent)
 
 	d->readonlyPalette = new widgets::GroupedToolButton;
 	AUTO_TR(d->readonlyPalette, setToolTip, tr("Write protect"));
-	d->readonlyPalette->setIcon(icon::fromTheme("object-locked"));
+	d->readonlyPalette->setIcon(QIcon::fromTheme("object-locked"));
 	d->readonlyPalette->setCheckable(true);
 	connect(d->readonlyPalette, &QToolButton::clicked, [=](bool checked) {
 		int idx = d->paletteChoiceBox->currentIndex();
@@ -120,7 +119,7 @@ ColorPaletteDock::ColorPaletteDock(QWidget *parent)
 	titlebar->addSpace(space);
 
 	auto *menuButton = new widgets::GroupedToolButton;
-	menuButton->setIcon(icon::fromTheme("application-menu"));
+	menuButton->setIcon(QIcon::fromTheme("application-menu"));
 	menuButton->setPopupMode(QToolButton::InstantPopup);
 	menuButton->setMenu(MenuBuilder(this, tr)
 		.action([=](ActionBuilder action) {
