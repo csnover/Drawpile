@@ -388,7 +388,7 @@ endif()
 
 include(AddResources)
 add_resources(drawpile
-	FILES initialbrushpresets.db
+	FILES initialbrushpresets.db nightmode.colors
 	DIRS palettes sounds theme
 )
 
