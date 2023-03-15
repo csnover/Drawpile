@@ -31,21 +31,12 @@ static inline auto getMetric(QStyle::PixelMetric pm, const QStyleOptionViewItem 
 	return getStyle(option).pixelMetric(pm, &option, option.widget);
 }
 
-static QRect calcIconRect(const QStyleOptionViewItem &option)
-{
-	const auto iconSize = getMetric(QStyle::PM_ListViewIconSize, option);
-	QRect rect(option.rect);
-	rect.setSize({ iconSize, iconSize });
-	rect.translate({ 0, (option.rect.height() - iconSize) / 2 });
-	return rect;
-}
-
 void LayerListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	// Cannot really delegate to QItemDelegate at all because it is not possible
-	// to override the functions it uses
-
 	auto opt = setOptions(index, option);
+
+	painter->save();
+	painter->setRenderHint(QPainter::SmoothPixmapTransform);
 
 	// It is not possible to just set the flags of the model item to be disabled
 	// because then it will be unselectable, but it is desired to draw it in the
@@ -84,6 +75,15 @@ void LayerListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 	}
 
 	QItemDelegate::paint(painter, opt, index);
+
+	const auto margin = getMetric(QStyle::PM_ButtonMargin, opt);
+	auto rect = m_decorationRect;
+	rect.moveTo(opt.rect.x() + opt.rect.width() - rect.width() - margin, rect.y());
+	drawOpacity(painter, opt, rect, index.data(canvas::LayerListModel::OpacityRole).toFloat());
+
+	qDebug() << m_decorationRect << m_displayRect << m_opacityRect;
+
+	painter->restore();
 }
 
 bool LayerListDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
@@ -96,10 +96,13 @@ bool LayerListDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, co
 		if(me->button() != Qt::LeftButton) {
 			break;
 		}
-		if(calcIconRect(option).contains(me->pos())) {
+		const auto rgn = region(me->pos());
+		if(rgn == Region::Decoration) {
 			const auto &layer = index.data(canvas::LayerListModel::ItemRole).value<canvas::LayerListItem>();
 			emit toggleVisibility(layer.id, layer.hidden);
 			return true;
+		} else if(rgn == Region::Opacity) {
+			qDebug() << "in opacity";
 		} else if(type == QEvent::MouseButtonDblClick) {
 			emit editProperties(index);
 			return true;
@@ -120,6 +123,33 @@ QSize LayerListDelegate::sizeHint(const QStyleOptionViewItem &option, const QMod
 
 void LayerListDelegate::drawDecoration(QPainter *painter, const QStyleOptionViewItem &option, const QRect &rect, const QPixmap &pixmap) const
 {
+	drawIcon(painter, option, rect, pixmap);
+	m_decorationRect = rect;
+}
+
+void LayerListDelegate::drawDisplay(QPainter *painter, const QStyleOptionViewItem &option, const QRect &rect, const QString &text) const
+{
+	const auto iconWidth = getMetric(QStyle::PM_ListViewIconSize, option) + 2 * getMetric(QStyle::PM_ButtonMargin, option);
+	const auto textRect = rect.adjusted(0, 0, -iconWidth, 0);
+	QItemDelegate::drawDisplay(painter, option, textRect, text);
+
+	m_displayRect = textRect;
+}
+
+void LayerListDelegate::drawOpacity(QPainter *painter, const QStyleOptionViewItem &option, const QRect &rect, qreal opacity) const
+{
+	const auto icon = QIcon::fromTheme("view-visible");
+	const auto pixmap = icon.pixmap(icon.actualSize(option.decorationSize));
+
+	painter->save();
+	painter->setOpacity(opacity);
+	drawIcon(painter, option, rect, pixmap);
+	painter->restore();
+	m_opacityRect = rect;
+}
+
+void LayerListDelegate::drawIcon(QPainter *painter, const QStyleOptionViewItem &option, const QRect &rect, const QPixmap &pixmap) const
+{
 	auto cg = option.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
 
 	if (cg == QPalette::Normal && !(option.state & QStyle::State_Active))
@@ -127,10 +157,10 @@ void LayerListDelegate::drawDecoration(QPainter *painter, const QStyleOptionView
 
 	const auto fill = option.palette.color(cg, (option.state & QStyle::State_Selected) ? QPalette::HighlightedText : QPalette::Text);
 
-	// The hateful Qt CoreGraphics implementation does not work to composite
-	// the pixmap directly and will draw #ececec in all of the areas that are
-	// supposed to be transparent if the pixmap does not start filled with
-	// Qt::transparent for some reason. QTBUG-11142 kinda.
+	// An unknown issue in Qt on macOS causes the OS default window background
+	// colour to be drawn in the composited area if not rendered to a QPixmap
+	// that is initialised with a Qt::transparent fill for some reason.
+	// QTBUG-111936
 	auto icon = QPixmap(pixmap);
 	icon.fill(Qt::transparent);
 	{
@@ -143,10 +173,17 @@ void LayerListDelegate::drawDecoration(QPainter *painter, const QStyleOptionView
 	painter->drawPixmap(rect, icon);
 }
 
-void LayerListDelegate::drawDisplay(QPainter *painter, const QStyleOptionViewItem &option, const QRect &rect, const QString &text) const
+LayerListDelegate::Region LayerListDelegate::region(const QPoint &pos) const
 {
-	auto textRect = rect.adjusted(0, 0, -0, 0);
-	QItemDelegate::drawDisplay(painter, option, textRect, text);
+	if (m_decorationRect.contains(pos)) {
+		return Region::Decoration;
+	} else if (m_displayRect.contains(pos)) {
+		return Region::Text;
+	} else if (m_opacityRect.contains(pos)) {
+		return Region::Opacity;
+	} else {
+		return Region::None;
+	}
 }
 
 }

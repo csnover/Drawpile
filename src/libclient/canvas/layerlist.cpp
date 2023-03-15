@@ -63,6 +63,8 @@ QVariant LayerListModel::data(const QModelIndex &index, int role) const
 			|| (m_aclstate.isLayerLocked(item.id));
 	case IsGroupRole:
 		return item.group;
+	case OpacityRole:
+		return item.attributes.opacity;
 	case ItemRole:
 		return QVariant::fromValue(item);
 	default: {}

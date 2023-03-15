@@ -120,6 +120,7 @@ public:
 		IsDefaultRole,             // bool
 		IsLockedRole,              // bool
 		IsGroupRole,               // bool
+		OpacityRole,               // qreal
 		AttributesRole,            // canvas::LayerListItem::Attributes
 		ItemRole,                  // canvas::LayerListItem
 	};
