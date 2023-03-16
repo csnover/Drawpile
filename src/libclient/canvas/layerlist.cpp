@@ -47,6 +47,17 @@ QVariant LayerListModel::data(const QModelIndex &index, int role) const
 			return QIcon::fromTheme("folder");
 		else
 			return QIcon::fromTheme("layer-visible-on");
+	case Qt::ToolTipRole:
+		if (item.id == m_defaultLayer) {
+			return tr("Default layer");
+		}
+		break;
+	case DecorationToolTipRole:
+		if (item.hidden)
+			return tr("Invisible to you");
+		else if (item.attributes.censored)
+			return tr("Censored");
+		break;
 	case Qt::FontRole:
 		if (item.id == m_defaultLayer) {
 			auto font = QFont();
@@ -228,6 +239,23 @@ bool LayerListModel::setData(const QModelIndex &index, const QVariant &value, in
 				attrs.blend
 			);
 			emit dataChanged(index, index, { role, ItemRole });
+		}
+		return true;
+	}
+	case OpacityRole: {
+		const auto opacity = value.toFloat();
+		if (item.attributes.opacity != opacity) {
+			item.attributes.opacity = opacity;
+			rustpile::write_layerattr(
+				m_eb,
+				m_aclstate.localUserId(),
+				item.id,
+				0,
+				item.attributes.flags(),
+				item.attributes.intOpacity(),
+				item.attributes.blend
+			);
+			emit dataChanged(index, index, { role, AttributesRole, ItemRole });
 		}
 		return true;
 	}

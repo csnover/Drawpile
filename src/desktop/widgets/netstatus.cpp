@@ -172,7 +172,7 @@ NetStatus::NetStatus(QWidget *parent)
 		.addTo(m_security);
 
 	// Popup label
-	m_popup = new PopupMessage(this);
+	m_popup = new PopupMessage(6, this);
 
 	// Some styles are buggy and have bad tooltip colors, so we force the colors here.
 	QPalette popupPalette;

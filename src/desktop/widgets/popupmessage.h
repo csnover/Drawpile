@@ -20,7 +20,7 @@ class PopupMessage : public QWidget
 {
 	Q_OBJECT
 public:
-	PopupMessage(QWidget *parent);
+	PopupMessage(int maxLines, const QWidget *parent);
 
 	/**
 	 * @brief Pop up the message box and show a message
@@ -34,18 +34,18 @@ public:
 	void showMessage(const QPoint& point, const QString &message);
 
 protected:
-	//void resizeEvent(QResizeEvent *);
 	void paintEvent(QPaintEvent *);
 
 private:
 	void setMessage(const QString &message);
 	void redrawBubble();
 
+	int m_maxLines;
 	qreal m_arrowoffset;
 	QPainterPath m_bubble;
 	QTimer *m_timer;
 	QTextDocument *m_doc;
-	QWidget *m_parentWidget;
+	const QWidget *m_parentWidget;
 };
 
 }

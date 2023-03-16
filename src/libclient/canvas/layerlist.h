@@ -123,6 +123,7 @@ public:
 		OpacityRole,               // qreal
 		AttributesRole,            // canvas::LayerListItem::Attributes
 		ItemRole,                  // canvas::LayerListItem
+		DecorationToolTipRole,
 	};
 
 	LayerListModel(AclState &aclState, QObject *parent=nullptr);

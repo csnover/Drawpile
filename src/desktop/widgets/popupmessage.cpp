@@ -14,8 +14,13 @@
 
 namespace widgets {
 
-PopupMessage::PopupMessage(QWidget *parent)
-	: QWidget(nullptr, Qt::ToolTip | Qt::FramelessWindowHint), m_arrowoffset(0), m_timer(new QTimer(this)), m_doc(new QTextDocument(this)), m_parentWidget(parent)
+PopupMessage::PopupMessage(int maxLines, const QWidget *parent)
+	: QWidget(nullptr, Qt::ToolTip | Qt::FramelessWindowHint)
+	, m_maxLines(maxLines)
+	, m_arrowoffset(0)
+	, m_timer(new QTimer(this))
+	, m_doc(new QTextDocument(this))
+	, m_parentWidget(parent)
 {
 	setAttribute(Qt::WA_TranslucentBackground);
 	m_timer->setSingleShot(true);
@@ -30,9 +35,13 @@ PopupMessage::PopupMessage(QWidget *parent)
 
 void PopupMessage::setMessage(const QString &message)
 {
-	static const int MAX_LINES = 6;
 	if(!isVisible())
 		m_doc->clear();
+
+	if (m_maxLines == 1) {
+		m_doc->setHtml(message);
+		return;
+	}
 
 	QTextCursor cursor(m_doc);
 	cursor.movePosition(QTextCursor::End);
@@ -48,7 +57,7 @@ void PopupMessage::setMessage(const QString &message)
 	cursor.mergeCharFormat(fmt);
 
 	// Limit the number of lines
-	while(m_doc->lineCount() > MAX_LINES) {
+	while(m_doc->lineCount() > m_maxLines) {
 		cursor.movePosition(QTextCursor::Start);
 		cursor.select(QTextCursor::LineUnderCursor);
 		cursor.removeSelectedText();

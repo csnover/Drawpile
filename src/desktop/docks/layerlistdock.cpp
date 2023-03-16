@@ -63,6 +63,7 @@ LayerList::LayerList(QWidget *parent)
 	// Custom layer list item delegate
 	LayerListDelegate *del = new LayerListDelegate(this);
 	connect(del, &LayerListDelegate::toggleVisibility, this, &LayerList::setLayerVisibility);
+	connect(del, &LayerListDelegate::openEditor, m_view, QOverload<const QModelIndex &>::of(&QTreeView::edit));
 	connect(del, &LayerListDelegate::editProperties, this, &LayerList::showPropertiesOfIndex);
 	m_view->setItemDelegate(del);
 }
