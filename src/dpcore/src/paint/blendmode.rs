@@ -4,10 +4,11 @@
 use num_enum::IntoPrimitive;
 use num_enum::TryFromPrimitive;
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, IntoPrimitive, TryFromPrimitive)]
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq, IntoPrimitive, TryFromPrimitive)]
 #[repr(u8)]
 pub enum Blendmode {
     Erase = 0,
+    #[default]
     Normal,
     Multiply,
     Divide,
@@ -124,11 +125,5 @@ impl Blendmode {
                 return None;
             }
         })
-    }
-}
-
-impl Default for Blendmode {
-    fn default() -> Self {
-        Blendmode::Normal
     }
 }
