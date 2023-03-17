@@ -8,6 +8,7 @@
 
 #include <QDockWidget>
 
+class QActionGroup;
 class QModelIndex;
 class QItemSelection;
 class QMenu;
@@ -77,6 +78,8 @@ private slots:
 	void censorSelected(bool censor);
 	void setLayerVisibility(int layerId, bool visible);
 	void changeLayerAcl(bool lock, rustpile::Tier tier, QVector<uint8_t> exclusive);
+	void changeLayerBlendMode(QAction *action);
+	void changeDefaultLayer(bool on);
 
 	void lockStatusChanged(int layerId);
 	void selectionChanged(const QItemSelection &selected);
@@ -103,6 +106,8 @@ private:
 	bool m_noupdate;
 
 	QMenu *m_contextMenu;
+	QAction *m_defaultLayerAction;
+	QActionGroup *m_blendMenu;
 	LayerAclMenu *m_aclmenu;
 
 	widgets::GroupedToolButton *m_lockButton;

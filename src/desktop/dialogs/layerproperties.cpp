@@ -22,9 +22,10 @@ LayerProperties::LayerProperties(canvas::CanvasModel &canvas, QPersistentModelIn
 	, m_item(index)
 	, m_layerId(index.data(canvas::LayerListModel::IdRole).toInt())
 {
-	const auto modes = canvas::blendmode::layerModeNames();
+	namespace blendmode = canvas::blendmode;
+	const auto modes = blendmode::layerModeNames();
 	for(const auto &bm : modes) {
-		m_ui->blendMode->addItem(bm.second, int(bm.first));
+		m_ui->blendMode->addItem(blendmode::tr(bm.second), int(bm.first));
 	}
 
 	connect(m_ui->title, &QLineEdit::returnPressed, this, &QDialog::accept);

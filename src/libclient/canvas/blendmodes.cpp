@@ -152,6 +152,11 @@ static const BlendModeInfo BLEND_MODE[] = {
 
 static const int BLEND_MODES = sizeof(BLEND_MODE)/sizeof(BlendModeInfo);
 
+QString tr(const char *key, const char *disambiguation, int n)
+{
+	return QCoreApplication::translate("blendmode", key, disambiguation, n);
+}
+
 QString svgName(Blendmode mode)
 {
 	uintptr_t len;
@@ -174,12 +179,12 @@ QVector<QPair<rustpile::Blendmode, QString>> brushModeNames()
 	return list;
 }
 
-QVector<QPair<rustpile::Blendmode, QString>> layerModeNames()
+QVector<QPair<rustpile::Blendmode, const char *>> layerModeNames()
 {
-	QVector<QPair<rustpile::Blendmode, QString>> list;
+	QVector<QPair<rustpile::Blendmode, const char *>> list;
 	for(int i=0;i<BLEND_MODES;++i) {
 		if((BLEND_MODE[i].flags & LayerMode))
-			list << QPair<rustpile::Blendmode, QString>{BLEND_MODE[i].id, QCoreApplication::translate("blendmode", BLEND_MODE[i].name)};
+			list << QPair<rustpile::Blendmode, const char *>{BLEND_MODE[i].id, BLEND_MODE[i].name};
 	}
 	return list;
 }

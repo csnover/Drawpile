@@ -22,6 +22,7 @@ LayerAclMenu::LayerAclMenu(QWidget *parent)
 	m_users->setExclusive(false);
 
 	MenuBuilder(this, tr)
+		.title(QT_TR_NOOP("User access"))
 		.action([=](ActionBuilder action) {
 			m_lock = action
 				.text(QT_TR_NOOP("Lock this layer"))

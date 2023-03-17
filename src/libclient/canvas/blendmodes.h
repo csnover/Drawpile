@@ -14,6 +14,8 @@ namespace rustpile {
 
 namespace canvas {
 namespace blendmode {
+	QString tr(const char *key, const char *disambiguation = nullptr, int n = -1);
+
 	//! Get the SVG name for the given blend mode
 	QString svgName(rustpile::Blendmode mode);
 
@@ -24,7 +26,7 @@ namespace blendmode {
 	QVector<QPair<rustpile::Blendmode, QString>> brushModeNames();
 
 	//! Get a list of (layer) blend modes and their translated names
-	QVector<QPair<rustpile::Blendmode, QString>> layerModeNames();
+	QVector<QPair<rustpile::Blendmode, const char *>> layerModeNames();
 }
 }
 

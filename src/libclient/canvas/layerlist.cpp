@@ -74,6 +74,8 @@ QVariant LayerListModel::data(const QModelIndex &index, int role) const
 			|| (m_aclstate.isLayerLocked(item.id));
 	case IsGroupRole:
 		return item.group;
+	case BlendModeRole:
+		return int(item.attributes.blend);
 	case OpacityRole:
 		return item.attributes.opacity;
 	case ItemRole:
@@ -239,6 +241,22 @@ bool LayerListModel::setData(const QModelIndex &index, const QVariant &value, in
 				attrs.blend
 			);
 			emit dataChanged(index, index, { role, ItemRole });
+		}
+		return true;
+	}
+	case BlendModeRole: {
+		const auto blend = rustpile::Blendmode(value.toInt());
+		if (item.attributes.blend != blend) {
+			rustpile::write_layerattr(
+				m_eb,
+				m_aclstate.localUserId(),
+				item.id,
+				0,
+				item.attributes.flags(),
+				item.attributes.intOpacity(),
+				blend
+			);
+			emit dataChanged(index, index, { role, AttributesRole, ItemRole });
 		}
 		return true;
 	}

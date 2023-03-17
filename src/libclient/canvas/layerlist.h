@@ -121,6 +121,7 @@ public:
 		IsLockedRole,              // bool
 		IsGroupRole,               // bool
 		OpacityRole,               // qreal
+		BlendModeRole,             // int
 		AttributesRole,            // canvas::LayerListItem::Attributes
 		ItemRole,                  // canvas::LayerListItem
 		DecorationToolTipRole,

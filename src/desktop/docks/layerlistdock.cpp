@@ -3,6 +3,7 @@
 
 #include "desktop/widgets/groupedtoolbutton.h"
 #include "libclient/canvas/acl.h"
+#include "libclient/canvas/blendmodes.h"
 #include "libclient/canvas/layerlist.h"
 #include "libclient/canvas/canvasmodel.h"
 #include "libclient/canvas/userlist.h"
@@ -12,6 +13,7 @@
 #include "desktop/docks/layeraclmenu.h"
 #include "desktop/docks/titlewidget.h"
 #include "desktop/dialogs/layerproperties.h"
+#include "desktop/utils/actionbuilder.h"
 #include "desktop/utils/dynamicui.h"
 #include "libclient/net/envelopebuilder.h"
 
@@ -154,6 +156,31 @@ void LayerList::setLayerEditActions(QAction *addLayer, QAction *addGroup, QActio
 	m_contextMenu->addAction(m_duplicateLayerAction);
 	m_contextMenu->addAction(m_mergeLayerAction);
 	m_contextMenu->addAction(m_deleteLayerAction);
+	m_contextMenu->addSeparator();
+	m_contextMenu->addMenu(m_aclmenu);
+
+	m_blendMenu = new QActionGroup(this);
+	connect(m_blendMenu, &QActionGroup::triggered, this, &LayerList::changeLayerBlendMode);
+
+	auto blendMenu = MenuBuilder(this, canvas::blendmode::tr)
+		.title(QT_TR_NOOP("Blend mode"));
+	for (const auto &mode : canvas::blendmode::layerModeNames()) {
+		blendMenu.action([=](ActionBuilder action) {
+			action.text(mode.second)
+				.property("blendmode", int(mode.first))
+				.checkable()
+				.addTo(m_blendMenu);
+		});
+	}
+	m_contextMenu->addMenu(blendMenu);
+
+	m_contextMenu->addSeparator();
+
+	m_defaultLayerAction = ActionBuilder(this, tr)
+		.text(QT_TR_NOOP("Default"))
+		.checkable()
+		.onTriggered(this, &LayerList::changeDefaultLayer);
+	m_contextMenu->addAction(m_defaultLayerAction);
 
 	// Action functionality
 	connect(m_addLayerAction, &QAction::triggered, this, &LayerList::addLayer);
@@ -177,6 +204,31 @@ void LayerList::onFeatureAccessChange(canvas::Feature feature, bool canUse)
 			updateLockedControls();
 		default: break;
 	}
+}
+
+void LayerList::changeDefaultLayer(bool on)
+{
+	const QModelIndex index = currentSelection();
+	if(!index.isValid())
+		return;
+
+	auto *layers = m_canvas->layerlist();
+	Q_ASSERT(layers);
+	layers->setDefaultLayer(on ? index.data(canvas::LayerListModel::IdRole).toInt() : 0);
+	layers->submit();
+}
+
+void LayerList::changeLayerBlendMode(QAction *action)
+{
+	const QModelIndex index = currentSelection();
+	if(!index.isValid())
+		return;
+
+	auto *layers = m_canvas->layerlist();
+	Q_ASSERT(layers);
+	const auto mode = action->property("blendmode").toInt();
+	layers->setData(index, mode, canvas::LayerListModel::BlendModeRole);
+	layers->submit();
 }
 
 void LayerList::updateLockedControls()
@@ -422,8 +474,14 @@ void LayerList::updateUiFromSelection()
 	const canvas::LayerListItem &layer = currentSelection().data(canvas::LayerListModel::ItemRole).value<canvas::LayerListItem>();
 	m_noupdate = true;
 	m_selectedId = layer.id;
-
+	m_defaultLayerAction->setChecked(m_canvas->layerlist()->defaultLayer() == layer.id);
 	m_aclmenu->setCensored(layer.attributes.censored);
+	for (auto *action : m_blendMenu->actions()) {
+		if (action->property("blendmode").toInt() == int(layer.attributes.blend)) {
+			action->setChecked(true);
+			break;
+		}
+	}
 
 	lockStatusChanged(layer.id);
 	updateLockedControls();
