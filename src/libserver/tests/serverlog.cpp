@@ -10,7 +10,7 @@ using server::ServerLog;
 using server::ServerLogQuery;
 using server::InMemoryLog;
 
-class TestServerLog: public QObject
+class TestServerLog final : public QObject
 {
 	Q_OBJECT
 private slots:

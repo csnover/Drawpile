@@ -13,7 +13,7 @@ namespace tools {
 /**
  * @brief Annotation tool
  */
-class Annotation : public Tool {
+class Annotation final : public Tool {
 public:
 	Annotation(ToolController &owner);
 

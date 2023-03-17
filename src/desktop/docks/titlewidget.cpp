@@ -24,7 +24,7 @@ namespace docks {
  *
  * This is a modified version of Qt's internal QDockWidgetTitleButton.
  */
-class TitleWidget::Button : public QAbstractButton
+class TitleWidget::Button final : public QAbstractButton
 {
 public:
 	Button(const QIcon &icon, QWidget *parent);

@@ -12,13 +12,13 @@ class Ui_NetStats;
 
 namespace dialogs {
 
-class NetStats : public DynamicUiWidget<QDialog, Ui_NetStats>
+class NetStats final : public DynamicUiWidget<QDialog, Ui_NetStats>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
-	explicit NetStats(QWidget *parent = 0);
-	~NetStats();
+	explicit NetStats(QWidget *parent = nullptr);
+	~NetStats() override;
 
 public slots:
 	void setSentBytes(int bytes);

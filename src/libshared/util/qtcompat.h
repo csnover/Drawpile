@@ -62,6 +62,11 @@ inline auto metaTypeFromVariant(const QVariant &variant) {
 inline auto stringSlice(const QString &str, qsizetype position) {
 	return QStringView(str).sliced(position);
 }
+
+template <typename T>
+inline T cast(T value) {
+	return value;
+}
 #else
 #define Q_MOC_INCLUDE(moc)
 
@@ -91,6 +96,11 @@ inline auto metaTypeFromVariant(const QVariant &variant) {
 
 inline auto stringSlice(const QString &str, int position) {
 	return str.midRef(position);
+}
+
+template <typename T, typename U>
+inline auto cast(U value) {
+	return static_cast<T>(value);
 }
 #endif
 

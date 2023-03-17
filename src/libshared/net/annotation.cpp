@@ -11,7 +11,7 @@ namespace protocol {
 AnnotationCreate *AnnotationCreate::deserialize(uint8_t ctx, const uchar *data, uint len)
 {
 	if(len!=14)
-		return 0;
+		return nullptr;
 	return new AnnotationCreate(
 		ctx,
 		qFromBigEndian<quint16>(data+0),
@@ -69,7 +69,7 @@ int AnnotationReshape::payloadLength() const
 AnnotationReshape *AnnotationReshape::deserialize(uint8_t ctx, const uchar *data, uint len)
 {
 	if(len!=14)
-		return 0;
+		return nullptr;
 	return new AnnotationReshape(
 		ctx,
 		qFromBigEndian<quint16>(data+0),
@@ -117,7 +117,7 @@ AnnotationReshape *AnnotationReshape::fromText(uint8_t ctx, const Kwargs &kwargs
 AnnotationEdit *AnnotationEdit::deserialize(uint8_t ctx, const uchar *data, uint len)
 {
 	if(len < 8)
-		return 0;
+		return nullptr;
 
 	return new AnnotationEdit(
 		ctx,
@@ -125,7 +125,7 @@ AnnotationEdit *AnnotationEdit::deserialize(uint8_t ctx, const uchar *data, uint
 		qFromBigEndian<quint32>(data+2),
 		*(data+6),
 		*(data+7),
-		QByteArray((const char*)data+8, len-8)
+		QByteArray(reinterpret_cast<const char*>(data)+8, len-8)
 	);
 }
 
@@ -185,7 +185,7 @@ AnnotationEdit *AnnotationEdit::fromText(uint8_t ctx, const Kwargs &kwargs)
 AnnotationDelete *AnnotationDelete::deserialize(uint8_t ctx, const uchar *data, uint len)
 {
 	if(len != 2)
-		return 0;
+		return nullptr;
 	return new AnnotationDelete(ctx, qFromBigEndian<quint16>(data));
 }
 

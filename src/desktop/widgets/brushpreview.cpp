@@ -130,9 +130,9 @@ void BrushPreview::updatePreview()
 
 	QPainter p(&m_preview);
 	p.drawTiledPixmap(0, 0, m_preview.width(), m_preview.height(), m_background);
-	rustpile::brushpreview_paint(m_previewcanvas, &p, [](void *p, int x, int y, const uchar *pixels) {
+	rustpile::brushpreview_paint(m_previewcanvas, &p, [](void *painter, int x, int y, const uchar *pixels) {
 		const QImage img(pixels, 64, 64, 64*4, QImage::Format_ARGB32_Premultiplied);
-		static_cast<QPainter*>(p)->drawImage(x, y, img);
+		static_cast<QPainter*>(painter)->drawImage(x, y, img);
 	});
 
 #endif

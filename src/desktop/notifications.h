@@ -17,8 +17,6 @@ enum class Event {
 
 void playSound(Event event);
 
-void setVolume(int volume);
-
 }
 
 #endif // NOTIFICATIONS_H

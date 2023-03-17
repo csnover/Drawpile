@@ -17,12 +17,12 @@ namespace net {
 
 namespace widgets {
 
-class TimelineWidget : public QWidget
+class TimelineWidget final : public QWidget
 {
 	Q_OBJECT
 public:
 	explicit TimelineWidget(QWidget *parent = nullptr);
-	~TimelineWidget();
+	~TimelineWidget() override;
 
 	void setModel(canvas::TimelineModel *model);
 	void setCurrentFrame(int frame);
@@ -39,11 +39,11 @@ signals:
 	void selectFrameRequest(int frame, int layerId);
 
 protected:
-	void paintEvent(QPaintEvent *);
-	void mousePressEvent(QMouseEvent *event);
-	void mouseDoubleClickEvent(QMouseEvent *event);
-	void resizeEvent(QResizeEvent *event);
-	void wheelEvent(QWheelEvent *event);
+	void paintEvent(QPaintEvent *) override;
+	void mousePressEvent(QMouseEvent *event) override;
+	void mouseDoubleClickEvent(QMouseEvent *event) override;
+	void resizeEvent(QResizeEvent *event) override;
+	void wheelEvent(QWheelEvent *event) override;
 
 private slots:
 	void setHorizontalScroll(int pos);

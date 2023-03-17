@@ -17,13 +17,13 @@ namespace dialogs {
  * The "new drawing" dialog allows the user to set the width, height
  * and background color of a new image.
  */
-class NewDialog : public DynamicUiWidget<QDialog, Ui_NewDialog>
+class NewDialog final : public DynamicUiWidget<QDialog, Ui_NewDialog>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	NewDialog(QWidget *parent=nullptr);
-	~NewDialog();
+	~NewDialog() override;
 
 	//! Set the width/height fields
 	void setSize(const QSize &size);

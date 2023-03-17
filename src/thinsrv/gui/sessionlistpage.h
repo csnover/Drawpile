@@ -8,8 +8,9 @@
 
 #include <QWidget>
 #include <QApplication>
+#include <memory>
 
-namespace  server {
+namespace server {
 
 struct JsonApiResult;
 
@@ -17,23 +18,22 @@ namespace gui {
 
 class SessionListModel;
 
-class SessionListPage : public QWidget
+class SessionListPage final : public QWidget
 {
 	Q_OBJECT
 public:
-	struct Private;
-
 	explicit SessionListPage(Server *server, QWidget *parent=nullptr);
-	~SessionListPage();
+	~SessionListPage() override;
 
 private slots:
 	void sendMessageToAll();
 
 private:
-	Private *d;
+	struct Private;
+	const std::unique_ptr<Private> d;
 };
 
-class SessionListPageFactory : public PageFactory
+class SessionListPageFactory final : public PageFactory
 {
 public:
 	QString pageId() const override { return QStringLiteral("sessionlist"); }

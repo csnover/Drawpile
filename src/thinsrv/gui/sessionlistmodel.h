@@ -9,7 +9,7 @@
 namespace server {
 namespace gui {
 
-class SessionListModel : public JsonListModel
+class SessionListModel final : public JsonListModel
 {
 	Q_OBJECT
 public:

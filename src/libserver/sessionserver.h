@@ -25,7 +25,7 @@ class TemplateLoader;
  * @brief Session manager
  *
  */
-class SessionServer : public QObject, public Sessions {
+class SessionServer final : public QObject, public Sessions {
 Q_OBJECT
 public:
 	SessionServer(ServerConfig *config, QObject *parent=nullptr);

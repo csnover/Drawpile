@@ -40,4 +40,6 @@ public:
 }
 }
 
+Q_DECLARE_METATYPE(server::gui::PageFactory*)
+
 #endif

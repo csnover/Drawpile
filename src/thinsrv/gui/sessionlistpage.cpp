@@ -57,7 +57,6 @@ SessionListPage::SessionListPage(Server *server, QWidget *parent)
 
 SessionListPage::~SessionListPage()
 {
-	delete d;
 }
 
 void SessionListPage::sendMessageToAll()

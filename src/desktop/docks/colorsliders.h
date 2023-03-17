@@ -13,11 +13,11 @@ namespace color_widgets {
 
 namespace docks {
 
-class ColorSliderDock : public QDockWidget {
+class ColorSliderDock final : public QDockWidget {
 	Q_OBJECT
 public:
 	ColorSliderDock(QWidget *parent);
-	~ColorSliderDock();
+	~ColorSliderDock() override;
 
 public slots:
 	void setColor(const QColor& color);

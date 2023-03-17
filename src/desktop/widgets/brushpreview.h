@@ -22,13 +22,13 @@ namespace widgets {
 /**
  * @brief Brush previewing widget
  */
-class QDESIGNER_WIDGET_EXPORT BrushPreview : public QFrame {
+class QDESIGNER_WIDGET_EXPORT BrushPreview final : public QFrame {
 	Q_OBJECT
 public:
 	enum PreviewShape {Stroke, Line, Rectangle, Ellipse, FloodFill, FloodErase};
 
 	explicit BrushPreview(QWidget *parent=nullptr, Qt::WindowFlags f=Qt::WindowFlags());
-	~BrushPreview();
+	~BrushPreview() override;
 
 	//! Set preview shape
 	void setPreviewShape(rustpile::BrushPreviewShape shape);
@@ -55,10 +55,10 @@ signals:
 	void requestColorChange();
 
 protected:
-	void paintEvent(QPaintEvent *event);
-	void resizeEvent(QResizeEvent *);
-	void changeEvent(QEvent *event);
-	void mouseDoubleClickEvent(QMouseEvent*);
+	void paintEvent(QPaintEvent *event) override;
+	void resizeEvent(QResizeEvent *) override;
+	void changeEvent(QEvent *event) override;
+	void mouseDoubleClickEvent(QMouseEvent*) override;
 
 private:
 	void updatePreview();

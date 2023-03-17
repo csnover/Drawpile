@@ -3,6 +3,7 @@
 
 #include "libclient/net/servercmd.h"
 #include "libclient/net/envelopebuilder.h"
+#include "libshared/util/qtcompat.h"
 #include "rustpile/rustpile.h"
 
 namespace net {
@@ -62,7 +63,7 @@ Envelope ServerCommand::toEnvelope() const
 		qWarning(
 			"ServerCommand::toEnvelope(%s) produced a message that is too long! (%lld bytes)",
 			qPrintable(cmd),
-			static_cast<long long>(payload.length())
+			compat::cast<long long>(payload.length())
 		);
 		return Envelope();
 	}

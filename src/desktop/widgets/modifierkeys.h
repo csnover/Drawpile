@@ -16,7 +16,7 @@ class QAbstractButton;
 
 namespace widgets {
 
-class QDESIGNER_WIDGET_EXPORT ModifierKeys : public QWidget
+class QDESIGNER_WIDGET_EXPORT ModifierKeys final : public QWidget
 {
 	Q_OBJECT
 	Q_PROPERTY(Qt::KeyboardModifiers modifiers READ modifiers WRITE setModifiers)

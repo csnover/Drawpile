@@ -35,7 +35,7 @@ void Freehand::begin(const canvas::Point& point, bool right, float zoom)
 	m_firstPoint = true;
 	m_lastTimestamp = QDateTime::currentMSecsSinceEpoch();
 
-	owner.setBrushEngineBrush(m_brushengine);
+	m_owner.setBrushEngineBrush(m_brushengine);
 
 	// The pressure value of the first point is unreliable
 	// because it is (or was?) possible to get a synthetic MousePress event
@@ -55,7 +55,7 @@ void Freehand::motion(const canvas::Point& point, bool constrain, bool center)
 	if(m_firstPoint) {
 		m_firstPoint = false;
 
-		rustpile::write_undopoint(writer, owner.client()->myId());
+		rustpile::write_undopoint(writer, m_owner.client()->myId());
 
 		rustpile::brushengine_stroke_to(
 			m_brushengine,
@@ -63,8 +63,8 @@ void Freehand::motion(const canvas::Point& point, bool constrain, bool center)
 			m_start.y(),
 			qMin(m_start.pressure(), point.pressure()),
 			0,
-			owner.model()->paintEngine()->engine(),
-			owner.activeLayer()
+			m_owner.model()->paintEngine()->engine(),
+			m_owner.activeLayer()
 		);
 	}
 
@@ -78,13 +78,13 @@ void Freehand::motion(const canvas::Point& point, bool constrain, bool center)
 		point.y(),
 		point.pressure(),
 		deltaMsec,
-		owner.model()->paintEngine()->engine(),
-		owner.activeLayer()
+		m_owner.model()->paintEngine()->engine(),
+		m_owner.activeLayer()
 	);
 
-	rustpile::brushengine_write_dabs(m_brushengine, owner.client()->myId(), writer);
+	rustpile::brushengine_write_dabs(m_brushengine, m_owner.client()->myId(), writer);
 
-	owner.client()->sendEnvelope(writer.toEnvelope());
+	m_owner.client()->sendEnvelope(writer.toEnvelope());
 }
 
 void Freehand::end()
@@ -97,7 +97,7 @@ void Freehand::end()
 		if(m_firstPoint) {
 			m_firstPoint = false;
 
-			rustpile::write_undopoint(writer, owner.client()->myId());
+			rustpile::write_undopoint(writer, m_owner.client()->myId());
 
 			rustpile::brushengine_stroke_to(
 				m_brushengine,
@@ -111,10 +111,10 @@ void Freehand::end()
 		}
 
 		rustpile::brushengine_end_stroke(m_brushengine);
-		rustpile::brushengine_write_dabs(m_brushengine, owner.client()->myId(), writer);
-		rustpile::write_penup(writer, owner.client()->myId());
+		rustpile::brushengine_write_dabs(m_brushengine, m_owner.client()->myId(), writer);
+		rustpile::write_penup(writer, m_owner.client()->myId());
 
-		owner.client()->sendEnvelope(writer.toEnvelope());
+		m_owner.client()->sendEnvelope(writer.toEnvelope());
 	}
 }
 

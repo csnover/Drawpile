@@ -13,13 +13,13 @@ class Ui_AbuseReportDialog;
 
 namespace dialogs {
 
-class AbuseReportDialog : public DynamicUiWidget<QDialog, Ui_AbuseReportDialog>
+class AbuseReportDialog final : public DynamicUiWidget<QDialog, Ui_AbuseReportDialog>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	explicit AbuseReportDialog(QWidget *parent=nullptr);
-	~AbuseReportDialog();
+	~AbuseReportDialog() override;
 
 	/**
 	 * @brief Set the info about the session

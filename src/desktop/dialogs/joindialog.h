@@ -15,13 +15,13 @@ class SessionFilterProxyModel;
 
 namespace dialogs {
 
-class JoinDialog : public DynamicUiWidget<QDialog, Ui_JoinDialog>
+class JoinDialog final : public DynamicUiWidget<QDialog, Ui_JoinDialog>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	explicit JoinDialog(const QUrl &defaultUrl, QWidget *parent=nullptr);
-	~JoinDialog();
+	~JoinDialog() override;
 
 	//! Get the host address
 	QString getAddress() const;

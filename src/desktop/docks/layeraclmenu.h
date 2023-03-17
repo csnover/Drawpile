@@ -18,7 +18,7 @@ class QWidget;
 
 namespace docks {
 
-class LayerAclMenu : public QMenu
+class LayerAclMenu final : public QMenu
 {
 	Q_OBJECT
 public:
@@ -46,7 +46,7 @@ signals:
 	void layerCensoredChange(bool censor);
 
 protected:
-	void showEvent(QShowEvent *e);
+	void showEvent(QShowEvent *e) override;
 
 private slots:
 	void userClicked(QAction *useraction);

@@ -23,13 +23,13 @@ namespace canvas { class CanvasModel; }
 
 namespace dialogs {
 
-class SessionSettingsDialog : public DynamicUiWidget<QDialog, Ui_SessionSettingsDialog>
+class SessionSettingsDialog final : public DynamicUiWidget<QDialog, Ui_SessionSettingsDialog>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	SessionSettingsDialog(Document *doc, QWidget *parent=nullptr);
-	~SessionSettingsDialog();
+	~SessionSettingsDialog() override;
 
 	//! Is persistence available at all on this server?
 	void setPersistenceEnabled(bool);

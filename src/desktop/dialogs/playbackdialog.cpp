@@ -204,8 +204,8 @@ void PlaybackDialog::loadIndex()
 			return QImage();
 
 		} else {
-			const QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataptr), len);
-			return QImage::fromData(data, "PNG");
+			const QByteArray pngData = QByteArray::fromRawData(reinterpret_cast<const char*>(dataptr), len);
+			return QImage::fromData(pngData, "PNG");
 		}
 	});
 
@@ -214,7 +214,7 @@ void PlaybackDialog::loadIndex()
 
 void PlaybackDialog::centerOnParent()
 {
-	if(parentWidget() != 0) {
+	if(parentWidget()) {
 		QRect parentG = parentWidget()->geometry();
 		QRect myG = geometry();
 

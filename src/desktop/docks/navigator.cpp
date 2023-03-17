@@ -202,12 +202,12 @@ void NavigatorView::paintEvent(QPaintEvent *)
 	if(m_cache.isNull())
 		return;
 
-	const QSize s = m_cache.size().scaled(size(), Qt::KeepAspectRatio);
+	const QSize scaledSize = m_cache.size().scaled(size(), Qt::KeepAspectRatio);
 	const QRect canvasRect {
-		width()/2 - s.width()/2,
-		height()/2 - s.height()/2,
-		s.width(),
-		s.height()
+		width()/2 - scaledSize.width()/2,
+		height()/2 - scaledSize.height()/2,
+		scaledSize.width(),
+		scaledSize.height()
 	};
 	painter.drawPixmap(canvasRect, m_cache);
 
@@ -220,8 +220,8 @@ void NavigatorView::paintEvent(QPaintEvent *)
 	painter.setPen(pen);
 	painter.setCompositionMode(QPainter::RasterOp_SourceXorDestination);
 
-	const qreal xscale = s.width() / qreal(canvasSize.width());
-	const qreal yscale = s.height() / qreal(canvasSize.height());
+	const qreal xscale = scaledSize.width() / qreal(canvasSize.width());
+	const qreal yscale = scaledSize.height() / qreal(canvasSize.height());
 	painter.translate(canvasRect.topLeft());
 	painter.scale(xscale, yscale);
 	painter.drawPolygon(m_focusRect);

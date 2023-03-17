@@ -16,7 +16,7 @@ namespace widgets {
 class GroupedToolButton;
 class KisAngleGauge;
 
-class ViewStatus : public QWidget
+class ViewStatus final : public QWidget
 {
 	Q_OBJECT
 public:

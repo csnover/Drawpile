@@ -180,7 +180,7 @@ void Selection::adjustGeometryScale(const QPoint &delta, bool keepAspect)
 		case Handle::Center: adjustTranslation(delta); return;
 		case Handle::BottomRight:
 			swap = true;
-			// fall through
+			Q_FALLTHROUGH();
 		case Handle::TopLeft:
 			handle = bounds.topLeft();
 			anchor = bounds.bottomRight();
@@ -189,7 +189,7 @@ void Selection::adjustGeometryScale(const QPoint &delta, bool keepAspect)
 			break;
 		case Handle::BottomLeft:
 			swap = true;
-			// fall through
+			Q_FALLTHROUGH();
 		case Handle::TopRight:
 			handle = bounds.topRight();
 			anchor = bounds.bottomLeft();
@@ -198,7 +198,7 @@ void Selection::adjustGeometryScale(const QPoint &delta, bool keepAspect)
 			break;
 		case Handle::Bottom:
 			swap = true;
-			// fall through
+			Q_FALLTHROUGH();
 		case Handle::Top:
 			handle = QPointF(bounds.left() + bounds.width() / 2, bounds.top());
 			anchor = handle + QPointF(0, bounds.height());
@@ -208,14 +208,13 @@ void Selection::adjustGeometryScale(const QPoint &delta, bool keepAspect)
 			break;
 		case Handle::Right:
 			swap = true;
-			// fall through
+			Q_FALLTHROUGH();
 		case Handle::Left:
 			handle = QPointF(bounds.left(), bounds.top() + bounds.height() / 2);
 			anchor = handle + QPointF(bounds.width(), 0);
 			top = 1;
 			left = 1;
 			bottom = -1;
-			break;
 		}
 
 		if(swap) {

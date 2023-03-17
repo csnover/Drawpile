@@ -28,7 +28,7 @@ namespace widgets {
  * the drawing board and handes user input.
  * It also provides other features, such as brush outline preview.
  */
-class CanvasView : public QGraphicsView
+class CanvasView final : public QGraphicsView
 {
 	Q_OBJECT
 public:

@@ -429,7 +429,7 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	HotBorderEventFilter *hbfilter = new HotBorderEventFilter(this);
 	m_view->installEventFilter(hbfilter);
 	for(QObject *c : children()) {
-		QToolBar *tb = dynamic_cast<QToolBar*>(c);
+		QToolBar *tb = qobject_cast<QToolBar*>(c);
 		if(tb)
 			tb->installEventFilter(hbfilter);
 	}
@@ -1419,9 +1419,9 @@ void MainWindow::join(const QUrl &url)
 	showJoinDialog(this, url);
 }
 
-void MainWindow::showJoinDialog(MainWindow *parent, const QUrl &url)
+void MainWindow::showJoinDialog(MainWindow *parent, const QUrl &initialUrl)
 {
-	auto dlg = new dialogs::JoinDialog(url, parent);
+	auto dlg = new dialogs::JoinDialog(initialUrl, parent);
 	connect(dlg, &dialogs::JoinDialog::finished, [=](int i) {
 		if(i == QDialog::Accepted) {
 			QUrl url = dlg->getUrl();

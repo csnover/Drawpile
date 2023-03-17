@@ -8,6 +8,7 @@
 #include "libclient/canvas/paintengine.h"
 #include "libclient/net/client.h"
 #include "libclient/net/envelopebuilder.h"
+#include "libshared/util/qtcompat.h"
 
 #include <QGuiApplication>
 #include <QPixmap>
@@ -25,23 +26,23 @@ void FloodFill::begin(const canvas::Point &point, bool right, float zoom)
 {
 	Q_UNUSED(zoom);
 	Q_UNUSED(right);
-	const QColor color = owner.activeBrush().qColor();
+	const QColor color = m_owner.activeBrush().qColor();
 
 	QGuiApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
 	net::EnvelopeBuilder writer;
 
 	if(rustpile::paintengine_floodfill(
-		owner.model()->paintEngine()->engine(),
+		m_owner.model()->paintEngine()->engine(),
 		writer,
-		owner.model()->localUserId(),
-		owner.activeLayer(),
+		m_owner.model()->localUserId(),
+		m_owner.activeLayer(),
 		point.x(),
 		point.y(),
 		rustpile::Color {
-			static_cast<float>(color.redF()),
-			static_cast<float>(color.greenF()),
-			static_cast<float>(color.blueF()),
+			compat::cast<float>(color.redF()),
+			compat::cast<float>(color.greenF()),
+			compat::cast<float>(color.blueF()),
 			m_eraseMode ? 0.0f : 1.0f,
 		},
 		m_tolerance,
@@ -50,7 +51,7 @@ void FloodFill::begin(const canvas::Point &point, bool right, float zoom)
 		m_expansion,
 		m_underFill
 	)) {
-		owner.client()->sendEnvelope(writer.toEnvelope());
+		m_owner.client()->sendEnvelope(writer.toEnvelope());
 	}
 
 	QGuiApplication::restoreOverrideCursor();

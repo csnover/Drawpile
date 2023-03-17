@@ -20,13 +20,13 @@ struct ResizeVector {
 	}
 };
 
-class ResizeDialog : public DynamicUiWidget<QDialog, Ui_ResizeDialog>
+class ResizeDialog final : public DynamicUiWidget<QDialog, Ui_ResizeDialog>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	explicit ResizeDialog(const QSize &oldsize, QWidget *parent=nullptr);
-	~ResizeDialog();
+	~ResizeDialog() override;
 
 	void setPreviewImage(const QImage &image);
 	void setBounds(const QRect &rect);

@@ -61,7 +61,6 @@ ServerLogPage::ServerLogPage(Server *server, QWidget *parent)
 
 ServerLogPage::~ServerLogPage()
 {
-	delete d;
 }
 
 void ServerLogPage::handleResponse(const QString &requestId, const JsonApiResult &result)

@@ -3,6 +3,7 @@
 
 #include "libclient/brushes/brush.h"
 #include "libclient/canvas/blendmodes.h"
+#include "libshared/util/qtcompat.h"
 
 #include <cmath>
 #include <mypaint-brush.h>
@@ -15,7 +16,7 @@ namespace {
 
 void setRustpileColorToQColor(rustpile::Color &r, const QColor &q)
 {
-	r = {float(q.redF()), float(q.greenF()), float(q.blueF()), float(q.alphaF())};
+	r = {compat::cast<float>(q.redF()), compat::cast<float>(q.greenF()), compat::cast<float>(q.blueF()), compat::cast<float>(q.alphaF())};
 }
 
 QColor rustpileColorToQColor(const rustpile::Color &color)
@@ -251,7 +252,7 @@ QColor MyPaintBrush::qColor() const
 
 QJsonObject MyPaintBrush::toJson() const
 {
-	QJsonValue mapping;
+	QJsonValue jsonMapping;
 	if(m_settings) {
 		QJsonObject o;
 		for (int i = 0; i < MYPAINT_BRUSH_SETTINGS_COUNT; ++i) {
@@ -279,7 +280,7 @@ QJsonObject MyPaintBrush::toJson() const
 				{"inputs", inputs},
 			};
 		}
-		mapping = o;
+		jsonMapping = o;
 	}
 
 	return QJsonObject {
@@ -288,7 +289,7 @@ QJsonObject MyPaintBrush::toJson() const
 		{"settings", QJsonObject {
 			{"lock_alpha", m_brush.lock_alpha},
 			{"erase", m_brush.erase},
-			{"mapping", mapping},
+			{"mapping", jsonMapping},
 		}},
 	};
 }

@@ -94,7 +94,11 @@ public:
 	static const int HEADER_LEN = 4;
 
 	Message(MessageType type, uint8_t ctx): m_type(type), _undone(DONE), m_refcount(0), m_contextid(ctx) {}
-	virtual ~Message() {}
+	Message(Message &other) = delete;
+	Message(Message &&other) = delete;
+	Message &operator=(Message &other) = delete;
+	Message &operator=(Message &&other) = delete;
+	virtual ~Message() = default;
 
 	/**
 	 * @brief Get the type of this message.
@@ -306,6 +310,13 @@ private:
 	int m_refcount;
 	uint8_t m_contextid;
 };
+
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69210
+namespace diagnostic_marker_private {
+	class [[maybe_unused]] AbstractMessageMarker : Message {
+		inline QString toString() const override { return QString(); }
+	};
+}
 
 typedef QList<MessagePtr> MessageList;
 

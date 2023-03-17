@@ -7,6 +7,7 @@ add_executable(drawpile MACOSX_BUNDLE
 	main.h
 	mainwindow.cpp
 	mainwindow.h
+	notifications_p.h
 	notifications.cpp
 	notifications.h
 	chat/chatbox.cpp
@@ -343,15 +344,9 @@ else()
 		bundled/QtColorWidgets/swatch.cpp
 	)
 	target_sources(drawpile PRIVATE ${sources})
-	if(MSVC)
-		set_source_files_properties(${sources} PROPERTIES
-			COMPILE_OPTIONS "/W0"
-		)
-	else()
-		set_source_files_properties(${sources} PROPERTIES
-			COMPILE_OPTIONS "-Wno-all;-Wno-extra;-Wno-error"
-		)
-	endif()
+	set_source_files_properties(${sources} PROPERTIES
+		COMPILE_OPTIONS "${IGNORE_WARNINGS_COMPILE_OPTIONS}"
+	)
 	target_include_directories(drawpile SYSTEM PRIVATE
 		"${CMAKE_CURRENT_SOURCE_DIR}/bundled/QtColorWidgets/include"
 	)

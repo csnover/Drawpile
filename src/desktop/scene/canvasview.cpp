@@ -514,7 +514,7 @@ void CanvasView::penPressEvent(const QPointF &pos, qreal pressure, Qt::MouseButt
 	case InputState::Waiting:
 		m_activationTimer->stop();
 		m_inputState = InputState::Blocked;
-		// fall through
+		Q_FALLTHROUGH();
 	case InputState::Blocked:
 		return;
 	case InputState::Normal:

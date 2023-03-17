@@ -12,13 +12,13 @@ class Ui_TabletTest;
 
 namespace dialogs {
 
-class TabletTestDialog : public DynamicUiWidget<QDialog, Ui_TabletTest>
+class TabletTestDialog final : public DynamicUiWidget<QDialog, Ui_TabletTest>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	TabletTestDialog(QWidget *parent=nullptr);
-	~TabletTestDialog();
+	~TabletTestDialog() override;
 };
 
 }

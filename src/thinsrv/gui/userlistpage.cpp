@@ -25,10 +25,6 @@ struct UserListPage::Private {
 	QTimer *refreshTimer;
 
 	UserListModel *userlist;
-
-	Private()
-	{
-	}
 };
 
 UserListPage::UserListPage(Server *server, QWidget *parent)
@@ -62,7 +58,6 @@ UserListPage::UserListPage(Server *server, QWidget *parent)
 
 UserListPage::~UserListPage()
 {
-	delete d;
 }
 
 void UserListPage::refreshPage()

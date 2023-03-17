@@ -12,11 +12,11 @@ namespace color_widgets {
 
 namespace docks {
 
-class ColorPaletteDock : public QDockWidget {
+class ColorPaletteDock final : public QDockWidget {
 	Q_OBJECT
 public:
 	ColorPaletteDock(QWidget *parent);
-	~ColorPaletteDock();
+	~ColorPaletteDock() override;
 
 public slots:
 	void setColor(const QColor& color);
@@ -41,7 +41,7 @@ private slots:
 
 private:
 	struct Private;
-	std::unique_ptr<Private> d;
+	const std::unique_ptr<Private> d;
 };
 
 int findPaletteColor(const color_widgets::ColorPalette &pal, const QColor &color);

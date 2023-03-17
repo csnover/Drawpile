@@ -51,7 +51,7 @@ void ShapeTool::motion(const canvas::Point& point, bool constrain, bool center)
 
 void ShapeTool::cancelMultipart()
 {
-	rustpile::paintengine_remove_preview(owner.model()->paintEngine()->engine(), owner.activeLayer());
+	rustpile::paintengine_remove_preview(m_owner.model()->paintEngine()->engine(), m_owner.activeLayer());
 	m_drawing = false;
 }
 
@@ -62,16 +62,16 @@ void ShapeTool::end()
 
 	m_drawing = false;
 
-	const uint8_t contextId = owner.client()->myId();
-	auto engine = owner.model()->paintEngine()->engine();
+	const uint8_t contextId = m_owner.client()->myId();
+	auto engine = m_owner.model()->paintEngine()->engine();
 
 	auto brushengine = rustpile::brushengine_new();
 
-	owner.setBrushEngineBrush(brushengine, false);
+	m_owner.setBrushEngineBrush(brushengine, false);
 
 	const auto pv = pointVector();
 	for(const auto &p : pv) {
-		rustpile::brushengine_stroke_to(brushengine, p.x(), p.y(), p.pressure(), 10, engine, owner.activeLayer());
+		rustpile::brushengine_stroke_to(brushengine, p.x(), p.y(), p.pressure(), 10, engine, m_owner.activeLayer());
 	}
 	rustpile::brushengine_end_stroke(brushengine);
 
@@ -82,27 +82,27 @@ void ShapeTool::end()
 
 	rustpile::brushengine_free(brushengine);
 
-	rustpile::paintengine_remove_preview(engine, owner.activeLayer());
-	owner.client()->sendEnvelope(writer.toEnvelope());
+	rustpile::paintengine_remove_preview(engine, m_owner.activeLayer());
+	m_owner.client()->sendEnvelope(writer.toEnvelope());
 }
 
 void ShapeTool::updatePreview()
 {
 	auto brushengine = rustpile::brushengine_new();
 
-	owner.setBrushEngineBrush(brushengine, false);
+	m_owner.setBrushEngineBrush(brushengine, false);
 
-	auto engine = owner.model()->paintEngine()->engine();
+	auto engine = m_owner.model()->paintEngine()->engine();
 
 	const canvas::PointVector pv = pointVector();
 	Q_ASSERT(pv.size()>1);
 
 	for(const auto &p : pv) {
-		rustpile::brushengine_stroke_to(brushengine, p.x(), p.y(), p.pressure(), 10, engine, owner.activeLayer());
+		rustpile::brushengine_stroke_to(brushengine, p.x(), p.y(), p.pressure(), 10, engine, m_owner.activeLayer());
 	}
 	rustpile::brushengine_end_stroke(brushengine);
 
-	rustpile::paintengine_preview_brush(engine, owner.activeLayer(), brushengine);
+	rustpile::paintengine_preview_brush(engine, m_owner.activeLayer(), brushengine);
 	rustpile::brushengine_free(brushengine);
 }
 

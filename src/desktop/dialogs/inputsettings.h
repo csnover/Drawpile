@@ -19,13 +19,13 @@ namespace input {
 
 namespace dialogs {
 
-class InputSettings : public DynamicUiWidget<QDialog, Ui_InputSettings>
+class InputSettings final : public DynamicUiWidget<QDialog, Ui_InputSettings>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	explicit InputSettings(QWidget *parent=nullptr);
-	~InputSettings();
+	~InputSettings() override;
 
 	void setCurrentPreset(const QString &id);
 

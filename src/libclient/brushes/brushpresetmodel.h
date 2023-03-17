@@ -36,12 +36,12 @@ struct PresetMetadata {
 
 class BrushPresetModel;
 
-class BrushPresetTagModel : public QAbstractItemModel {
+class BrushPresetTagModel final : public QAbstractItemModel {
 	Q_OBJECT
 	friend class BrushPresetModel;
 public:
 	explicit BrushPresetTagModel(QObject *parent = nullptr);
-	virtual ~BrushPresetTagModel();
+	~BrushPresetTagModel() override;
 
 	BrushPresetModel *presetModel() { return m_presetModel; }
 
@@ -77,7 +77,7 @@ private:
 		const QString &description, const ActiveBrush &brush);
 };
 
-class BrushPresetModel : public QAbstractItemModel {
+class BrushPresetModel final : public QAbstractItemModel {
 	Q_OBJECT
 public:
 	enum Roles {
@@ -86,7 +86,7 @@ public:
 	};
 
 	explicit BrushPresetModel(BrushPresetTagModel *tagModel);
-	virtual ~BrushPresetModel();
+	~BrushPresetModel() override;
 
 	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -96,7 +96,7 @@ public:
 
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-	int getIdFromIndex(const QModelIndex &index) { return index.isValid() ? index.internalId() : 0; };
+	int getIdFromIndex(const QModelIndex &index) { return index.isValid() ? index.internalId() : 0; }
 
 	void setTagIdToFilter(int tagId);
 

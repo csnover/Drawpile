@@ -9,7 +9,7 @@
 namespace server {
 namespace gui {
 
-class SidebarItemDelegate : public QItemDelegate
+class SidebarItemDelegate final : public QItemDelegate
 {
 	Q_OBJECT
 public:

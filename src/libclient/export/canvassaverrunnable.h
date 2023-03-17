@@ -14,7 +14,7 @@ namespace canvas { class PaintEngine; }
  *
  * When constructed, a copy of the layerstack is made.
  */
-class CanvasSaverRunnable : public QObject, public QRunnable
+class CanvasSaverRunnable final : public QObject, public QRunnable
 {
 	Q_OBJECT
 public:

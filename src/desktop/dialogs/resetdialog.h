@@ -17,12 +17,12 @@ namespace net {
 
 namespace dialogs {
 
-class ResetDialog : public QDialog
+class ResetDialog final : public QDialog
 {
 	Q_OBJECT
 public:
 	explicit ResetDialog(const canvas::PaintEngine *pe, QWidget *parent=nullptr);
-	~ResetDialog();
+	~ResetDialog() override;
 
 	void setCanReset(bool canReset);
 
@@ -38,7 +38,7 @@ private slots:
 
 private:
 	struct Private;
-	std::unique_ptr<Private> d;
+	const std::unique_ptr<Private> d;
 };
 
 }

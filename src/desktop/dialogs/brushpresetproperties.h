@@ -12,7 +12,7 @@ class Ui_BrushPresetProperties;
 
 namespace dialogs {
 
-class BrushPresetProperties : public DynamicUiWidget<QDialog, Ui_BrushPresetProperties>
+class BrushPresetProperties final : public DynamicUiWidget<QDialog, Ui_BrushPresetProperties>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
@@ -20,7 +20,7 @@ public:
 	explicit BrushPresetProperties(int id, const QString &name, const QString &description,
 		const QPixmap &thumbnail, QWidget *parent = nullptr);
 
-	virtual ~BrushPresetProperties();
+	~BrushPresetProperties() override;
 
 signals:
 	void presetPropertiesApplied(int id, const QString &name, const QString &description,

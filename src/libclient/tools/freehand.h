@@ -13,11 +13,11 @@ namespace rustpile {
 namespace tools {
 
 //! Freehand brush tool
-class Freehand : public Tool
+class Freehand final : public Tool
 {
 public:
 	Freehand(ToolController &owner, bool isEraser);
-	~Freehand();
+	~Freehand() override;
 
 	void begin(const canvas::Point& point, bool right, float zoom) override;
 	void motion(const canvas::Point& point, bool constrain, bool center) override;

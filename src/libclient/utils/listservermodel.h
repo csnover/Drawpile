@@ -20,7 +20,7 @@ struct ListServer {
 	bool privateListings;
 };
 
-class ListServerModel : public QAbstractListModel
+class ListServerModel final : public QAbstractListModel
 {
 	Q_OBJECT
 public:

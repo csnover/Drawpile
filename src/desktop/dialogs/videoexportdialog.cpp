@@ -105,7 +105,7 @@ void VideoExportDialog::updateFfmpegArgumentPreview()
 VideoExporter *VideoExportDialog::getExporter()
 {
 	if(result() != QDialog::Accepted)
-		return 0;
+		return nullptr;
 
 	// Return appropriate exporter based on exporter format box selection
 	VideoExporter *ve = nullptr;

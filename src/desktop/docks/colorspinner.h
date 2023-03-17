@@ -15,11 +15,11 @@ namespace color_widgets {
 
 namespace docks {
 
-class ColorSpinnerDock : public QDockWidget {
+class ColorSpinnerDock final : public QDockWidget {
 	Q_OBJECT
 public:
 	ColorSpinnerDock(QWidget *parent);
-	~ColorSpinnerDock();
+	~ColorSpinnerDock() override;
 
 public slots:
 	void setColor(const QColor& color);
@@ -33,7 +33,7 @@ private slots:
 
 private:
 	struct Private;
-	std::unique_ptr<Private> d;
+	const std::unique_ptr<Private> d;
 };
 
 }

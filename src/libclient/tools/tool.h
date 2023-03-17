@@ -35,7 +35,7 @@ public:
 		_LASTTOOL};
 
 	Tool(ToolController &owner, Type type, const QCursor &cursor)
-		: owner(owner), m_type(type), m_cursor(cursor)
+		: m_owner(owner), m_type(type), m_cursor(cursor)
 		{}
 	virtual ~Tool() {}
 
@@ -86,7 +86,7 @@ public:
 	virtual bool allowSmoothing() const { return false; }
 
 protected:
-	ToolController &owner;
+	ToolController &m_owner;
 
 private:
 	const Type m_type;

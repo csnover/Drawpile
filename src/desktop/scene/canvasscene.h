@@ -27,7 +27,7 @@ class LaserTrailItem;
 /**
  * @brief The drawing board scene
  */
-class CanvasScene : public QGraphicsScene
+class CanvasScene final : public QGraphicsScene
 {
 	Q_OBJECT
 

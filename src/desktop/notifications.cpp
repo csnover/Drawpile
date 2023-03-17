@@ -2,53 +2,20 @@
 // SPDX-FileCopyrightText: Calle Laakkonen
 
 #include "desktop/notifications.h"
+#include "desktop/notifications_p.h"
 #include "libshared/util/paths.h"
 
-#include <QSoundEffect>
-#include <QThread>
-#include <QMap>
-#include <QFileInfo>
-#include <QDir>
-#include <QDebug>
-#include <QSettings>
 #include <QDateTime>
+#include <QDebug>
+#include <QDir>
+#include <QFileInfo>
+#include <QMap>
+#include <QSettings>
 
 namespace notification {
 
-class Sound;
 static QMap<Event, Sound*> sounds;
 static qint64 lasttime = 0;
-static QThread soundThread;
-
-class Sound : public QObject {
-	Q_OBJECT
-public:
-	Sound(const QUrl &source)
-		: QObject()
-	{
-		m_sound.setSource(source);
-		connect(this, &Sound::playSound, &m_sound, &QSoundEffect::play);
-		m_sound.moveToThread(&soundThread);
-
-		if (!soundThread.isRunning()) {
-			soundThread.start();
-		}
-	}
-
-	void play(int volume)
-	{
-		if (!m_sound.isPlaying()) {
-			m_sound.setVolume(volume / 100.0f);
-			emit playSound();
-		}
-	}
-
-signals:
-	void playSound();
-
-private:
-	QSoundEffect m_sound;
-};
 
 void playSound(Event event)
 {
@@ -113,5 +80,3 @@ void playSound(Event event)
 }
 
 }
-
-#include "notifications.moc"

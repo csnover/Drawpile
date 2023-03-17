@@ -29,11 +29,11 @@ namespace canvas {
  *
  * The canvas view cache is held on this side of the C++/Rust boundary.
  */
-class PaintEngine : public QObject {
+class PaintEngine final : public QObject {
 	Q_OBJECT
 public:
 	explicit PaintEngine(QObject *parent=nullptr);
-	~PaintEngine();
+	~PaintEngine() override;
 
 	/// Reset the paint engine to its default state
 	void reset();

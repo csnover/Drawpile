@@ -19,11 +19,11 @@ namespace tools {
 /**
  * @brief Canvas inspector (a moderation tool)
  */
-class InspectorSettings : public ToolSettings {
+class InspectorSettings final : public ToolSettings {
 Q_OBJECT
 public:
 	InspectorSettings(ToolController *ctrl, QObject *parent=nullptr);
-	~InspectorSettings();
+	~InspectorSettings() override;
 
 	QString toolType() const override { return QStringLiteral("inspector"); }
 

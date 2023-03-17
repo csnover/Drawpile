@@ -27,7 +27,6 @@ class Translator final {
 	class Base : public QObject {
 	public:
 		Base(QObject *parent) : QObject(parent) {}
-		virtual ~Base() {}
 		virtual void args(Args... args) = 0;
 		virtual void trigger() = 0;
 	};
@@ -44,7 +43,7 @@ class Translator final {
 			parent->installEventFilter(this);
 		}
 
-		~Listener()
+		~Listener() override
 		{
 			this->parent()->removeEventFilter(this);
 		}

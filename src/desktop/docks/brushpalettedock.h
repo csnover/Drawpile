@@ -21,12 +21,12 @@ namespace docks {
  *
  * This dock displays a list of brush presets to choose from.
  */
-class BrushPalette : public QDockWidget
+class BrushPalette final : public QDockWidget
 {
 	Q_OBJECT
 public:
 	BrushPalette(QWidget *parent=nullptr);
-	~BrushPalette();
+	~BrushPalette() override;
 
 	void connectBrushSettings(tools::ToolSettings *toolSettings);
 
@@ -50,7 +50,7 @@ private slots:
 
 private:
 	struct Private;
-	std::unique_ptr<Private> d;
+	const std::unique_ptr<Private> d;
 
 	void changeTagAssignment(int tagId, bool assigned);
 

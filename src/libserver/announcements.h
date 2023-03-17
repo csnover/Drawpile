@@ -21,7 +21,7 @@ class Announcable;
 /**
  * @brief All session announcements made from this server
  */
-class Announcements : public QObject
+class Announcements final : public QObject
 {
 	Q_OBJECT
 public:

@@ -40,7 +40,7 @@ class OnlineUserListModel;
 /**
  * A list model to represent session users.
  */
-class UserListModel : public QAbstractTableModel {
+class UserListModel final : public QAbstractTableModel {
 	Q_OBJECT
 public:
 	enum UserListRoles {
@@ -155,14 +155,14 @@ private:
 /**
  * A filtered user list model that only includes online users
  */
-class OnlineUserListModel : public QSortFilterProxyModel
+class OnlineUserListModel final : public QSortFilterProxyModel
 {
 	Q_OBJECT
 public:
 	using QSortFilterProxyModel::QSortFilterProxyModel;
 
 protected:
-	bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+	bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 };
 
 }

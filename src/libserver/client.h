@@ -35,7 +35,7 @@ class Client : public QObject
 	Q_OBJECT
 
 public:
-	~Client();
+	~Client() override;
 
 	//! Get the user's IP address
 	QHostAddress peerAddress() const;

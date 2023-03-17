@@ -33,8 +33,6 @@ public:
 		Q_ASSERT(ctrl);
 	}
 
-	virtual ~ToolSettings() = default;
-
 	/**
 	 * @brief Create the UI widget
 	 *

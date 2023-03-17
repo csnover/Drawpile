@@ -10,7 +10,7 @@ namespace canvas {
 
 class PaintEngine;
 
-class DocumentMetadata : public QObject
+class DocumentMetadata final : public QObject
 {
 	Q_OBJECT
 public:

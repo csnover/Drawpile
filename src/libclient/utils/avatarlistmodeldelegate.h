@@ -10,7 +10,7 @@
 class QPainter;
 class QStyleOptionViewItem;
 
-class AvatarItemDelegate : public QItemDelegate {
+class AvatarItemDelegate final : public QItemDelegate {
 public:
 	using QItemDelegate::QItemDelegate;
 protected:

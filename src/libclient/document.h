@@ -41,7 +41,7 @@ Q_MOC_INCLUDE("libclient/net/announcementlist.h")
  * based application or a pure QML app.
  *
  */
-class Document : public QObject
+class Document final : public QObject
 {
 	Q_PROPERTY(canvas::CanvasModel* canvas READ canvas() NOTIFY canvasChanged)
 	Q_PROPERTY(net::BanlistModel* banlist READ banlist() CONSTANT)

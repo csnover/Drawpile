@@ -4,6 +4,7 @@
 // SPDX-FileCopyrightText: Cyrille Berger <cberger@cberger.net>
 
 #include "libclient/utils/kis_cubic_curve.h"
+#include "libshared/util/qtcompat.h"
 
 #include <QPointF>
 #include <QList>
@@ -278,7 +279,7 @@ qreal KisCubicCurve::Data::value(qreal x)
 	 */
 	x = qBound(spline.begin(), x, spline.end());
 	qreal y = spline.getValue(x);
-	return qBound(qreal(0.0), y, qreal(1.0));
+	return qBound(compat::cast<qreal>(0.0), y, compat::cast<qreal>(1.0));
 }
 
 template<typename _T_, typename _T2_>

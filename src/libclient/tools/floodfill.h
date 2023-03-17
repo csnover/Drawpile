@@ -8,7 +8,7 @@
 
 namespace tools {
 
-class FloodFill : public Tool
+class FloodFill final : public Tool
 {
 public:
 	FloodFill(ToolController &owner);

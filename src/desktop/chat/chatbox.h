@@ -23,7 +23,7 @@ class UserItemDelegate;
 /**
  * Chat box with user list
  */
-class ChatBox : public QWidget
+class ChatBox final : public QWidget
 {
 	Q_OBJECT
 public:
@@ -32,7 +32,7 @@ public:
 	//! Focus the text input widget
 	void focusInput();
 
-	bool isCollapsed() const { return m_state == State::Collapsed; };
+	bool isCollapsed() const { return m_state == State::Collapsed; }
 
 private slots:
 	void onCanvasChanged(canvas::CanvasModel *canvas);

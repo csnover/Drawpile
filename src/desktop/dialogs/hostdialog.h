@@ -12,13 +12,13 @@ class Ui_HostDialog;
 
 namespace dialogs {
 
-class HostDialog : public DynamicUiWidget<QDialog, Ui_HostDialog>
+class HostDialog final : public DynamicUiWidget<QDialog, Ui_HostDialog>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	explicit HostDialog(QWidget *parent=nullptr);
-	~HostDialog();
+	~HostDialog() override;
 
 	//! Store settings in configuration file
 	void rememberSettings() const;

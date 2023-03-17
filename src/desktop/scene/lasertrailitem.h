@@ -9,7 +9,7 @@
 
 namespace drawingboard {
 
-class LaserTrailItem : public QGraphicsItem
+class LaserTrailItem final : public QGraphicsItem
 {
 public:
 	enum { Type = UserType + 13 };

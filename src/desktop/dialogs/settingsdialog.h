@@ -21,13 +21,13 @@ namespace color_widgets { class ColorWheel; }
 
 namespace dialogs {
 
-class SettingsDialog : public DynamicUiWidget<QDialog, Ui_SettingsDialog>
+class SettingsDialog final : public DynamicUiWidget<QDialog, Ui_SettingsDialog>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	SettingsDialog(QWidget *parent=nullptr);
-	~SettingsDialog();
+	~SettingsDialog() override;
 
 private slots:
 	void resetSettings();

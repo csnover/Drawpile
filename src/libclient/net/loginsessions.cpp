@@ -59,7 +59,7 @@ QVariant LoginSessionModel::data(const QModelIndex &index, int role) const
 			else
 				return 0;
 		}
-		// fall through
+		Q_FALLTHROUGH();
 	case Qt::DisplayRole:
 		switch(index.column()) {
 		case TitleColumn: {

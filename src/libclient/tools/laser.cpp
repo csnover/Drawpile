@@ -28,9 +28,9 @@ void LaserPointer::begin(const canvas::Point &point, bool right, float zoom)
 
 	net::EnvelopeBuilder msgs;
 
-	rustpile::write_lasertrail(msgs, owner.client()->myId(), owner.activeBrush().qColor().rgb(), m_persistence);
-	rustpile::write_movepointer(msgs, owner.client()->myId(), point.x(), point.y());
-	owner.client()->sendEnvelope(msgs.toEnvelope());
+	rustpile::write_lasertrail(msgs, m_owner.client()->myId(), m_owner.activeBrush().qColor().rgb(), m_persistence);
+	rustpile::write_movepointer(msgs, m_owner.client()->myId(), point.x(), point.y());
+	m_owner.client()->sendEnvelope(msgs.toEnvelope());
 
 }
 
@@ -40,8 +40,8 @@ void LaserPointer::motion(const canvas::Point &point, bool constrain, bool cente
 	Q_UNUSED(center);
 	if(m_drawing) {
 		net::EnvelopeBuilder msgs;
-		rustpile::write_movepointer(msgs, owner.client()->myId(), point.x(), point.y());
-		owner.client()->sendEnvelope(msgs.toEnvelope());
+		rustpile::write_movepointer(msgs, m_owner.client()->myId(), point.x(), point.y());
+		m_owner.client()->sendEnvelope(msgs.toEnvelope());
 	}
 }
 
@@ -51,8 +51,8 @@ void LaserPointer::end()
 		m_drawing = false;
 
 		net::EnvelopeBuilder msgs;
-		rustpile::write_lasertrail(msgs, owner.client()->myId(), 0, 0);
-		owner.client()->sendEnvelope(msgs.toEnvelope());
+		rustpile::write_lasertrail(msgs, m_owner.client()->myId(), 0, 0);
+		m_owner.client()->sendEnvelope(msgs.toEnvelope());
 	}
 }
 

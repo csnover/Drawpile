@@ -8,7 +8,7 @@
 
 namespace widgets {
 
-class ChatWindow : public QWidget
+class ChatWindow final : public QWidget
 {
 	Q_OBJECT
 public:

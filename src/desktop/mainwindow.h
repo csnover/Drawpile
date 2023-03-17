@@ -67,7 +67,7 @@ class MacMenu;
 class ShortcutDetector;
 
 //! The application main window
-class MainWindow : public QMainWindow {
+class MainWindow final : public QMainWindow {
 	Q_OBJECT
 public:
 	static ActionBuilder makeAction(const char *text, const char *name, QObject *parent);
@@ -77,7 +77,7 @@ public:
 	static void showJoinDialog(MainWindow *parent, const QUrl &defaultUrl=QUrl());
 
 	MainWindow(bool restoreWindowPosition=true);
-	~MainWindow();
+	~MainWindow() override;
 
 	//! Host a session using the settings from the given dialog
 	void hostSession(dialogs::HostDialog *dlg);

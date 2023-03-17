@@ -10,7 +10,7 @@
 
 class QTranslator;
 
-class DrawpileApp : public QApplication {
+class DrawpileApp final : public QApplication {
 Q_OBJECT
 public:
 	DrawpileApp(int & argc, char ** argv);

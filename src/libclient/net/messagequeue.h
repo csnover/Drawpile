@@ -18,7 +18,7 @@ namespace net {
 /**
  * A wrapper for an IO device for sending and receiving messages.
  */
-class MessageQueue : public QObject {
+class MessageQueue final : public QObject {
 Q_OBJECT
 public:
 	/**
@@ -27,7 +27,7 @@ public:
 	 * The MessageQueue does not take ownership of the device.
 	 */
 	explicit MessageQueue(QTcpSocket *socket, QObject *parent=nullptr);
-	~MessageQueue();
+	~MessageQueue() override;
 
 	/**
 	 * @brief Check if there are new messages available

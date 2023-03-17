@@ -4,6 +4,7 @@
 #include "libclient/net/messagequeue.h"
 #include "libclient/net/envelopebuilder.h"
 #include "libshared/net/message.h"
+#include "libshared/util/qtcompat.h"
 #include "rustpile/rustpile.h"
 
 #include <QTcpSocket>
@@ -124,7 +125,7 @@ void MessageQueue::sendDisconnect(const protocol::DisconnectExt &payload)
 	rustpile::write_disconnectext(eb, 0, reinterpret_cast<const uchar*>(json.constData()), json.length());
 	rustpile::write_disconnect(eb, 0, uint8_t(reason), reinterpret_cast<const uint16_t*>(message.constData()), message.length());
 
-	qInfo("Sending disconnect message (reason=%d), will disconnect after queue (%lld messages) is empty.", int(reason), static_cast<long long>(m_outbox.size()));
+	qInfo("Sending disconnect message (reason=%d), will disconnect after queue (%lld messages) is empty.", int(reason), compat::cast<long long>(m_outbox.size()));
 	send(eb.toEnvelope());
 	m_gracefullyDisconnecting = true;
 	m_recvbytes = 0;

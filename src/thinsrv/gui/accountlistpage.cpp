@@ -79,7 +79,6 @@ AccountListPage::AccountListPage(Server *server, QWidget *parent)
 
 AccountListPage::~AccountListPage()
 {
-	delete d;
 }
 
 void AccountListPage::handleResponse(const QString &requestId, const JsonApiResult &result)
@@ -149,9 +148,11 @@ void AccountListPage::editSelectedAccount()
 
 	ui.username->setText(account["username"].toString());
 	ui.locked->setChecked(account["locked"].toBool());
-	const QStringList flags = account["flags"].toString().split(',', compat::SkipEmptyParts);
-	ui.flagHost->setChecked(flags.contains("HOST"));
-	ui.flagMod->setChecked(flags.contains("MOD"));
+	{
+		const QStringList flags = account["flags"].toString().split(',', compat::SkipEmptyParts);
+		ui.flagHost->setChecked(flags.contains("HOST"));
+		ui.flagMod->setChecked(flags.contains("MOD"));
+	}
 
 	connect(dlg, &QDialog::accepted, this, [this, ui, id]() {
 		QJsonObject body;

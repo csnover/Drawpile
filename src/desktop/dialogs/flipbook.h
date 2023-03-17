@@ -19,13 +19,13 @@ namespace canvas {
 
 namespace dialogs {
 
-class Flipbook : public DynamicUiWidget<QDialog, Ui_Flipbook>
+class Flipbook final : public DynamicUiWidget<QDialog, Ui_Flipbook>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	explicit Flipbook(QWidget *parent=nullptr);
-	~Flipbook();
+	~Flipbook() override;
 
 	void setPaintEngine(canvas::PaintEngine *pe);
 

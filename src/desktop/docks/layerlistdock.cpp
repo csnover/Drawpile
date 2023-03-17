@@ -202,6 +202,7 @@ void LayerList::onFeatureAccessChange(canvas::Feature feature, bool canUse)
 		case canvas::Feature::EditLayers:
 		case canvas::Feature::OwnLayers:
 			updateLockedControls();
+			break;
 		default: break;
 	}
 }

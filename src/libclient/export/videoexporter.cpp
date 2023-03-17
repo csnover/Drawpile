@@ -60,9 +60,6 @@ void VideoExporter::saveFrame(const QImage &image, int count)
 		frameImage = newframe;
 	}
 
-	if(_frame==0)
-		startExporter();
-
 	writeFrame(frameImage, count);
 	_frame += count;
 }

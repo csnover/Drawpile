@@ -3,7 +3,7 @@
 
 #include <QtTest/QtTest>
 
-class TestPasswordHash: public QObject
+class TestPasswordHash final : public QObject
 {
 	Q_OBJECT
 private slots:

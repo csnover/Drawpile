@@ -21,28 +21,6 @@ namespace {
 	struct Frame {
 		/// the original list of layers in this frame
 		rustpile::Frame frame = {0};
-
-		/// lookup table generated from the above
-		QBitArray rows;
-
-		/// Regenerate the lookup table
-		void updateRows(const QVector<Layer> &layers)
-		{
-			rows.clear();
-			rows.resize(layers.size());
-			for(int i=0;i<MAX_LAYERS_PER_FRAME;++i) {
-				if(frame[i] == 0)
-					break;
-				// TODO needs benchmarking? Number of layers is generally low enough
-				// that a linear search may still be faster than a hashmap?
-				for(int j=0;j<layers.size();++i) {
-					if(layers.at(j).id == frame[i]) {
-						rows.setBit(j);
-						break;
-					}
-				}
-			}
-		}
 	};
 }
 
@@ -95,7 +73,7 @@ void TimelineModel::setLayers(const QVector<LayerListItem> &layers)
 
 void timelineUpdateFrames(void *ctx, const rustpile::Frame *frames, uintptr_t count)
 {
-	TimelineModel *model = reinterpret_cast<TimelineModel*>(ctx);
+	TimelineModel *model = static_cast<TimelineModel*>(ctx);
 	model->m_frames.resize(count);
 	memcpy(model->m_frames.data(), frames, sizeof(rustpile::Frame) * count);
 	emit model->framesChanged();

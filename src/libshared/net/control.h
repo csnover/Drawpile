@@ -62,7 +62,7 @@ struct ServerReply {
  * - setting session parameters (e.g. max user count and password)
  * - sending administration commands (e.g. kick user)
  */
-class Command : public Message {
+class Command final : public Message {
 public:
 	Command(uint8_t ctx, const QByteArray &msg) : Message(MSG_COMMAND, ctx), m_msg(msg) {}
 	Command(uint8_t ctx, const QJsonDocument &doc) : Command(ctx, doc.toJson(QJsonDocument::Compact)) {}
@@ -103,7 +103,7 @@ private:
  * This message is used when closing the connection gracefully. The message queue
  * will automatically close the socket after sending this message.
  */
-class Disconnect : public Message {
+class Disconnect final : public Message {
 public:
 	// These values are sent on the wire so should not be reordered
 	enum Reason {
@@ -153,7 +153,7 @@ private:
  *
  * The server should return with a Ping with the pong message setenv()
  */
-class Ping : public Message {
+class Ping final : public Message {
 public:
 	Ping(uint8_t ctx, bool pong) : Message(MSG_PING, ctx), m_isPong(pong) { }
 
@@ -173,7 +173,7 @@ private:
 	bool m_isPong;
 };
 
-class DisconnectExt : public Message {
+class DisconnectExt final : public Message {
 	Q_DECLARE_TR_FUNCTIONS(protocol::DisconnectExt)
 public:
 	using Reason = Disconnect::Reason;
@@ -214,7 +214,7 @@ public:
 		, m_raw(message) {}
 
 	DisconnectExt(const DisconnectExt &other)
-		: Message(other)
+		: Message(MSG_DISCONNECT_EXT, other.contextId())
 		, m_reason(other.m_reason)
 	{
 		switch (m_reason) {
@@ -226,20 +226,7 @@ public:
 		}
 	}
 
-	DisconnectExt(DisconnectExt &&other)
-		: Message(other)
-		, m_reason(other.m_reason)
-	{
-		switch (m_reason) {
-		case Reason::KICK: new (&m_actor) auto(std::move(other.m_actor)); break;
-		case Reason::ERROR: new (&m_error) auto(std::move(other.m_error)); break;
-		case Reason::SHUTDOWN: new (&m_shutdown) auto(std::move(other.m_shutdown)); break;
-		case Reason::OTHER: new (&m_raw) auto(std::move(other.m_raw)); break;
-		case Reason::_Last: Q_UNREACHABLE(); break;
-		}
-	}
-
-	~DisconnectExt()
+	~DisconnectExt() override
 	{
 		switch(m_reason) {
 		case Reason::KICK: m_actor.~ChatActor(); break;

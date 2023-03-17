@@ -11,7 +11,7 @@ namespace tools {
 /**
  * \brief A bezier curve tool
  */
-class BezierTool : public Tool {
+class BezierTool final : public Tool {
 public:
 	BezierTool(ToolController &owner);
 

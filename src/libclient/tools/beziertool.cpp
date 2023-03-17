@@ -96,14 +96,14 @@ void BezierTool::finishMultipart()
 		m_points.pop_back();
 
 		auto brushengine = rustpile::brushengine_new();
-		owner.setBrushEngineBrush(brushengine, false);
+		m_owner.setBrushEngineBrush(brushengine, false);
 
-		const uint8_t contextId = owner.client()->myId();
-		auto engine = owner.model()->paintEngine()->engine();
+		const uint8_t contextId = m_owner.client()->myId();
+		auto engine = m_owner.model()->paintEngine()->engine();
 
 		const auto pv = calculateBezierCurve();
 		for(const auto &p : pv) {
-			rustpile::brushengine_stroke_to(brushengine, p.x(), p.y(), p.pressure(), 10, engine, owner.activeLayer());
+			rustpile::brushengine_stroke_to(brushengine, p.x(), p.y(), p.pressure(), 10, engine, m_owner.activeLayer());
 		}
 		rustpile::brushengine_end_stroke(brushengine);
 
@@ -114,7 +114,7 @@ void BezierTool::finishMultipart()
 
 		rustpile::brushengine_free(brushengine);
 
-		owner.client()->sendEnvelope(writer.toEnvelope());
+		m_owner.client()->sendEnvelope(writer.toEnvelope());
 	}
 	cancelMultipart();
 }
@@ -122,7 +122,7 @@ void BezierTool::finishMultipart()
 void BezierTool::cancelMultipart()
 {
 	m_points.clear();
-	rustpile::paintengine_remove_preview(owner.model()->paintEngine()->engine(), owner.activeLayer());
+	rustpile::paintengine_remove_preview(m_owner.model()->paintEngine()->engine(), m_owner.activeLayer());
 }
 
 void BezierTool::undoMultipart()
@@ -188,16 +188,16 @@ void BezierTool::updatePreview()
 		return;
 
 	auto brushengine = rustpile::brushengine_new();
-	owner.setBrushEngineBrush(brushengine, false);
+	m_owner.setBrushEngineBrush(brushengine, false);
 
-	auto engine = owner.model()->paintEngine()->engine();
+	auto engine = m_owner.model()->paintEngine()->engine();
 
 	for(const auto &p : pv) {
-		rustpile::brushengine_stroke_to(brushengine, p.x(), p.y(), p.pressure(), 10, engine, owner.activeLayer());
+		rustpile::brushengine_stroke_to(brushengine, p.x(), p.y(), p.pressure(), 10, engine, m_owner.activeLayer());
 	}
 	rustpile::brushengine_end_stroke(brushengine);
 
-	rustpile::paintengine_preview_brush(engine, owner.activeLayer(), brushengine);
+	rustpile::paintengine_preview_brush(engine, m_owner.activeLayer(), brushengine);
 	rustpile::brushengine_free(brushengine);
 }
 

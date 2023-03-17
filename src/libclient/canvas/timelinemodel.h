@@ -17,7 +17,7 @@ namespace net {
 
 namespace canvas {
 
-class TimelineModel : public QObject {
+class TimelineModel final : public QObject {
 	Q_OBJECT
 	friend void timelineUpdateFrames(void *ctx, const rustpile::Frame *frames, uintptr_t count);
 public:

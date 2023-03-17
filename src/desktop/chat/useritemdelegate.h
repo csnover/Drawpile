@@ -15,7 +15,7 @@ namespace net {
 
 namespace widgets {
 
-class UserItemDelegate : public QAbstractItemDelegate
+class UserItemDelegate final : public QAbstractItemDelegate
 {
 	Q_OBJECT
 public:

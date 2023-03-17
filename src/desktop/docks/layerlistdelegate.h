@@ -26,7 +26,7 @@ namespace docks {
 /**
  * \brief A custom item delegate for displaying layer names and editing layer settings.
  */
-class LayerListDelegate : public QItemDelegate {
+class LayerListDelegate final : public QItemDelegate {
 	Q_OBJECT
 
 	enum Region {

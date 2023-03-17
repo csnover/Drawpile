@@ -77,10 +77,10 @@ bool CanvasModel::load(const QSize &size, const QColor &background)
 		size.width(),
 		size.height(),
 		rustpile::Color {
-			float(background.redF()),
-			float(background.greenF()),
-			float(background.blueF()),
-			float(background.alphaF())
+			compat::cast<float>(background.redF()),
+			compat::cast<float>(background.greenF()),
+			compat::cast<float>(background.blueF()),
+			compat::cast<float>(background.alphaF())
 		}
 	);
 }

@@ -11,11 +11,11 @@
  *
  * Currently ipecho.net is used to discover the address.
  */
-class WhatIsMyIp : public QObject
+class WhatIsMyIp final : public QObject
 {
 	Q_OBJECT
 public:
-	explicit WhatIsMyIp(QObject *parent = 0);
+	explicit WhatIsMyIp(QObject *parent = nullptr);
 
 	/**
 	 * @brief Get the local address

@@ -63,7 +63,7 @@ Q_DECLARE_METATYPE(sessionlisting::Announcement)
 
 namespace sessionlisting {
 
-class AnnouncementApiResponse : public QObject
+class AnnouncementApiResponse final : public QObject
 {
 	Q_OBJECT
 public:

@@ -11,7 +11,7 @@ static const int TILE_SIZE = 64; // FIXME
 
 static void updateCacheTile(void *p, int x, int y, const uchar *pixels)
 {
-	((QPainter*)p)->drawImage(
+	static_cast<QPainter*>(p)->drawImage(
 			x,
 			y,
 			QImage(pixels,
@@ -30,13 +30,13 @@ namespace canvas {
 // need to be repainted now.
 void paintEngineAreaChanged(void *pe, rustpile::Rectangle area)
 {
-	emit reinterpret_cast<PaintEngine*>(pe)->areaChanged(QRect(area.x, area.y, area.w, area.h));
+	emit static_cast<PaintEngine*>(pe)->areaChanged(QRect(area.x, area.y, area.w, area.h));
 }
 
 // Callback: notify the view that the canvas size has changed.
 void paintEngineResized(void *pe, int xoffset, int yoffset, rustpile::Size oldSize)
 {
-	emit reinterpret_cast<PaintEngine*>(pe)->resized(xoffset, yoffset, QSize{oldSize.width, oldSize.height});
+	emit static_cast<PaintEngine*>(pe)->resized(xoffset, yoffset, QSize{oldSize.width, oldSize.height});
 }
 
 void paintEngineLayersChanged(void *pe, const rustpile::LayerInfo *layerInfos, uintptr_t count)
@@ -65,23 +65,23 @@ void paintEngineLayersChanged(void *pe, const rustpile::LayerInfo *layerInfos, u
 		};
 	}
 
-	emit reinterpret_cast<PaintEngine*>(pe)->layersChanged(layers);
+	emit static_cast<PaintEngine*>(pe)->layersChanged(layers);
 }
 
 void paintEngineAnnotationsChanged(void *pe, rustpile::Annotations *annotations)
 {
 	// Note: rustpile::Annotations is thread safe
-	emit reinterpret_cast<PaintEngine*>(pe)->annotationsChanged(annotations);
+	emit static_cast<PaintEngine*>(pe)->annotationsChanged(annotations);
 }
 
 void paintEngineMetadataChanged(void *pe)
 {
-	emit reinterpret_cast<PaintEngine*>(pe)->metadataChanged();
+	emit static_cast<PaintEngine*>(pe)->metadataChanged();
 }
 
 void paintEngineTimelineChanged(void *pe)
 {
-	emit reinterpret_cast<PaintEngine*>(pe)->timelineChanged();
+	emit static_cast<PaintEngine*>(pe)->timelineChanged();
 }
 
 void paintEngineFrameVisbilityChanged(void *pe, const rustpile::Frame *frame, bool frameMode)
@@ -95,23 +95,23 @@ void paintEngineFrameVisbilityChanged(void *pe, const rustpile::Frame *frame, bo
 				break;
 		}
 	}
-	emit reinterpret_cast<PaintEngine*>(pe)->frameVisibilityChanged(layers, frameMode);
+	emit static_cast<PaintEngine*>(pe)->frameVisibilityChanged(layers, frameMode);
 }
 
 void paintEngineCursors(void *pe, uint8_t user, uint16_t layer, int32_t x, int32_t y)
 {
 	// This may be emitted from either the main thread or the paint engine thread
-	emit reinterpret_cast<PaintEngine*>(pe)->cursorMoved(user, layer, x, y);
+	emit static_cast<PaintEngine*>(pe)->cursorMoved(user, layer, x, y);
 }
 
 void paintEnginePlayback(void *pe, int64_t pos, uint32_t interval)
 {
-	emit reinterpret_cast<PaintEngine*>(pe)->playbackAt(pos, interval);
+	emit static_cast<PaintEngine*>(pe)->playbackAt(pos, interval);
 }
 
 void paintEngineCatchup(void *pe, uint32_t progress)
 {
-	emit reinterpret_cast<PaintEngine*>(pe)->caughtUpTo(progress);
+	emit static_cast<PaintEngine*>(pe)->caughtUpTo(progress);
 }
 
 PaintEngine::PaintEngine(QObject *parent)

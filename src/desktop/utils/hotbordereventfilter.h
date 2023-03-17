@@ -9,7 +9,7 @@
  * Absolute pointer coordinates are used. This can be used to show and hide the menu
  * bar in fullscreen mode. (Note: not needed on macOS, as the OS provides this feature itself.)
  */
-class HotBorderEventFilter : public QObject {
+class HotBorderEventFilter final : public QObject {
 	Q_OBJECT
 public:
 	HotBorderEventFilter(QObject *parent);

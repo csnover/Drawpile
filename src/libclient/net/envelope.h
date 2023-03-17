@@ -81,7 +81,7 @@ public:
 	//! Get the length of the message from its header
 	static int sniffLength(const char *data) {
 		// extract payload length
-		quint16 len = qFromBigEndian<quint16>((uchar*)data);
+		quint16 len = qFromBigEndian<quint16>(reinterpret_cast<const uchar*>(data));
 
 		// return total message length
 		return len + HEADER_LEN;

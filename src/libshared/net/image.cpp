@@ -11,7 +11,7 @@ namespace protocol {
 PutImage *PutImage::deserialize(uint8_t ctx, const uchar *data, uint len)
 {
 	if(len < 19)
-		return 0;
+		return nullptr;
 
 	return new PutImage(
 		ctx,
@@ -21,7 +21,7 @@ PutImage *PutImage::deserialize(uint8_t ctx, const uchar *data, uint len)
 		qFromBigEndian<quint32>(data+7),
 		qFromBigEndian<quint32>(data+11),
 		qFromBigEndian<quint32>(data+15),
-		QByteArray((const char*)data+19, len-19)
+		QByteArray(reinterpret_cast<const char*>(data)+19, len-19)
 	);
 }
 
@@ -127,7 +127,7 @@ PutTile *PutTile::deserialize(uint8_t ctx, const uchar *data, uint len)
 		qFromBigEndian<quint16>(data+3),
 		qFromBigEndian<quint16>(data+5),
 		qFromBigEndian<quint16>(data+7),
-		QByteArray((const char*)data+9, len-9)
+		QByteArray(reinterpret_cast<const char*>(data)+9, len-9)
 	);
 }
 
@@ -222,7 +222,7 @@ CanvasBackground *CanvasBackground::deserialize(uint8_t ctx, const uchar *data, 
 
 	return new CanvasBackground(
 		ctx,
-		QByteArray((const char*)data, len)
+		QByteArray(reinterpret_cast<const char*>(data), len)
 	);
 }
 
@@ -278,7 +278,7 @@ CanvasBackground *CanvasBackground::fromText(uint8_t ctx, const Kwargs &kwargs)
 FillRect *FillRect::deserialize(uint8_t ctx, const uchar *data, uint len)
 {
 	if(len != 23)
-		return 0;
+		return nullptr;
 
 	return new FillRect(
 		ctx,
@@ -358,7 +358,7 @@ MoveRegion *MoveRegion::deserialize(uint8_t ctx, const uchar *data, uint len)
 		qFromBigEndian<quint32>(data+38),
 		qFromBigEndian<quint32>(data+42), // target 4
 		qFromBigEndian<quint32>(data+46),
-		QByteArray((const char*)data+50, len-50) // source mask
+		QByteArray(reinterpret_cast<const char*>(data)+50, len-50) // source mask
 	);
 }
 

@@ -17,7 +17,7 @@ namespace KDNSSD {
 	class ServiceBrowser;
 }
 
-class ZeroconfDiscovery : public QObject
+class ZeroconfDiscovery final : public QObject
 {
 	Q_OBJECT
 public:

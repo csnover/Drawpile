@@ -10,7 +10,7 @@
 
 namespace server {
 
-class DbLog : public ServerLog
+class DbLog final : public ServerLog
 {
 public:
 	explicit DbLog(const QSqlDatabase &db);

@@ -16,13 +16,13 @@ class AvatarListModel;
 
 namespace dialogs {
 
-class AvatarImport : public DynamicUiWidget<QDialog, Ui_AvatarImport>
+class AvatarImport final : public DynamicUiWidget<QDialog, Ui_AvatarImport>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	AvatarImport(const QImage &source, QWidget *parent=nullptr);
-	~AvatarImport();
+	~AvatarImport() override;
 
 	// Size of the final avatar image
 	static const int Size = 32;

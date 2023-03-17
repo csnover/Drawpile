@@ -66,8 +66,8 @@ public:
 		return pages[currentTool].settings.data();
 	}
 
-	Private(tools::ToolController *ctrl)
-		: ctrl(ctrl)
+	Private(tools::ToolController *ctrl_)
+		: ctrl(ctrl_)
 	{
 		Q_ASSERT(ctrl);
 

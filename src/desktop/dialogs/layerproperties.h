@@ -22,13 +22,13 @@ namespace net {
 
 namespace dialogs {
 
-class LayerProperties : public DynamicUiWidget<QDialog, Ui_LayerProperties>
+class LayerProperties final : public DynamicUiWidget<QDialog, Ui_LayerProperties>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	LayerProperties(canvas::CanvasModel &canvas, QPersistentModelIndex index, QWidget *parent = nullptr);
-	~LayerProperties();
+	~LayerProperties() override;
 
 	void updateUi();
 	void setControlsEnabled(bool enabled);

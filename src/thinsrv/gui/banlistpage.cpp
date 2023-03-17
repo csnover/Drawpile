@@ -72,7 +72,6 @@ BanListPage::BanListPage(Server *server, QWidget *parent)
 
 BanListPage::~BanListPage()
 {
-	delete d;
 }
 
 void BanListPage::handleResponse(const QString &requestId, const JsonApiResult &result)

@@ -278,8 +278,9 @@ void DrawpileApp::setLanguage(QString preferredLang)
 	if(preferredLang == "en")
 		return;
 
+	QTranslator *translator;
 	// Qt's own translations
-	QTranslator *translator = new QTranslator(this);
+	translator = new QTranslator(this);
 	if(translator->load("qt_" + preferredLang, compat::libraryPath(QLibraryInfo::TranslationsPath))) {
 		m_translators.push_back(translator);
 		installTranslator(translator);
@@ -289,7 +290,7 @@ void DrawpileApp::setLanguage(QString preferredLang)
 	}
 
 	for(auto &bundle : { "libshared_", "libclient_", "drawpile_" }) {
-		QTranslator *translator = new QTranslator(this);
+		translator = new QTranslator(this);
 		for(const QString &datapath : utils::paths::dataPaths()) {
 			if(translator->load(bundle + preferredLang, datapath + "/i18n"))
 				break;

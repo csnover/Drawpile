@@ -24,13 +24,13 @@ namespace net {
 
 namespace dialogs {
 
-class ServerLogDialog : public DynamicUiWidget<QDialog, Ui_ServerLogDialog>
+class ServerLogDialog final : public DynamicUiWidget<QDialog, Ui_ServerLogDialog>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	ServerLogDialog(QWidget *parent=nullptr);
-	~ServerLogDialog();
+	~ServerLogDialog() override;
 
 	void setModel(QAbstractItemModel *model);
 	void setUserList(canvas::UserListModel *userlist);

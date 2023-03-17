@@ -13,7 +13,7 @@ class QWidget;
 
 namespace macui {
 
-class MacViewStatusBarProxyStyle : public QProxyStyle {
+class MacViewStatusBarProxyStyle final : public QProxyStyle {
 	void drawPrimitive(QStyle::PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = nullptr) const override;
 };
 

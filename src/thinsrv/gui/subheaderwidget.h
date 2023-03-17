@@ -9,14 +9,14 @@
 namespace server {
 namespace gui {
 
-class SubheaderWidget : public QLabel
+class SubheaderWidget final : public QLabel
 {
 	Q_OBJECT
 public:
-	SubheaderWidget(const QString &text, int level, QWidget *parent=nullptr);
+	SubheaderWidget(const QString &text, int level, QWidget *parent = nullptr);
 
 protected:
-	void paintEvent(QPaintEvent*);
+	void paintEvent(QPaintEvent*) override;
 };
 
 }

@@ -176,8 +176,8 @@ void CanvasScene::annotationsChanged(rustpile::Annotations *annotations) {
 	}
 
 	// The update function
-	auto update = [](void *ctx, rustpile::AnnotationID id, const char *text, uintptr_t textlen, rustpile::Rectangle rect, rustpile::Color background, bool protect, rustpile::VAlign valign) {
-		auto context = reinterpret_cast<Context*>(ctx);
+	auto update = [](void *inCtx, rustpile::AnnotationID id, const char *text, uintptr_t textlen, rustpile::Rectangle rect, rustpile::Color background, bool protect, rustpile::VAlign valign) {
+		auto context = static_cast<Context*>(inCtx);
 		AnnotationItem *ai = nullptr;
 		for(int i=0;i<context->items.size();++i) {
 			if(context->items.at(i)->id() == id) {

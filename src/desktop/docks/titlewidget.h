@@ -11,7 +11,7 @@ class QSpacerItem;
 
 namespace docks {
 
-class TitleWidget : public QWidget
+class TitleWidget final : public QWidget
 {
 	Q_OBJECT
 public:

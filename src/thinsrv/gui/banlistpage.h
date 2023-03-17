@@ -8,21 +8,20 @@
 
 #include <QWidget>
 #include <QApplication>
+#include <memory>
 
-namespace  server {
+namespace server {
 
 struct JsonApiResult;
 
 namespace gui {
 
-class BanListPage : public QWidget
+class BanListPage final : public QWidget
 {
 	Q_OBJECT
 public:
-	struct Private;
-
 	explicit BanListPage(Server *server, QWidget *parent=nullptr);
-	~BanListPage();
+	~BanListPage() override;
 
 private slots:
 	void handleResponse(const QString &requestId, const JsonApiResult &result);
@@ -33,10 +32,11 @@ private slots:
 private:
 	void refreshPage();
 
-	Private *d;
+	struct Private;
+	const std::unique_ptr<Private> d;
 };
 
-class BanListPageFactory : public PageFactory
+class BanListPageFactory final : public PageFactory
 {
 public:
 	QString pageId() const override { return QStringLiteral("banlist"); }

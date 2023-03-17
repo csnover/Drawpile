@@ -12,7 +12,7 @@
 namespace server {
 namespace gui {
 
-class SidebarModel : public QAbstractItemModel
+class SidebarModel final : public QAbstractItemModel
 {
 	Q_OBJECT
 public:
@@ -21,7 +21,7 @@ public:
 	};
 
 	SidebarModel(QObject *parent=nullptr);
-	~SidebarModel();
+	~SidebarModel() override;
 
 	QVariant data(const QModelIndex &index, int role) const override;
 	Qt::ItemFlags flags(const QModelIndex &index) const override;

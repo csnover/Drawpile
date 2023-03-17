@@ -32,29 +32,29 @@ void Annotation::begin(const canvas::Point& point, bool right, float zoom)
 	m_p2 = point;
 
 	const int handleSize = qRound(qMax(10.0, 10.0 / zoom) / 2.0);
-	auto selection = owner.model()->paintEngine()->getAnnotationAt(point.x(), point.y(), handleSize);
+	auto selection = m_owner.model()->paintEngine()->getAnnotationAt(point.x(), point.y(), handleSize);
 
 	if(selection.id > 0) {
 		m_isNew = false;
 		m_selectedId = selection.id;
 		m_shape = QRect{selection.rect.x, selection.rect.y, selection.rect.w, selection.rect.h};
 
-		if(selection.protect && !owner.model()->aclState()->amOperator() && (selection.id >> 8) != owner.client()->myId()) {
+		if(selection.protect && !m_owner.model()->aclState()->amOperator() && (selection.id >> 8) != m_owner.client()->myId()) {
 			m_handle = Handle::Outside;
 		} else {
 			m_handle = handleAt(m_shape, point.toPoint(), handleSize);
 		}
 
-		owner.setActiveAnnotation(m_selectedId);
+		m_owner.setActiveAnnotation(m_selectedId);
 
 	} else {
 		// No annotation, start creating a new one
-		if(!owner.model()->aclState()->canUseFeature(canvas::Feature::CreateAnnotation)) {
+		if(!m_owner.model()->aclState()->canUseFeature(canvas::Feature::CreateAnnotation)) {
 			m_handle = Handle::Outside;
 			return;
 		}
 
-		m_selectedId = owner.model()->paintEngine()->findAvailableAnnotationId(owner.model()->localUserId());
+		m_selectedId = m_owner.model()->paintEngine()->findAvailableAnnotationId(m_owner.model()->localUserId());
 		m_handle = Handle::BottomRight;
 		m_shape = QRect { m_p1.toPoint(), QSize{1, 1} };
 		m_isNew = true;
@@ -62,7 +62,7 @@ void Annotation::begin(const canvas::Point& point, bool right, float zoom)
 		// Note: The tool functions perfectly even if nothing happens in
 		// response to the call, only the visual feedback will be missing.
 		if(m_selectedId > 0)
-			owner.model()->previewAnnotation(m_selectedId, m_shape);
+			m_owner.model()->previewAnnotation(m_selectedId, m_shape);
 	}
 }
 
@@ -153,7 +153,7 @@ void Annotation::motion(const canvas::Point& point, bool constrain, bool center)
 		m_shape = m_shape.normalized();
 	}
 
-	owner.model()->previewAnnotation(m_selectedId, m_shape);
+	m_owner.model()->previewAnnotation(m_selectedId, m_shape);
 }
 
 /**
@@ -166,7 +166,7 @@ void Annotation::end()
 		return;
 
 	net::EnvelopeBuilder eb;
-	const uint8_t contextId = owner.client()->myId();
+	const uint8_t contextId = m_owner.client()->myId();
 
 	rustpile::write_undopoint(eb, contextId);
 	bool hasMessages = false;
@@ -189,7 +189,7 @@ void Annotation::end()
 	}
 
 	if(hasMessages)
-		owner.client()->sendEnvelope(eb.toEnvelope());
+		m_owner.client()->sendEnvelope(eb.toEnvelope());
 }
 
 }

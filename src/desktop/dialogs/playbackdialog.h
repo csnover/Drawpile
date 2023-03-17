@@ -26,13 +26,13 @@ class VideoExporter;
 
 namespace dialogs {
 
-class PlaybackDialog : public DynamicUiWidget<QDialog, Ui_PlaybackDialog>
+class PlaybackDialog final : public DynamicUiWidget<QDialog, Ui_PlaybackDialog>
 {
 	Q_OBJECT
 	DP_DYNAMIC_UI
 public:
 	explicit PlaybackDialog(canvas::CanvasModel *canvas, QWidget *parent=nullptr);
-	~PlaybackDialog();
+	~PlaybackDialog() override;
 
 	void centerOnParent();
 

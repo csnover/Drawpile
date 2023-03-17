@@ -11,7 +11,7 @@
 namespace server {
 namespace gui {
 
-class RemoteServer : public Server
+class RemoteServer final : public Server
 {
 	Q_OBJECT
 public:

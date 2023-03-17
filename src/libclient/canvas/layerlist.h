@@ -111,7 +111,7 @@ namespace canvas {
 
 typedef std::function<QImage(int id)> GetLayerFunction;
 
-class LayerListModel : public QAbstractItemModel {
+class LayerListModel final : public QAbstractItemModel {
 	Q_OBJECT
 	friend class LayerMimeData;
 public:
@@ -225,7 +225,7 @@ private:
  * A specialization of QMimeData for passing layers around inside
  * the application.
  */
-class LayerMimeData : public QMimeData
+class LayerMimeData final : public QMimeData
 {
 Q_OBJECT
 public:

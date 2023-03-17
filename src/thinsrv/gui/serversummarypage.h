@@ -8,6 +8,7 @@
 
 #include <QWidget>
 #include <QApplication>
+#include <memory>
 
 namespace server {
 
@@ -15,13 +16,13 @@ struct JsonApiResult;
 
 namespace gui {
 
-class ServerSummaryPage : public QWidget
+class ServerSummaryPage final : public QWidget
 {
 	Q_OBJECT
 public:
 	struct Private;
 	explicit ServerSummaryPage(Server *server, QWidget *parent=nullptr);
-	~ServerSummaryPage();
+	~ServerSummaryPage() override;
 
 private slots:
 	void startOrStopServer();
@@ -34,10 +35,10 @@ private slots:
 private:
 	void refreshPage();
 
-	Private *d;
+	const std::unique_ptr<Private> d;
 };
 
-class ServersummaryPageFactory : public PageFactory
+class ServersummaryPageFactory final : public PageFactory
 {
 public:
 	QString pageId() const override { return QStringLiteral("summary:server"); }

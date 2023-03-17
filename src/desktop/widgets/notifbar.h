@@ -9,7 +9,7 @@ class QPushButton;
 
 namespace widgets {
 
-class NotificationBar : public QWidget
+class NotificationBar final : public QWidget
 {
 	Q_OBJECT
 public:

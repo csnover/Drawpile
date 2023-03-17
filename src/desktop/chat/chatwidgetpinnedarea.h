@@ -8,7 +8,7 @@
 
 namespace widgets {
 
-class ChatWidgetPinnedArea : public QLabel
+class ChatWidgetPinnedArea final : public QLabel
 {
 	Q_OBJECT
 public:
@@ -16,7 +16,7 @@ public:
 	void setPinText(const QString &);
 
 protected:
-	void mouseDoubleClickEvent(QMouseEvent *event);
+	void mouseDoubleClickEvent(QMouseEvent *event) override;
 };
 
 }
