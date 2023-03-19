@@ -27,6 +27,10 @@
 #include <QDebug>
 #include <QFileDialog>
 
+namespace {
+	using Model = SessionListingModel;
+}
+
 namespace dialogs {
 
 // Height below which the session listing widgets are hidden.
@@ -60,7 +64,7 @@ JoinDialog::JoinDialog(const QUrl &url, QWidget *parent)
 	if(parentalcontrols::level() != parentalcontrols::Level::Unrestricted)
 		m_ui->showNsfw->setEnabled(false);
 
-	m_sessions = new SessionListingModel(this);
+	m_sessions = new Model(this);
 
 #ifdef HAVE_DNSSD
 	if(ZeroconfDiscovery::isAvailable()) {
@@ -78,6 +82,10 @@ JoinDialog::JoinDialog(const QUrl &url, QWidget *parent)
 		if(ls.publicListings)
 			m_sessions->setMessage(ls.name, tr("Loading..."));
 	}
+	AUTO_TR(m_ui->noListServersNotification, setText, tr("<p>You haven’t added any list servers yet. Find some at %1, or try %2.</p>")
+		.arg("<a href=\"https://drawpile.net/communities/\">drawpile.net/communities</a>")
+		.arg("pub.drawpile.net")
+	);
 	m_ui->noListServersNotification->setVisible(servers.isEmpty());
 
 	m_filteredSessions = new SessionFilterProxyModel(this);
@@ -103,16 +111,16 @@ JoinDialog::JoinDialog(const QUrl &url, QWidget *parent)
 	m_ui->listing->expandAll();
 
 	QHeaderView *header = m_ui->listing->header();
-	header->setSectionResizeMode(0, QHeaderView::Stretch);
-	header->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-	header->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-	header->setSectionResizeMode(3, QHeaderView::ResizeToContents);
-	header->setSectionResizeMode(4, QHeaderView::ResizeToContents);
+	header->setSectionResizeMode(Model::Title, QHeaderView::Stretch);
+	header->setSectionResizeMode(Model::Server, QHeaderView::ResizeToContents);
+	header->setSectionResizeMode(Model::UserCount, QHeaderView::ResizeToContents);
+	header->setSectionResizeMode(Model::Owner, QHeaderView::ResizeToContents);
+	header->setSectionResizeMode(Model::Uptime, QHeaderView::ResizeToContents);
 
 	connect(m_ui->listing, &QTreeView::clicked, this, [this](const QModelIndex &index) {
 		// Set the server URL when clicking on an item
 		if((index.flags() & Qt::ItemIsEnabled))
-			m_ui->address->setCurrentText(index.data(SessionListingModel::UrlRole).value<QUrl>().toString());
+			m_ui->address->setCurrentText(index.data(Model::UrlRole).value<QUrl>().toString());
 	});
 
 	connect(m_ui->listing, &QTreeView::doubleClicked, [this](const QModelIndex &index) {

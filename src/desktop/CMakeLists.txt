@@ -210,6 +210,8 @@ add_executable(drawpile MACOSX_BUNDLE
 	widgets/presetselector.h
 	widgets/resizerwidget.cpp
 	widgets/resizerwidget.h
+	widgets/spanawaretreeview.cpp
+	widgets/spanawaretreeview.h
 	widgets/spinner.cpp
 	widgets/spinner.h
 	widgets/tablettest.cpp

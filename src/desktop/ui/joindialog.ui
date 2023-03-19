@@ -52,9 +52,6 @@ padding: 6px;</string>
      <property name="textFormat">
       <enum>Qt::RichText</enum>
      </property>
-     <property name="text">
-      <string><![CDATA[<p>You haven’t added any servers yet. Find some at <a href="https://drawpile.net/communities/">drawpile.net/communities</a>, or try pub.drawpile.net.</p>]]></string>
-     </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
@@ -122,7 +119,13 @@ padding: 6px;</string>
     </layout>
    </item>
    <item>
-    <widget class="QTreeView" name="listing">
+    <widget class="widgets::SpanAwareTreeView" name="listing">
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="indentation">
+      <number>0</number>
+     </property>
      <property name="rootIsDecorated">
       <bool>false</bool>
      </property>
@@ -207,6 +210,13 @@ padding: 6px;</string>
   <tabstop>address</tabstop>
   <tabstop>buttons</tabstop>
  </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>widgets::SpanAwareTreeView</class>
+   <extends>QTreeView</extends>
+   <header>desktop/widgets/spanawaretreeview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

@@ -4,19 +4,16 @@
 #include "libclient/net/sessionlistingmodel.h"
 #include "config.h"
 
+#include <QFont>
 #include <QIcon>
+#include <QPalette>
+#include <QPixmap>
+#include <QSize>
 #include <QUrl>
-#include <QDebug>
 
-using sessionlisting::Session;
-
-// Columns:
-// 0 - title
-// 1 - server
-// 2 - user count
-// 3 - owner
-// 4 - uptime
-static const int COLUMN_COUNT = 5;
+namespace {
+	using sessionlisting::Session;
+}
 
 SessionListingModel::SessionListingModel(QObject *parent)
 	: QAbstractItemModel(parent)
@@ -25,16 +22,14 @@ SessionListingModel::SessionListingModel(QObject *parent)
 
 QModelIndex SessionListingModel::index(int row, int column, const QModelIndex &parent) const
 {
-	if(row < 0 || column < 0)
+	if(row < 0 || column < 0 || column >= ColumnCount) {
 		return QModelIndex();
+	}
 
-	if(parent.isValid()) {
-		if(!parent.internalId()) {
-			return createIndex(row, column, quintptr(parent.row()+1));
-		}
-	} else {
-		if(row < m_listings.size())
-			return createIndex(row, column);
+	if(parent.isValid() && isRootItem(parent)) {
+		return createIndex(row, column, quintptr(parent.row() + 1));
+	} else if (!parent.isValid() && row < m_listings.size()) {
+		return createIndex(row, column, quintptr(0));
 	}
 
 	return QModelIndex();
@@ -42,36 +37,51 @@ QModelIndex SessionListingModel::index(int row, int column, const QModelIndex &p
 
 QModelIndex SessionListingModel::parent(const QModelIndex &child) const
 {
-	if(child.isValid() && child.internalId()>0) {
-		return createIndex(int(child.internalId()-1), child.column());
-	}
+	if (!child.isValid() || isRootItem(child))
+		return QModelIndex();
 
-	return QModelIndex();
+	return createIndex(int(child.internalId() - 1), child.column());
 }
 
 int SessionListingModel::rowCount(const QModelIndex &parent) const
 {
-	if(parent.isValid()) {
-		if(parent.internalId()==0) {
-			const Listing &l = m_listings.at(parent.row());
-			return l.message.isEmpty() ? l.sessions.size() : 1;
-		}
+	if (!parent.isValid()) {
+		return m_listings.size();
+	}
 
+	if (!isRootItem(parent) || parent.row() >= m_listings.size()) {
 		return 0;
 	}
 
-	return m_listings.size();
+	const auto &listing = m_listings.at(parent.row());
+	return listing.offline() ? 1 : listing.sessions.size();
 }
 
 int SessionListingModel::columnCount(const QModelIndex &) const
 {
-	return COLUMN_COUNT;
+	return ColumnCount;
 }
 
 static QString ageString(const qint64 seconds)
 {
 	const auto minutes = seconds / 60;
-	return SessionListingModel::tr("%1h %2m").arg(minutes/60).arg(minutes%60);
+	if (minutes >= 60) {
+		const auto hours = minutes / 60;
+		if (hours >= 24) {
+			const auto days = hours / 24;
+			return SessionListingModel::tr("%1d%2h%3m")
+				.arg(days)
+				.arg(hours % 24)
+				.arg(minutes % 60);
+		} else {
+			return SessionListingModel::tr("%1h%2m")
+				.arg(hours)
+				.arg(minutes % 60);
+		}
+	} else {
+		return SessionListingModel::tr("%1m")
+			.arg(minutes);
+	}
 }
 
 static QUrl sessionUrl(const Session &s)
@@ -87,77 +97,114 @@ static QUrl sessionUrl(const Session &s)
 
 QVariant SessionListingModel::data(const QModelIndex &index, int role) const
 {
-	if(index.internalId() > 0) {
-		const Listing &listing = m_listings.at(int(index.internalId() - 1));
+	if (!index.isValid())
+		return QVariant();
 
-		if(!listing.message.isEmpty()) {
-			if(index.row() == 0 && index.column() == 0 && role == Qt::DisplayRole)
+	const auto &listing = m_listings.at(listingIndex(index));
+
+	if (isRootItem(index)) {
+		if (index.column() != Title) {
+			return QVariant();
+		}
+
+		switch (role) {
+		case Qt::DisplayRole:
+		case SortKeyRole:
+			return listing.name;
+		case Qt::FontRole: {
+			QFont font;
+			font.setBold(true);
+			return font;
+		}
+		}
+	} else if (listing.offline()) {
+		if (index.row() != 0) {
+			return QVariant();
+		}
+
+		switch(role) {
+		case Qt::DisplayRole:
+			if (index.column() == Title)
 				return listing.message;
-			return QVariant();
+			break;
+		case Qt::DecorationRole:
+			if (index.column() == Title)
+				return QIcon::fromTheme("dialog-information");
+			break;
+		case Qt::FontRole:
+			if (index.column() == Title) {
+				QFont font;
+				font.setStyle(QFont::StyleItalic);
+				return font;
+			}
+			break;
+		case Qt::ForegroundRole:
+			return QPalette().color(QPalette::Text);
 		}
-
-		if(index.row() < 0 || index.row() >= listing.sessions.size())
-			return QVariant();
-
-		const Session &s = listing.sessions.at(index.row());
-
-		if(role == Qt::DisplayRole) {
-			switch(index.column()) {
-			case 0: return s.title.isEmpty() ? tr("(untitled)") : s.title;
-			case 1: return s.host;
-			case 2: return s.users < 0 ? QVariant() : QString::number(s.users);
-			case 3: return s.owner;
-			case 4: return ageString(s.started.msecsTo(QDateTime::currentDateTime()) / 1000);
-			}
-
-		} else if(role == Qt::DecorationRole) {
-			if(index.column() == 0) {
-				if(!s.protocol.isCurrent())
-					return QIcon::fromTheme("dontknow");
-				else if(s.password)
-					return QIcon::fromTheme("object-locked");
-				else if(s.nsfm)
-					return QIcon(":/icons/censored.svg");
-			}
-
-		} else if(role == Qt::ToolTipRole) {
-			if(!s.protocol.isCurrent()) {
-				QString ver;
-				if(s.protocol.isFuture())
-					ver = tr("New version");
-				else
-					ver = s.protocol.versionName();
-				if(ver.isEmpty())
-					ver = tr("Unknown version");
-
-				return tr("Incompatible version (%1)").arg(ver);
-			}
-
-		} else if(role == SortKeyRole) {
-			// User Role is used for sorting keys
-			switch(index.column()) {
-			case 0: return s.title;
-			case 1: return s.host;
-			case 2: return s.users;
-			case 3: return s.owner;
-			case 4: return s.started;
-			}
-
-		} else {
-			// Direct data access roles
-			switch(role) {
-			case UrlRole: return sessionUrl(s);
-			case IsPasswordedRole: return s.password;
-			case IsNsfwRole: return s.nsfm;
-			}
-		}
-
 	} else {
-		if(role == Qt::DisplayRole) {
-			if(index.column() == 0)
-				return m_listings.at(index.row()).name;
-		} else if(role == SortKeyRole) {
-			return index.row();
+		if(index.row() >= listing.sessions.size())
+			return QVariant();
+
+		const auto &session = listing.sessions.at(index.row());
+
+		switch (role) {
+		case Qt::DisplayRole:
+			switch(Column(index.column())) {
+			case Title:
+				return session.title.isEmpty() ? tr("(untitled)") : session.title;
+			case Server:
+				return session.host;
+			case UserCount:
+				return session.users < 0 ? QVariant() : QString::number(session.users);
+			case Owner:
+				return session.owner;
+			case Uptime:
+				return ageString(session.started.secsTo(QDateTime::currentDateTime()));
+			case ColumnCount: break;
+			}
+			break;
+		case Qt::DecorationRole:
+			if (index.column() != Title) {
+				return QVariant();
+			}
+
+			if(!session.protocol.isCurrent())
+				return QIcon::fromTheme("dontknow");
+			else if(session.password)
+				return QIcon::fromTheme("object-locked");
+			else if(session.nsfm)
+				return QIcon(":/icons/censored.svg");
+			else {
+				QPixmap pm(64, 64);
+				pm.fill(Qt::transparent);
+				return QIcon(pm);
+			}
+		case Qt::ToolTipRole:
+			if(!session.protocol.isCurrent()) {
+				QString version = session.protocol.isFuture()
+					? tr("New version")
+					: session.protocol.versionName();
+
+				if(version.isEmpty())
+					version = tr("Unknown version");
+
+				return tr("Incompatible version (%1)").arg(version);
+			}
+			break;
+		case SortKeyRole:
+			switch(Column(index.column())) {
+			case Title: return session.title;
+			case Server: return session.host;
+			case UserCount: return session.users;
+			case Owner: return session.owner;
+			case Uptime: return session.started;
+			case ColumnCount: break;
+			}
+			break;
+		case UrlRole: return sessionUrl(session);
+		case IsPasswordedRole: return session.password;
+		case IsNsfwRole: return session.nsfm;
+		default: {}
 		}
 	}
 
@@ -169,30 +216,50 @@ QVariant SessionListingModel::headerData(int section, Qt::Orientation orientatio
 	if(role != Qt::DisplayRole || orientation != Qt::Horizontal)
 		return QVariant();
 
-	switch(section) {
-	case 0: return tr("Title");
-	case 1: return tr("Server");
-	case 2: return tr("Users");
-	case 3: return tr("Owner");
-	case 4: return tr("Age");
+	switch(Column(section)) {
+	case Title: return tr("Title");
+	case Server: return tr("Server");
+	case UserCount: return tr("Users");
+	case Owner: return tr("Owner");
+	case Uptime: return tr("Age");
+	case ColumnCount: {}
 	}
-	static_assert (COLUMN_COUNT == 5, "Update headerData()");
-
 	return QVariant();
 }
 
 Qt::ItemFlags SessionListingModel::flags(const QModelIndex &index) const
 {
-	if(index.internalId()>0) {
-		const Listing &l = m_listings.at(int(index.internalId() - 1));
-		if(!l.message.isEmpty())
-			return Qt::NoItemFlags;
-
-		const Session &s = l.sessions.at(index.row());
-		if(!s.protocol.isCurrent())
-			return Qt::NoItemFlags;
+	if (isRootItem(index)) {
+		return Qt::ItemIsEnabled;
 	}
-	return QAbstractItemModel::flags(index);
+
+	const auto &listing = m_listings.at(listingIndex(index));
+	if(listing.offline())
+		return Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
+
+	const auto &session = listing.sessions.at(index.row());
+	if(!session.protocol.isCurrent())
+		return Qt::ItemNeverHasChildren;
+
+	return QAbstractItemModel::flags(index) | Qt::ItemNeverHasChildren;
+}
+
+QSize SessionListingModel::span(const QModelIndex &index) const
+{
+	if (!index.isValid()) {
+		return QSize(1, 1);
+	}
+
+	if (isRootItem(index)) {
+		return QSize(ColumnCount, 1);
+	}
+
+	const auto li = listingIndex(index);
+	if (index.row() == 0 && li < m_listings.size() && m_listings.at(li).offline()) {
+		return QSize(ColumnCount, 1);
+	}
+
+	return QSize(1, 1);
 }
 
 QModelIndex SessionListingModel::indexOfListing(const QString &listing) const
@@ -207,57 +274,63 @@ QModelIndex SessionListingModel::indexOfListing(const QString &listing) const
 	return QModelIndex();
 }
 
-void SessionListingModel::setMessage(const QString &listing, const QString &message)
+void SessionListingModel::setMessage(const QString &name, const QString &message)
 {
-	for(int i=0;i<m_listings.size();++i) {
-		if(m_listings.at(i).name == listing) {
-			const int oldSize = m_listings[i].message.isEmpty() ? m_listings[i].sessions.size() : 1;
-			if(oldSize > 1)
-				beginRemoveRows(createIndex(i, 0), 1, oldSize-1);
+	for(int i = 0; i < m_listings.size(); ++i) {
+		auto &listing = m_listings[i];
+		if (listing.name == name) {
+			const auto oldSize = listing.offline() ? 1 : listing.sessions.size();
 
-			m_listings[i].message = message;
-			m_listings[i].sessions.clear();
+			if (oldSize > 1)
+				beginRemoveRows(createIndex(i, 0), 1, oldSize - 1);
+
+			listing.message = message;
+			listing.sessions.clear();
 
 			if(oldSize > 1)
 				endRemoveRows();
 
 			emit dataChanged(createIndex(i, 0), createIndex(i, 0));
-			const QModelIndex mi = createIndex(0, 0, quintptr(i+1));
+			const auto mi = createIndex(0, 0, quintptr(i + 1));
 			emit dataChanged(mi, mi);
 			return;
 		}
 	}
 
 	beginInsertRows(QModelIndex(), m_listings.size(), m_listings.size());
-	m_listings << Listing { listing, message, QVector<sessionlisting::Session>() };
+	m_listings << Listing { name, message, {} };
 	endInsertRows();
 }
 
-void SessionListingModel::setList(const QString &listing, const QVector<Session> sessions)
+void SessionListingModel::setList(const QString &name, const QVector<Session> sessions)
 {
-	for(int i=0;i<m_listings.size();++i) {
-		if(m_listings.at(i).name == listing) {
-			const int oldSize = m_listings[i].message.isEmpty() ? m_listings[i].sessions.size() : 1;
-			if(sessions.size() < oldSize)
-				beginRemoveRows(createIndex(i, 0), sessions.size(), oldSize-1);
-			else if(sessions.size() > oldSize)
-				beginInsertRows(createIndex(i, 0), oldSize, sessions.size()-1);
+	for (auto i = 0; i < m_listings.size(); ++i) {
+		auto &listing = m_listings[i];
+		if (listing.name == name) {
+			const auto oldSize = listing.offline() ? 1 : listing.sessions.size();
+			if (sessions.size() < oldSize)
+				beginRemoveRows(createIndex(i, 0), sessions.size() - 1, oldSize - 1);
+			else if (sessions.size() > oldSize)
+				beginInsertRows(createIndex(i, 0), oldSize - 1, sessions.size() - 1);
 
-			m_listings[i].message = QString();
-			m_listings[i].sessions = sessions;
+			listing.message = QString();
+			listing.sessions = sessions;
 
-			if(sessions.size() < oldSize)
+			if (sessions.size() < oldSize)
 				endRemoveRows();
-			else if(sessions.size() > oldSize)
+			else if (sessions.size() > oldSize)
 				endInsertRows();
 
 			emit dataChanged(createIndex(i, 0), createIndex(i, 0));
-			emit dataChanged(createIndex(0, 0, quintptr(i+1)), createIndex(sessions.size(), COLUMN_COUNT, quintptr(i+1)));
+			emit dataChanged(
+				createIndex(0, 0, quintptr(i + 1)),
+				createIndex(sessions.size() - 1, ColumnCount - 1, quintptr(i + 1))
+			);
 			return;
 		}
 	}
 
 	beginInsertRows(QModelIndex(), m_listings.size(), m_listings.size());
-	m_listings << Listing { listing, QString(), sessions };
+	m_listings << Listing { name, QString(), sessions };
 	endInsertRows();
 }
