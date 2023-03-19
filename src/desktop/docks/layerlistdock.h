@@ -12,6 +12,7 @@ class QActionGroup;
 class QModelIndex;
 class QItemSelection;
 class QMenu;
+class QSlider;
 class QTimer;
 class QTreeView;
 
@@ -77,6 +78,7 @@ private slots:
 	void showContextMenu(const QPoint &pos);
 	void censorSelected(bool censor);
 	void setLayerVisibility(int layerId, bool visible);
+	void changeOpacity(int value);
 	void changeLayerAcl(bool lock, rustpile::Tier tier, QVector<uint8_t> exclusive);
 	void changeLayerBlendMode(QAction *action);
 	void changeDefaultLayer(bool on);
@@ -108,6 +110,7 @@ private:
 	QMenu *m_contextMenu;
 	LayerAclMenu *m_aclMenu;
 	QMenu *m_blendMenu;
+	QSlider *m_opacity;
 
 	widgets::GroupedToolButton *m_menuButton;
 	QTreeView *m_view;

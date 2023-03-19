@@ -38,6 +38,7 @@ LayerList::LayerList(QWidget *parent)
 	, m_selectedId(0)
 	, m_nearestToDeletedId(0)
 	, m_noupdate(false)
+	, m_opacity(new QSlider(this))
 	, m_addLayerAction(nullptr)
 	, m_duplicateLayerAction(nullptr)
 	, m_mergeLayerAction(nullptr)
@@ -68,6 +69,13 @@ LayerList::LayerList(QWidget *parent)
 	connect(del, &LayerListDelegate::openEditor, m_view, QOverload<const QModelIndex &>::of(&QTreeView::edit));
 	connect(del, &LayerListDelegate::editProperties, this, &LayerList::showPropertiesOfIndex);
 	m_view->setItemDelegate(del);
+
+	m_opacity->setMaximum(255);
+	m_opacity->setSingleStep(2);
+	m_opacity->setPageStep(25);
+	m_opacity->setOrientation(Qt::Horizontal);
+	connect(m_opacity, &QSlider::valueChanged, this, &LayerList::changeOpacity);
+	titlebar->addCustomWidget(m_opacity, true);
 }
 
 void LayerList::setCanvas(canvas::CanvasModel *canvas)
@@ -260,6 +268,18 @@ void LayerList::setLayerVisibility(int layerId, bool visible)
 	);
 }
 
+void LayerList::changeOpacity(int opacity)
+{
+	const QModelIndex index = currentSelection();
+	if(!index.isValid())
+		return;
+
+	auto *layers = m_canvas->layerlist();
+	Q_ASSERT(layers);
+	layers->setData(index, qreal(opacity) / 255., canvas::LayerListModel::OpacityRole);
+	layers->submit();
+}
+
 void LayerList::changeLayerAcl(bool lock, rustpile::Tier tier, QVector<uint8_t> exclusive)
 {
 	const QModelIndex index = currentSelection();
@@ -447,6 +467,7 @@ void LayerList::updateUiFromSelection()
 			break;
 		}
 	}
+	m_opacity->setValue(layer.attributes.opacity * 255);
 
 	lockStatusChanged(layer.id);
 	updateLockedControls();
