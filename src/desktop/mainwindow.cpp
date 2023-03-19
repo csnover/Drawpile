@@ -1593,6 +1593,7 @@ void MainWindow::onServerConnected()
 {
 	// Enable connection related actions
 	getAction("hostsession")->setEnabled(false);
+	getAction("joinsession")->setEnabled(false);
 	getAction("leavesession")->setEnabled(true);
 	getAction("sessionsettings")->setEnabled(true);
 
@@ -1606,7 +1607,9 @@ void MainWindow::onServerConnected()
  */
 void MainWindow::onServerDisconnected(const QString &message, const QString &errorcode, bool localDisconnect)
 {
-	getAction("hostsession")->setEnabled(m_doc->canvas() != nullptr);
+	getAction("hostsession")->setEnabled(true);
+	getAction("joinsession")->setEnabled(true);
+	getAction("resetsession")->setEnabled(true);
 	getAction("leavesession")->setEnabled(false);
 	getAction("sessionsettings")->setEnabled(false);
 	getAction("reportabuse")->setEnabled(false);
@@ -1664,6 +1667,11 @@ void MainWindow::onServerDisconnected(const QString &message, const QString &err
 			tr("Reconnect"),
 			widgets::NotificationBar::RoleColor::Warning
 		);
+	} else if (!m_doc->client()->isLoggedIn() && localDisconnect && !m_doc->canvas()) {
+		// Joining created a new MainWindow, and then the user disconnected before
+		// the canvas was initiated, so just delete the window
+		deleteLater();
+		return;
 	}
 }
 
