@@ -42,7 +42,7 @@ public:
 	void setCanvas(canvas::CanvasModel *canvas);
 
 	//! These actions are shown in a menu outside this dock
-	void setLayerEditActions(QAction *addLayer, QAction *addGroup, QAction *duplicate, QAction *merge, QAction *properties, QAction *del);
+	void setLayerEditActions(QAction *addLayer, QAction *addGroup, QAction *duplicate, QAction *merge, QAction *properties, QAction *del, LayerAclMenu *aclMenu, QMenu *blendMenu);
 
 	/**
 	 * Is the currently selected layer locked for editing?
@@ -106,11 +106,10 @@ private:
 	bool m_noupdate;
 
 	QMenu *m_contextMenu;
-	QAction *m_defaultLayerAction;
-	QActionGroup *m_blendMenu;
-	LayerAclMenu *m_aclmenu;
+	LayerAclMenu *m_aclMenu;
+	QMenu *m_blendMenu;
 
-	widgets::GroupedToolButton *m_lockButton;
+	widgets::GroupedToolButton *m_menuButton;
 	QTreeView *m_view;
 
 	QAction *m_addLayerAction;

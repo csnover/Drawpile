@@ -27,6 +27,7 @@ public:
 	void setUserList(QAbstractItemModel *model);
 	void setAcl(bool lock, rustpile::Tier tier, const QVector<uint8_t> acl);
 	void setCensored(bool censor);
+	void setDefault(bool on);
 
 signals:
 	/**
@@ -45,6 +46,11 @@ signals:
 	 */
 	void layerCensoredChange(bool censor);
 
+	/**
+	 * @brief The default checkbox was toggled
+	 */
+	void layerDefaultChange(bool on);
+
 protected:
 	void showEvent(QShowEvent *e) override;
 
@@ -57,6 +63,7 @@ private:
 	QVector<uint8_t> m_exclusives;
 	QAction *m_lock;
 	QAction *m_censored;
+	QAction *m_default;
 	QActionGroup *m_tiers;
 	QActionGroup *m_users;
 };

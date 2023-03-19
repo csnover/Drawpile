@@ -329,7 +329,8 @@ public:
 	}
 
 	template <typename Fn>
-	MenuBuilder &submenu(Fn fn)
+	typename std::enable_if_t<!std::is_convertible<Fn, QMenu *>::value, MenuBuilder &>
+	submenu(Fn fn)
 	{
 		auto *menu = new QMenu(m_menu);
 		fn(MenuBuilder(menu, tr));

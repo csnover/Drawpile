@@ -46,6 +46,7 @@ static constexpr auto CTRL_KEY = Qt::CTRL;
 #include "libclient/document.h"
 #include "desktop/main.h"
 
+#include "libclient/canvas/blendmodes.h"
 #include "libclient/canvas/canvasmodel.h"
 #include "desktop/scene/canvasview.h"
 #include "desktop/scene/canvasscene.h"
@@ -73,6 +74,7 @@ static constexpr auto CTRL_KEY = Qt::CTRL;
 
 #include "desktop/docks/toolsettingsdock.h"
 #include "desktop/docks/brushpalettedock.h"
+#include "desktop/docks/layeraclmenu.h"
 #include "desktop/docks/navigator.h"
 #include "desktop/docks/colorpalette.h"
 #include "desktop/docks/colorspinner.h"
@@ -2766,12 +2768,40 @@ void MainWindow::setupActions()
 	QAction *layerDelete = makeAction(QT_TR_NOOP("Delete Layer"), "layerdelete")
 		.icon("list-remove");
 
+	auto *aclMenu = new docks::LayerAclMenu(this);
+
+	auto blendMenuGroup = new QActionGroup(this);
+	auto blendMenu = MenuBuilder(this, canvas::blendmode::tr)
+		.title(QT_TR_NOOP("Blend Mode"));
+	for (const auto &mode : canvas::blendmode::layerModeNames()) {
+		switch (mode.first) {
+		case rustpile::Blendmode::Darken:
+		case rustpile::Blendmode::Lighten:
+		case rustpile::Blendmode::Overlay:
+		case rustpile::Blendmode::Subtract:
+		case rustpile::Blendmode::Hue:
+			blendMenu.separator();
+			break;
+		default: {}
+		}
+
+		blendMenu.action([=](ActionBuilder action) {
+			action.text(mode.second)
+				.property("blendmode", int(mode.first))
+				.checkable()
+				.addTo(blendMenuGroup);
+		});
+	}
+
 	makeMenu(QT_TR_NOOP("Layer"), menuBar())
 		.action(layerAdd)
 		.action(groupAdd)
 		.action(layerDupe)
 		.action(layerMerge)
 		.action(layerDelete)
+		.separator()
+		.submenu(aclMenu)
+		.submenu(blendMenu)
 		.separator()
 		.action(makeAction(QT_TR_NOOP("Frame"), "layerviewframe")
 			.shortcut("Home")
@@ -2803,7 +2833,7 @@ void MainWindow::setupActions()
 			.onTriggered(m_dockTimeline, &docks::Timeline::setPreviousFrame)
 		);
 
-	m_dockLayers->setLayerEditActions(layerAdd, groupAdd, layerDupe, layerMerge, layerProperties, layerDelete);
+	m_dockLayers->setLayerEditActions(layerAdd, groupAdd, layerDupe, layerMerge, layerProperties, layerDelete, aclMenu, blendMenu);
 
 	// Session menu
 	m_admintools = new QActionGroup(this);

@@ -49,23 +49,19 @@ static const BlendModeInfo BLEND_MODE[] = {
 		BrushMode
 	},
 	{
+		QT_TRANSLATE_NOOP("blendmode", "Erase"),
+		Blendmode::Erase,
+		LayerMode
+	},
+
+	{
+		QT_TRANSLATE_NOOP("blendmode", "Darken"),
+		Blendmode::Darken,
+		UniversalMode
+	},
+	{
 		QT_TRANSLATE_NOOP("blendmode", "Multiply"),
 		Blendmode::Multiply,
-		UniversalMode
-	},
-	{
-		QT_TRANSLATE_NOOP("blendmode", "Screen"),
-		Blendmode::Screen,
-		UniversalMode
-	},
-	{
-		QT_TRANSLATE_NOOP("blendmode", "Overlay"),
-		Blendmode::Overlay,
-		UniversalMode
-	},
-	{
-		QT_TRANSLATE_NOOP("blendmode", "Divide"),
-		Blendmode::Divide,
 		UniversalMode
 	},
 	{
@@ -74,23 +70,24 @@ static const BlendModeInfo BLEND_MODE[] = {
 		UniversalMode
 	},
 	{
-		QT_TRANSLATE_NOOP("blendmode", "Dodge"),
-		Blendmode::Dodge,
+		QT_TRANSLATE_NOOP("blendmode", "Linear Burn"),
+		Blendmode::LinearBurn,
 		UniversalMode
 	},
-	{
-		QT_TRANSLATE_NOOP("blendmode", "Darken"),
-		Blendmode::Darken,
-		UniversalMode
-	},
+
 	{
 		QT_TRANSLATE_NOOP("blendmode", "Lighten"),
 		Blendmode::Lighten,
 		UniversalMode
 	},
 	{
-		QT_TRANSLATE_NOOP("blendmode", "Subtract"),
-		Blendmode::Subtract,
+		QT_TRANSLATE_NOOP("blendmode", "Screen"),
+		Blendmode::Screen,
+		UniversalMode
+	},
+	{
+		QT_TRANSLATE_NOOP("blendmode", "Dodge"),
+		Blendmode::Dodge,
 		UniversalMode
 	},
 	{
@@ -98,14 +95,10 @@ static const BlendModeInfo BLEND_MODE[] = {
 		Blendmode::Add,
 		UniversalMode
 	},
+
 	{
-		QT_TRANSLATE_NOOP("blendmode", "Erase"),
-		Blendmode::Erase,
-		LayerMode
-	},
-	{
-		QT_TRANSLATE_NOOP("blendmode", "Hard Light"),
-		Blendmode::HardLight,
+		QT_TRANSLATE_NOOP("blendmode", "Overlay"),
+		Blendmode::Overlay,
 		UniversalMode
 	},
 	{
@@ -114,8 +107,8 @@ static const BlendModeInfo BLEND_MODE[] = {
 		UniversalMode
 	},
 	{
-		QT_TRANSLATE_NOOP("blendmode", "Linear Burn"),
-		Blendmode::LinearBurn,
+		QT_TRANSLATE_NOOP("blendmode", "Hard Light"),
+		Blendmode::HardLight,
 		UniversalMode
 	},
 	{
@@ -128,6 +121,18 @@ static const BlendModeInfo BLEND_MODE[] = {
 		Blendmode::LuminosityShineSai,
 		UniversalMode
 	},
+
+	{
+		QT_TRANSLATE_NOOP("blendmode", "Subtract"),
+		Blendmode::Subtract,
+		UniversalMode
+	},
+	{
+		QT_TRANSLATE_NOOP("blendmode", "Divide"),
+		Blendmode::Divide,
+		UniversalMode
+	},
+
 	{
 		QT_TRANSLATE_NOOP("blendmode", "Hue"),
 		Blendmode::Hue,
@@ -139,18 +144,18 @@ static const BlendModeInfo BLEND_MODE[] = {
 		UniversalMode
 	},
 	{
-		QT_TRANSLATE_NOOP("blendmode", "Luminosity"),
-		Blendmode::Luminosity,
-		UniversalMode
-	},
-	{
 		QT_TRANSLATE_NOOP("blendmode", "Color"),
 		Blendmode::Color,
 		UniversalMode
 	},
+	{
+		QT_TRANSLATE_NOOP("blendmode", "Luminosity"),
+		Blendmode::Luminosity,
+		UniversalMode
+	},
 };
 
-static const int BLEND_MODES = sizeof(BLEND_MODE)/sizeof(BlendModeInfo);
+static const int BLEND_MODES = sizeof(BLEND_MODE)/sizeof(BLEND_MODE[0]);
 
 QString tr(const char *key, const char *disambiguation, int n)
 {

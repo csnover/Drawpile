@@ -22,15 +22,20 @@ LayerAclMenu::LayerAclMenu(QWidget *parent)
 	m_users->setExclusive(false);
 
 	MenuBuilder(this, tr)
-		.title(QT_TR_NOOP("User access"))
+		.title(QT_TR_NOOP("User Access"))
 		.action([=](ActionBuilder action) {
 			m_lock = action
-				.text(QT_TR_NOOP("Lock this layer"))
+				.text(QT_TR_NOOP("Lock Layer"))
 				.checkable();
 		})
 		.action([=](ActionBuilder action) {
 			m_censored = action
-				.text(QT_TR_NOOP("Censor"))
+				.text(QT_TR_NOOP("Censor Layer"))
+				.checkable();
+		})
+		.action([=](ActionBuilder action) {
+			m_default = action
+				.text(QT_TR_NOOP("Default Layer"))
 				.checkable();
 		})
 		.action([=](ActionBuilder action) {
@@ -134,12 +139,13 @@ void LayerAclMenu::userClicked(QAction *useraction)
 		const bool enable = !useraction->isChecked();
 		m_tiers->setEnabled(enable && exclusive.isEmpty());
 		m_users->setEnabled(enable);
-
 	} else if(useraction == m_censored) {
 		// Just toggle the censored flag, no other ACL changes
 		emit layerCensoredChange(m_censored->isChecked());
 		return;
-
+	} else if(useraction == m_default) {
+		emit layerDefaultChange(m_default->isChecked());
+		return;
 	} else {
 		// User exclusive access bit or tier changed.
 		m_tiers->setEnabled(exclusive.isEmpty());
@@ -164,6 +170,11 @@ void LayerAclMenu::setAcl(bool lock, rustpile::Tier tier, const QVector<uint8_t>
 	}
 
 	m_exclusives = exclusive;
+}
+
+void LayerAclMenu::setDefault(bool on)
+{
+	m_default->setChecked(on);
 }
 
 void LayerAclMenu::setCensored(bool censor)

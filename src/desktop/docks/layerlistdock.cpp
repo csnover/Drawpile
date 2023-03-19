@@ -75,7 +75,7 @@ void LayerList::setCanvas(canvas::CanvasModel *canvas)
 	m_canvas = canvas;
 	m_view->setModel(canvas->layerlist());
 
-	m_aclmenu->setUserList(canvas->userlist()->onlineUsers());
+	m_aclMenu->setUserList(canvas->userlist()->onlineUsers());
 
 	connect(canvas->layerlist(), &canvas::LayerListModel::modelAboutToBeReset, this, &LayerList::beforeLayerReset);
 	connect(canvas->layerlist(), &canvas::LayerListModel::modelReset, this, &LayerList::afterLayerReset);
@@ -89,66 +89,40 @@ void LayerList::setCanvas(canvas::CanvasModel *canvas)
 	updateLockedControls();
 }
 
-void LayerList::setLayerEditActions(QAction *addLayer, QAction *addGroup, QAction *duplicate, QAction *merge, QAction *properties, QAction *del)
+void LayerList::setLayerEditActions(QAction *addLayer, QAction *addGroup, QAction *duplicate, QAction *merge, QAction *properties, QAction *del, LayerAclMenu *aclMenu, QMenu *blendMenu)
 {
 	Q_ASSERT(addLayer);
 	Q_ASSERT(addGroup);
 	Q_ASSERT(duplicate);
 	Q_ASSERT(merge);
 	Q_ASSERT(del);
+
 	m_addLayerAction = addLayer;
+	connect(m_addLayerAction, &QAction::triggered, this, &LayerList::addLayer);
+
 	m_addGroupAction = addGroup;
+	connect(m_addGroupAction, &QAction::triggered, this, &LayerList::addGroup);
+
 	m_duplicateLayerAction = duplicate;
+	connect(m_duplicateLayerAction, &QAction::triggered, this, &LayerList::duplicateLayer);
+
 	m_mergeLayerAction = merge;
+	connect(m_mergeLayerAction, &QAction::triggered, this, &LayerList::mergeSelected);
+
 	m_propertiesAction = properties;
+	connect(m_propertiesAction, &QAction::triggered, this, &LayerList::showPropertiesOfSelected);
+
 	m_deleteLayerAction = del;
+	connect(m_deleteLayerAction, &QAction::triggered, this, &LayerList::deleteSelected);
 
-	// Add the actions to the header bar
-	TitleWidget *titlebar = qobject_cast<TitleWidget*>(titleBarWidget());
-	Q_ASSERT(titlebar);
+	m_aclMenu = aclMenu;
+	connect(m_aclMenu, &LayerAclMenu::layerAclChange, this, &LayerList::changeLayerAcl);
+	connect(m_aclMenu, &LayerAclMenu::layerCensoredChange, this, &LayerList::censorSelected);
+	connect(m_aclMenu, &LayerAclMenu::layerDefaultChange, this, &LayerList::changeDefaultLayer);
 
-	m_lockButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::NotGrouped, titlebar);
-	m_lockButton->setIcon(QIcon::fromTheme("object-locked"));
-	m_lockButton->setCheckable(true);
-	m_lockButton->setPopupMode(QToolButton::InstantPopup);
-	// To make the edit action buttons centred
-	titlebar->addSpace(m_lockButton->sizeHint().width());
+	m_blendMenu = blendMenu;
+	connect(m_blendMenu, &QMenu::triggered, this, &LayerList::changeLayerBlendMode);
 
-	// Layer ACL menu
-	m_aclmenu = new LayerAclMenu(this);
-	connect(m_aclmenu, &LayerAclMenu::layerAclChange, this, &LayerList::changeLayerAcl);
-	connect(m_aclmenu, &LayerAclMenu::layerCensoredChange, this, &LayerList::censorSelected);
-	m_lockButton->setMenu(m_aclmenu);
-
-	titlebar->addStretch();
-
-	auto *addLayerButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupLeft, titlebar);
-	addLayerButton->setDefaultAction(addLayer);
-	titlebar->addCustomWidget(addLayerButton);
-
-	auto *addGroupButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupCenter, titlebar);
-	addGroupButton->setDefaultAction(addGroup);
-	titlebar->addCustomWidget(addGroupButton);
-
-	auto *duplicateLayerButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupCenter, titlebar);
-	duplicateLayerButton->setDefaultAction(m_duplicateLayerAction);
-	titlebar->addCustomWidget(duplicateLayerButton);
-
-	auto *mergeLayerButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupCenter, titlebar);
-	mergeLayerButton->setDefaultAction(m_mergeLayerAction);
-	titlebar->addCustomWidget(mergeLayerButton);
-
-	auto *propertiesButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupCenter, titlebar);
-	propertiesButton->setDefaultAction(m_propertiesAction);
-	titlebar->addCustomWidget(propertiesButton);
-
-	auto *deleteLayerButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupRight, titlebar);
-	deleteLayerButton->setDefaultAction(m_deleteLayerAction);
-	titlebar->addCustomWidget(deleteLayerButton);
-
-	titlebar->addStretch();
-
-	// Add the actions to the context menu
 	m_contextMenu->addAction(m_propertiesAction);
 	m_contextMenu->addSeparator();
 	m_contextMenu->addAction(m_addLayerAction);
@@ -157,40 +131,27 @@ void LayerList::setLayerEditActions(QAction *addLayer, QAction *addGroup, QActio
 	m_contextMenu->addAction(m_mergeLayerAction);
 	m_contextMenu->addAction(m_deleteLayerAction);
 	m_contextMenu->addSeparator();
-	m_contextMenu->addMenu(m_aclmenu);
+	m_contextMenu->addMenu(m_aclMenu);
+	m_contextMenu->addMenu(m_blendMenu);
 
-	m_blendMenu = new QActionGroup(this);
-	connect(m_blendMenu, &QActionGroup::triggered, this, &LayerList::changeLayerBlendMode);
+	auto *titlebar = static_cast<TitleWidget*>(titleBarWidget());
 
-	auto blendMenu = MenuBuilder(this, canvas::blendmode::tr)
-		.title(QT_TR_NOOP("Blend mode"));
-	for (const auto &mode : canvas::blendmode::layerModeNames()) {
-		blendMenu.action([=](ActionBuilder action) {
-			action.text(mode.second)
-				.property("blendmode", int(mode.first))
-				.checkable()
-				.addTo(m_blendMenu);
-		});
-	}
-	m_contextMenu->addMenu(blendMenu);
+	titlebar->addSpace();
 
-	m_contextMenu->addSeparator();
+	auto *addLayerButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupLeft, titlebar);
+	addLayerButton->setDefaultAction(addLayer);
+	titlebar->addCustomWidget(addLayerButton);
 
-	m_defaultLayerAction = ActionBuilder(this, tr)
-		.text(QT_TR_NOOP("Default"))
-		.checkable()
-		.onTriggered(this, &LayerList::changeDefaultLayer);
-	m_contextMenu->addAction(m_defaultLayerAction);
+	auto *deleteLayerButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupCenter, titlebar);
+	deleteLayerButton->setDefaultAction(m_deleteLayerAction);
+	titlebar->addCustomWidget(deleteLayerButton);
 
-	// Action functionality
-	connect(m_addLayerAction, &QAction::triggered, this, &LayerList::addLayer);
-	connect(m_addGroupAction, &QAction::triggered, this, &LayerList::addGroup);
-	connect(m_duplicateLayerAction, &QAction::triggered, this, &LayerList::duplicateLayer);
-	connect(m_mergeLayerAction, &QAction::triggered, this, &LayerList::mergeSelected);
-	connect(m_propertiesAction, &QAction::triggered, this, &LayerList::showPropertiesOfSelected);
-	connect(m_deleteLayerAction, &QAction::triggered, this, &LayerList::deleteSelected);
-
-	titlebar->addCustomWidget(m_lockButton);
+	m_menuButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupRight, titlebar);
+	m_menuButton->setIcon(QIcon::fromTheme("application-menu"));
+	m_menuButton->setCheckable(true);
+	m_menuButton->setPopupMode(QToolButton::InstantPopup);
+	m_menuButton->setMenu(m_contextMenu);
+	titlebar->addCustomWidget(m_menuButton);
 
 	updateLockedControls();
 }
@@ -248,13 +209,16 @@ void LayerList::updateLockedControls()
 	// Rest of the controls need a selection to work.
 	const bool enabled = m_selectedId && (canEdit || (ownLayers && (m_selectedId>>8) == m_canvas->localUserId()));
 
-	m_lockButton->setEnabled(enabled);
+	m_menuButton->setEnabled(enabled);
 
 	if(hasEditActions) {
 		m_duplicateLayerAction->setEnabled(enabled);
 		m_propertiesAction->setEnabled(enabled);
 		m_deleteLayerAction->setEnabled(enabled);
 		m_mergeLayerAction->setEnabled(enabled && canMergeCurrent());
+		m_aclMenu->setEnabled(enabled);
+		m_blendMenu->setEnabled(enabled);
+		m_opacity->setEnabled(enabled);
 	}
 }
 
@@ -475,8 +439,8 @@ void LayerList::updateUiFromSelection()
 	const canvas::LayerListItem &layer = currentSelection().data(canvas::LayerListModel::ItemRole).value<canvas::LayerListItem>();
 	m_noupdate = true;
 	m_selectedId = layer.id;
-	m_defaultLayerAction->setChecked(m_canvas->layerlist()->defaultLayer() == layer.id);
-	m_aclmenu->setCensored(layer.attributes.censored);
+	m_aclMenu->setDefault(m_canvas->layerlist()->defaultLayer() == layer.id);
+	m_aclMenu->setCensored(layer.attributes.censored);
 	for (auto *action : m_blendMenu->actions()) {
 		if (action->property("blendmode").toInt() == int(layer.attributes.blend)) {
 			action->setChecked(true);
@@ -496,8 +460,8 @@ void LayerList::lockStatusChanged(int layerId)
 {
 	if(m_selectedId == layerId) {
 		const auto acl = m_canvas->aclState()->layerAcl(layerId);
-		m_lockButton->setChecked(acl.locked || acl.tier != rustpile::Tier::Guest || !acl.exclusive.isEmpty());
-		m_aclmenu->setAcl(acl.locked, acl.tier, acl.exclusive);
+		m_menuButton->setChecked(acl.locked || acl.tier != rustpile::Tier::Guest || !acl.exclusive.isEmpty());
+		m_aclMenu->setAcl(acl.locked, acl.tier, acl.exclusive);
 
 		emit activeLayerVisibilityChanged();
 	}
