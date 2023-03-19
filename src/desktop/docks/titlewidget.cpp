@@ -185,6 +185,9 @@ void TitleWidget::addCustomWidget(QWidget *widget, bool stretch)
 
 void TitleWidget::addSpace(int space)
 {
+	if (space == -1)
+		space = style()->pixelMetric(QStyle::PM_ToolBarItemSpacing, nullptr, this);
+
 	m_layout->insertSpacing(m_layout->count()-DEFAULT_WIDGET_COUNT, space);
 }
 

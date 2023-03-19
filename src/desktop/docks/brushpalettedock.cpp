@@ -68,17 +68,15 @@ BrushPalette::BrushPalette(QWidget *parent)
 	TitleWidget *titleWidget = new TitleWidget(this);
 	setTitleBarWidget(titleWidget);
 
-	const auto space = titleWidget->style()->pixelMetric(QStyle::PM_ToolBarItemSpacing, nullptr, titleWidget);
-
 	d->tagComboBox = new QComboBox(this);
 	d->tagComboBox->setInsertPolicy(QComboBox::NoInsert);
 	titleWidget->addCustomWidget(d->tagComboBox, true);
-	titleWidget->addSpace(space);
+	titleWidget->addSpace();
 
 	d->searchLineEdit = new QLineEdit(this);
 	AUTO_TR(d->searchLineEdit, setPlaceholderText, tr("Search"));
 	titleWidget->addCustomWidget(d->searchLineEdit, true);
-	titleWidget->addSpace(space);
+	titleWidget->addSpace();
 
 	d->menuButton = new widgets::GroupedToolButton(this);
 	d->menuButton->setIcon(QIcon::fromTheme("application-menu"));

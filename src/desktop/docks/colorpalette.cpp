@@ -92,14 +92,12 @@ ColorPaletteDock::ColorPaletteDock(QWidget *parent)
 	auto *titlebar = new TitleWidget(this);
 	setTitleBarWidget(titlebar);
 
-	const auto space = titlebar->style()->pixelMetric(QStyle::PM_ToolBarItemSpacing, nullptr, titlebar);
-
 	d->paletteChoiceBox = new QComboBox;
 	d->paletteChoiceBox->setInsertPolicy(QComboBox::NoInsert); // we want to handle editingFinished signal ourselves
 	d->paletteChoiceBox->setModel(getSharedPaletteModel());
 	connect(d->paletteChoiceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ColorPaletteDock::paletteChanged);
 	titlebar->addCustomWidget(d->paletteChoiceBox, true);
-	titlebar->addSpace(space);
+	titlebar->addSpace();
 
 	d->readonlyPalette = new widgets::GroupedToolButton;
 	AUTO_TR(d->readonlyPalette, setToolTip, tr("Write protect"));
@@ -116,7 +114,7 @@ ColorPaletteDock::ColorPaletteDock(QWidget *parent)
 		}
 	});
 	titlebar->addCustomWidget(d->readonlyPalette);
-	titlebar->addSpace(space);
+	titlebar->addSpace();
 
 	auto *menuButton = new widgets::GroupedToolButton;
 	menuButton->setIcon(QIcon::fromTheme("application-menu"));

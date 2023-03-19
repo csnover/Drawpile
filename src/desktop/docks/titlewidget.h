@@ -18,7 +18,7 @@ public:
 	explicit TitleWidget(QDockWidget *parent = nullptr);
 
 	void addCustomWidget(QWidget *widget, bool stretch=false);
-	void addSpace(int space);
+	void addSpace(int space = -1);
 	void addStretch(int stretch=0);
 
 private slots:
