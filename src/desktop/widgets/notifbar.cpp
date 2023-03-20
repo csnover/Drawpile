@@ -42,7 +42,7 @@ NotificationBar::NotificationBar(QWidget *parent)
 	auto *buttonLayout = new QVBoxLayout;
 	buttonLayout->setSpacing(0);
 	buttonLayout->setContentsMargins(0, 0, 0, 0);
-	buttonLayout->addSpacing(4);
+	buttonLayout->addSpacing(QFontMetrics(QFont()).descent());
 	buttonLayout->addWidget(m_actionButton);
 	layout->addLayout(buttonLayout);
 #else
