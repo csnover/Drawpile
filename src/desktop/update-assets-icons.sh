@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-cd $(dirname $0)/assets/theme
+cd "$(dirname "$0")/assets/theme"
 
 update_icons() {
 	pushd "$1" > /dev/null

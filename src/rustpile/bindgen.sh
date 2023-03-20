@@ -7,4 +7,5 @@ then
 	exit 1
 fi
 
+cd "$(dirname "$0")"
 cbindgen --config cbindgen.toml --lang c++ --crate rustpile --output rustpile.h
