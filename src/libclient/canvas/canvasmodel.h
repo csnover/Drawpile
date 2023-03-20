@@ -95,6 +95,8 @@ public:
 	 */
 	void resetCanvas();
 
+	void resetPaintEngine();
+
 public slots:
 	//! Handle a meta/command message received from the server
 	void handleCommand(const net::Envelope &cmd);

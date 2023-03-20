@@ -17,7 +17,7 @@ DocumentMetadata::DocumentMetadata(PaintEngine *engine, QObject *parent)
 
 void DocumentMetadata::refreshMetadata()
 {
-	const auto e = m_engine->engine();
+	const auto *e = m_engine->engine();
 
 	// Note: dpix and dpiy are presently not used in the GUI.
 	// To be included here when needed.

@@ -70,6 +70,11 @@ CanvasModel::CanvasModel(uint8_t localUserId, QObject *parent)
 	updateLayerViewOptions();
 }
 
+void CanvasModel::resetPaintEngine()
+{
+	m_paintengine->restart();
+}
+
 bool CanvasModel::load(const QSize &size, const QColor &background)
 {
 	return rustpile::paintengine_load_blank(

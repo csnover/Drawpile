@@ -90,7 +90,7 @@ signals:
 	//! An annotation item was just deleted
 	void annotationDeleted(int id);
 
-	void paintEngineCrashed();
+	void paintEngineCrashed(const QString &message);
 
 private slots:
 	void onSelectionChanged(canvas::Selection *sel);

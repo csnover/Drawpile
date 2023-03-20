@@ -114,6 +114,11 @@ void paintEngineCatchup(void *pe, uint32_t progress)
 	emit static_cast<PaintEngine*>(pe)->caughtUpTo(progress);
 }
 
+void paintEngineError(void *pe, const char *error)
+{
+	emit static_cast<PaintEngine*>(pe)->enginePanicked(error);
+}
+
 PaintEngine::PaintEngine(QObject *parent)
 	: QObject(parent), m_pe(nullptr)
 {
@@ -139,22 +144,27 @@ void PaintEngine::reset()
 		paintEngineCatchup,
 		paintEngineMetadataChanged,
 		paintEngineTimelineChanged,
-		paintEngineFrameVisbilityChanged
+		paintEngineFrameVisbilityChanged,
+		paintEngineError
 	);
+	restart();
 
 	m_cache = QPixmap();
 }
 
+void PaintEngine::restart()
+{
+	rustpile::paintengine_start(m_pe);
+}
+
 void PaintEngine::receiveMessages(bool local, const net::Envelope &msgs)
 {
-	if(!rustpile::paintengine_receive_messages(m_pe, local, msgs.data(), msgs.length()))
-		emit enginePanicked();
+	rustpile::paintengine_receive_messages(m_pe, local, msgs.data(), msgs.length());
 }
 
 void PaintEngine::enqueueCatchupProgress(int progress)
 {
-	if(!rustpile::paintengine_enqueue_catchup(m_pe, progress))
-		emit enginePanicked();
+	rustpile::paintengine_enqueue_catchup(m_pe, progress);
 }
 
 void PaintEngine::cleanup()

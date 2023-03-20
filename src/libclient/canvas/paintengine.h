@@ -35,6 +35,8 @@ public:
 	explicit PaintEngine(QObject *parent=nullptr);
 	~PaintEngine() override;
 
+	void restart();
+
 	/// Reset the paint engine to its default state
 	void reset();
 
@@ -113,7 +115,7 @@ signals:
 	void frameVisibilityChanged(const QVector<int> layers, bool frameMode);
 
 	//! Paint engine has panicked and died
-	void enginePanicked();
+	void enginePanicked(const QString &error);
 
 private:
 	rustpile::PaintEngine *m_pe;

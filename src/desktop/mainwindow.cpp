@@ -215,11 +215,12 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	m_view = new widgets::CanvasView(this);
 
 	m_notificationBar = new widgets::NotificationBar(this);
-	connect(m_notificationBar, &widgets::NotificationBar::actionButtonClicked, m_view, &widgets::CanvasView::reconnectRequested);
-	connect(m_canvasscene, &drawingboard::CanvasScene::paintEngineCrashed, [=] {
+	connect(m_notificationBar, &widgets::NotificationBar::actionButtonClicked, this, &MainWindow::recoverFromError);
+	connect(m_canvasscene, &drawingboard::CanvasScene::paintEngineCrashed, [=](const QString &message) {
+		m_error = NotificationError::PaintEngineCrashed;
 		m_notificationBar->show(
-			tr("Paint engine has crashed! Save your work and restart the application."),
-			QString(),
+			tr("Paint engine has crashed: %1").arg(message),
+			tr("Reset engine"),
 			widgets::NotificationBar::RoleColor::Fatal
 		);
 	});
@@ -380,10 +381,6 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 
 	connect(m_canvasscene, &drawingboard::CanvasScene::canvasResized, m_doc->toolCtrl(), &tools::ToolController::offsetActiveTool);
 
-	connect(m_view, &widgets::CanvasView::reconnectRequested, this, [this]() {
-		joinSession(m_doc->client()->sessionUrl(true));
-	});
-
 	// Network status changes
 	connect(m_doc, &Document::serverConnected, this, &MainWindow::onServerConnected);
 	connect(m_doc, &Document::serverLoggedIn, this, &MainWindow::onServerLogin);
@@ -526,6 +523,22 @@ void MainWindow::onCanvasChanged(canvas::CanvasModel *canvas)
 	for(int i=0;i<canvas::FeatureCount;++i) {
 		onFeatureAccessChange(canvas::Feature(i), m_doc->canvas()->aclState()->canUseFeature(canvas::Feature(i)));
 	}
+}
+
+void MainWindow::recoverFromError()
+{
+	switch(m_error) {
+	case NotificationError::None:
+		break;
+	case NotificationError::Disconnected:
+		joinSession(m_doc->client()->sessionUrl(true));
+		break;
+	case NotificationError::PaintEngineCrashed:
+		m_doc->canvas()->resetPaintEngine();
+		break;
+	}
+
+	m_error = NotificationError::None;
 }
 
 /**
@@ -1662,6 +1675,7 @@ void MainWindow::onServerDisconnected(const QString &message, const QString &err
 	}
 	// If logged in but disconnected unexpectedly, show notification bar
 	else if(m_doc->client()->isLoggedIn() && !localDisconnect) {
+		m_error = NotificationError::Disconnected;
 		m_notificationBar->show(
 			tr("Disconnected:") + " " + message,
 			tr("Reconnect"),

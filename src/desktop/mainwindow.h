@@ -172,11 +172,19 @@ private slots:
 	void onCanvasSaveStarted();
 	void onCanvasSaved(const QString &errorMessage);
 
+	void recoverFromError();
+
 protected:
 	void closeEvent(QCloseEvent *event) override;
 	bool event(QEvent *event) override;
 
 private:
+	enum class NotificationError {
+		None,
+		Disconnected,
+		PaintEngineCrashed
+	};
+
 	MainWindow *replaceableWindow();
 
 	//! Confirm saving of image in a format that doesn't support all required features
@@ -265,6 +273,8 @@ private:
 
 	Translator<QString, QString> m_windowTitle;
 	Translator<bool> m_recordAction;
+
+	NotificationError m_error = NotificationError::None;
 };
 
 #endif

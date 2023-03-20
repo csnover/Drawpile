@@ -298,6 +298,8 @@ using Frame = LayerID[12];
 
 using NotifyFrameVisibilityCallback = void(*)(void *ctx, const Frame *Frame, bool frame_mode);
 
+using NotifyErrorCallback = void(*)(void *ctx, const char *err);
+
 using JoinCallback = void(*)(void *ctx, UserID user, uint8_t flags, const uint8_t *name, uintptr_t name_len, const uint8_t *avatar, uintptr_t avatar_len);
 
 using LeaveCallback = void(*)(void *ctx, UserID user);
@@ -639,7 +641,10 @@ PaintEngine *paintengine_new(void *ctx,
                              NotifyCatchupCallback catchup,
                              NotifyMetadataCallback metadata,
                              NotifyTimelineCallback timeline,
-                             NotifyFrameVisibilityCallback framevis);
+                             NotifyFrameVisibilityCallback framevis,
+                             NotifyErrorCallback notify_error);
+
+void paintengine_start(PaintEngine *dp);
 
 /// Delete a paint engine instance and wait for its thread to finish
 void paintengine_free(PaintEngine *dp);
@@ -675,7 +680,7 @@ bool paintengine_enqueue_catchup(PaintEngine *dp, uint32_t progress);
 bool paintengine_cleanup(PaintEngine *dp);
 
 /// Reset the canvas in preparation of receiving a reset image
-void paintengine_reset_canvas(PaintEngine *dp);
+bool paintengine_reset_canvas(PaintEngine *dp);
 
 /// Reset the ACL filter back to local (non-networked) operating mode
 void paintengine_reset_acl(PaintEngine *dp, UserID local_user);
@@ -728,22 +733,22 @@ UserID paintengine_inspect_canvas(PaintEngine *dp, int32_t x, int32_t y);
 void paintengine_set_highlight_user(PaintEngine *dp, UserID user);
 
 /// Set a layer's local visibility flag
-void paintengine_set_layer_visibility(PaintEngine *dp, LayerID layer_id, bool visible);
+bool paintengine_set_layer_visibility(PaintEngine *dp, LayerID layer_id, bool visible);
 
 /// Draw a preview brush stroke onto the given layer
 ///
 /// This consumes the content of the brush engine.
-void paintengine_preview_brush(PaintEngine *dp, LayerID layer_id, BrushEngine *brushengine);
+bool paintengine_preview_brush(PaintEngine *dp, LayerID layer_id, BrushEngine *brushengine);
 
 /// Make a temporary eraser layer to preview a cut operation
-void paintengine_preview_cut(PaintEngine *dp,
+bool paintengine_preview_cut(PaintEngine *dp,
                              LayerID layer_id,
                              Rectangle rect,
                              const uint8_t *mask);
 
 /// Remove preview brush strokes from the given layer
 /// If layer ID is 0, previews from all layers will be removed
-void paintengine_remove_preview(PaintEngine *dp, LayerID layer_id);
+bool paintengine_remove_preview(PaintEngine *dp, LayerID layer_id);
 
 /// Perform a flood fill operation
 ///
@@ -873,7 +878,7 @@ CanvasIoError paintengine_load_file(PaintEngine *dp, const uint16_t *path, uintp
 CanvasIoError paintengine_load_recording(PaintEngine *dp, const uint16_t *path, uintptr_t path_len);
 
 /// Stop recording playback
-void paintengine_close_recording(PaintEngine *dp);
+bool paintengine_close_recording(PaintEngine *dp);
 
 /// Try opening the index file for the currently open recording.
 bool paintengine_load_recording_index(PaintEngine *dp);
@@ -920,12 +925,12 @@ void paintengine_stop_recording(PaintEngine *dp);
 ///
 /// If "sequences" is true, whole undo sequences are stepped instead of
 /// single messages. The playback callback will be called at the end.
-void paintengine_playback_step(PaintEngine *dp, int32_t steps, bool sequences);
+bool paintengine_playback_step(PaintEngine *dp, int32_t steps, bool sequences);
 
 /// Jump to a position in the recording.
 ///
 /// The recording must have been indexed.
-void paintengine_playback_jump(PaintEngine *dp, uint32_t pos, bool exact);
+bool paintengine_playback_jump(PaintEngine *dp, uint32_t pos, bool exact);
 
 bool paintengine_is_recording(const PaintEngine *dp);
 

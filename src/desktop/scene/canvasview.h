@@ -94,8 +94,6 @@ signals:
 
 	void rightClicked(const QPoint &p);
 
-	void reconnectRequested();
-
 public slots:
 	//! Set the size of the brush preview outline
 	void setOutlineSize(int size);

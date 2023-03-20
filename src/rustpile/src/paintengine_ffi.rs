@@ -28,9 +28,10 @@ use dpimpex;
 use dpimpex::rec::reader as rec_reader;
 use dpimpex::rec::writer as rec_writer;
 
-use core::ffi::c_void;
+use core::ffi::{c_char, c_void};
 use std::collections::HashMap;
 use std::convert::TryFrom;
+use std::ffi::CString;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::{Receiver, Sender};
@@ -55,6 +56,7 @@ type NotifyMetadataCallback = extern "C" fn(ctx: *mut c_void);
 type NotifyTimelineCallback = extern "C" fn(ctx: *mut c_void);
 type NotifyFrameVisibilityCallback =
     extern "C" fn(ctx: *mut c_void, Frame: *const Frame, frame_mode: bool);
+type NotifyErrorCallback = extern "C" fn(ctx: *mut c_void, err: *const c_char);
 
 // Main thread callbacks:
 type JoinCallback = Option<
@@ -98,6 +100,7 @@ pub struct ViewCache {
 /// changes to the canvas.
 /// Note that these callbacks are called in the *paint engine thread*.
 /// They should only be used to post events to the main thread's event loop.
+#[derive(Clone, Copy)]
 struct CanvasChangeCallbacks {
     context_object: *mut c_void,
     notify_changes: NotifyChangesCallback,
@@ -137,10 +140,12 @@ pub struct PaintEngine {
     view_opts: LayerViewOptions,
 
     /// A channel for sending commands to the paint engine
-    engine_channel: Sender<PaintEngineCommand>,
+    engine_channel: Option<Sender<PaintEngineCommand>>,
 
     /// The paint engine thread's handle
-    thread_handle: thread::JoinHandle<()>,
+    thread_handle: Option<thread::JoinHandle<()>>,
+    thread_callbacks: CanvasChangeCallbacks,
+    notify_error: NotifyErrorCallback,
 
     /// Message filtering state
     aclfilter: AclFilter,
@@ -180,7 +185,8 @@ fn run_paintengine(
     channel: Receiver<PaintEngineCommand>,
     callbacks: CanvasChangeCallbacks,
 ) {
-    let mut canvas = CanvasState::new();
+    let mut canvas =
+        CanvasState::new_with_layerstack((*viewcache.lock().unwrap().layerstack).clone());
 
     // only the last preview command needs to be executed
     let mut preview: (LayerID, Vec<CommandMessage>) = (0, Vec::new());
@@ -335,30 +341,14 @@ pub extern "C" fn paintengine_new(
     metadata: NotifyMetadataCallback,
     timeline: NotifyTimelineCallback,
     framevis: NotifyFrameVisibilityCallback,
+    notify_error: NotifyErrorCallback,
 ) -> *mut PaintEngine {
-    let viewcache = Arc::new(Mutex::new(ViewCache {
-        layerstack: Arc::new(LayerStack::new(0, 0)),
-        snapshots: SnapshotQueue::new(Duration::from_secs(10), 6),
-        unrefreshed_area: AoE::Nothing,
-    }));
-
-    let callbacks = CanvasChangeCallbacks {
-        context_object: ctx,
-        notify_changes: changes,
-        notify_resize: resizes,
-        notify_layerlist: layers,
-        notify_annotations: annotations,
-        notify_cursor: cursors,
-        notify_playback: playback,
-        notify_catchup: catchup,
-        notify_metadata: metadata,
-        notify_timeline: timeline,
-    };
-
-    let (sender, receiver) = mpsc::channel::<PaintEngineCommand>();
-
     let dp = Box::new(PaintEngine {
-        viewcache: viewcache.clone(),
+        viewcache: Arc::new(Mutex::new(ViewCache {
+            layerstack: Arc::new(LayerStack::new(0, 0)),
+            snapshots: SnapshotQueue::new(Duration::from_secs(10), 6),
+            unrefreshed_area: AoE::Nothing,
+        })),
         view_opts: LayerViewOptions::default().with_background(Tile::new_checkerboard(
             &Color::WHITE,
             &Color {
@@ -368,10 +358,21 @@ pub extern "C" fn paintengine_new(
                 a: 1.0,
             },
         )),
-        engine_channel: sender,
-        thread_handle: thread::spawn(move || {
-            run_paintengine(viewcache, receiver, callbacks);
-        }),
+        engine_channel: None,
+        thread_handle: None,
+        thread_callbacks: CanvasChangeCallbacks {
+            context_object: ctx,
+            notify_changes: changes,
+            notify_resize: resizes,
+            notify_layerlist: layers,
+            notify_annotations: annotations,
+            notify_cursor: cursors,
+            notify_playback: playback,
+            notify_catchup: catchup,
+            notify_metadata: metadata,
+            notify_timeline: timeline,
+        },
+        notify_error,
         aclfilter: AclFilter::new(),
         recorder: None,
         last_recorded_interval: Instant::now(),
@@ -395,6 +396,24 @@ pub extern "C" fn paintengine_new(
     Box::into_raw(dp)
 }
 
+#[no_mangle]
+pub extern "C" fn paintengine_start(dp: &mut PaintEngine) {
+    if let Some(handle) = dp.thread_handle.take() {
+        if let Err(err) = handle.join() {
+            let message = panic_message_c_str(&err);
+            (dp.notify_error)(dp.context_object, message.as_ptr());
+        }
+    }
+
+    let viewcache = dp.viewcache.clone();
+    let (sender, receiver) = mpsc::channel::<PaintEngineCommand>();
+    let callbacks = dp.thread_callbacks;
+    dp.engine_channel = Some(sender);
+    dp.thread_handle = Some(thread::spawn(move || {
+        run_paintengine(viewcache, receiver, callbacks);
+    }));
+}
+
 /// Delete a paint engine instance and wait for its thread to finish
 #[no_mangle]
 pub extern "C" fn paintengine_free(dp: *mut PaintEngine) {
@@ -404,8 +423,13 @@ pub extern "C" fn paintengine_free(dp: *mut PaintEngine) {
             dp.thread_handle
         };
 
-        if let Err(err) = handle.join() {
-            error!("Paintengine thread exited with an error {:?}", err);
+        if let Some(handle) = handle {
+            if let Err(err) = handle.join() {
+                error!(
+                    "Paintengine thread exited with an error {:?}",
+                    panic_message(&err)
+                );
+            }
         }
     }
 }
@@ -498,18 +522,17 @@ pub extern "C" fn paintengine_receive_messages(
 
         match msg {
             Message::Command(m) => {
-                if let Err(err) = dp.engine_channel.send(if local {
+                if !dp.send(if local {
                     PaintEngineCommand::LocalMessage(m)
                 } else {
                     PaintEngineCommand::RemoteMessage(m)
                 }) {
-                    warn!("Couldn't send command to paint engine thread {:?}", err);
                     return false;
                 }
             }
             Message::ServerMeta(m) => {
-                if !local {
-                    dp.handle_servermeta(m);
+                if !local && !dp.handle_servermeta(m) {
+                    return false;
                 }
             }
             Message::ClientMeta(m) => {
@@ -536,47 +559,25 @@ pub extern "C" fn paintengine_receive_messages(
 /// progress of the message queue
 #[no_mangle]
 pub extern "C" fn paintengine_enqueue_catchup(dp: &mut PaintEngine, progress: u32) -> bool {
-    if let Err(err) = dp
-        .engine_channel
-        .send(PaintEngineCommand::Catchup(progress))
-    {
-        warn!(
-            "Couldn't send catchup command to paint engine thread {:?}",
-            err
-        );
-        return false;
-    }
-
-    true
+    dp.send(PaintEngineCommand::Catchup(progress))
 }
 
 /// Clean up the paint engine state after disconnecting from a session
 #[no_mangle]
 pub extern "C" fn paintengine_cleanup(dp: &mut PaintEngine) -> bool {
-    if let Err(err) = dp.engine_channel.send(PaintEngineCommand::Cleanup) {
-        warn!(
-            "Couldn't send cleanup command to paint engine thread {:?}",
-            err
-        );
-        return false;
-    }
-
-    true
+    dp.send(PaintEngineCommand::Cleanup)
 }
 
 /// Reset the canvas in preparation of receiving a reset image
 #[no_mangle]
-pub extern "C" fn paintengine_reset_canvas(dp: &mut PaintEngine) {
+pub extern "C" fn paintengine_reset_canvas(dp: &mut PaintEngine) -> bool {
     dp.aclfilter = AclFilter::new();
 
-    if let Err(err) = dp.engine_channel.send(PaintEngineCommand::ReplaceCanvas(
+    if !dp.send(PaintEngineCommand::ReplaceCanvas(
         Box::new(LayerStack::new(0, 0)),
         true,
     )) {
-        warn!(
-            "Couldn't send reset canvas command to paint engine thread {:?}",
-            err
-        );
+        return false;
     }
 
     if let Some(cb) = dp.state_notify_aclchange {
@@ -587,6 +588,8 @@ pub extern "C" fn paintengine_reset_canvas(dp: &mut PaintEngine) {
         paintengine_stop_recording(dp);
         // TODO automatically start a new recording?
     }
+
+    true
 }
 
 /// Reset the ACL filter back to local (non-networked) operating mode
@@ -868,16 +871,8 @@ pub extern "C" fn paintengine_set_layer_visibility(
     dp: &mut PaintEngine,
     layer_id: LayerID,
     visible: bool,
-) {
-    if let Err(err) = dp
-        .engine_channel
-        .send(PaintEngineCommand::SetLocalVisibility(layer_id, visible))
-    {
-        warn!(
-            "Couldn't send visibility command to paint engine: {:?}",
-            err
-        );
-    }
+) -> bool {
+    dp.send(PaintEngineCommand::SetLocalVisibility(layer_id, visible))
 }
 
 /// Draw a preview brush stroke onto the given layer
@@ -888,13 +883,11 @@ pub extern "C" fn paintengine_preview_brush(
     dp: &mut PaintEngine,
     layer_id: LayerID,
     brushengine: &mut BrushEngine,
-) {
-    if let Err(err) = dp.engine_channel.send(PaintEngineCommand::BrushPreview(
+) -> bool {
+    dp.send(PaintEngineCommand::BrushPreview(
         layer_id,
         brushengine.take_dabs(0),
-    )) {
-        warn!("Couldn't send preview strokes to paint engine: {:?}", err);
-    }
+    ))
 }
 
 /// Make a temporary eraser layer to preview a cut operation
@@ -904,7 +897,7 @@ pub extern "C" fn paintengine_preview_cut(
     layer_id: LayerID,
     rect: Rectangle,
     mask: *const u8,
-) {
+) -> bool {
     let cmd = if mask.is_null() {
         vec![CommandMessage::FillRect(
             0,
@@ -935,24 +928,14 @@ pub extern "C" fn paintengine_preview_cut(
         )
     };
 
-    if let Err(err) = dp
-        .engine_channel
-        .send(PaintEngineCommand::BrushPreview(layer_id, cmd))
-    {
-        warn!("Couldn't send preview strokes to paint engine: {:?}", err);
-    }
+    dp.send(PaintEngineCommand::BrushPreview(layer_id, cmd))
 }
 
 /// Remove preview brush strokes from the given layer
 /// If layer ID is 0, previews from all layers will be removed
 #[no_mangle]
-pub extern "C" fn paintengine_remove_preview(dp: &mut PaintEngine, layer_id: LayerID) {
-    if let Err(err) = dp
-        .engine_channel
-        .send(PaintEngineCommand::RemovePreview(layer_id))
-    {
-        warn!("Couldn't send remove preview to paint engine: {:?}", err);
-    }
+pub extern "C" fn paintengine_remove_preview(dp: &mut PaintEngine, layer_id: LayerID) -> bool {
+    dp.send(PaintEngineCommand::RemovePreview(layer_id))
 }
 
 /// Perform a flood fill operation
@@ -1060,10 +1043,10 @@ pub extern "C" fn paintengine_make_movelayer(
 
     if let Some(layers) = new_ordering {
         CommandMessage::LayerOrder(user_id, LayerOrderMessage { root: 0, layers }).write(writer);
-        return true;
+        true
+    } else {
+        false
     }
-
-    false
 }
 
 /// Generate the commands for deleting all the empty
@@ -1326,18 +1309,7 @@ pub extern "C" fn paintengine_load_blank(
         .unwrap();
     l.metadata_mut().title = "Layer 1".into();
 
-    if let Err(err) = dp
-        .engine_channel
-        .send(PaintEngineCommand::ReplaceCanvas(ls, false))
-    {
-        warn!(
-            "Couldn't send replace command to paint engine thread {:?}",
-            err
-        );
-        return false;
-    }
-
-    true
+    dp.send(PaintEngineCommand::ReplaceCanvas(ls, false))
 }
 
 #[repr(C)]
@@ -1386,18 +1358,11 @@ pub extern "C" fn paintengine_load_file(
         }
     };
 
-    if let Err(err) = dp
-        .engine_channel
-        .send(PaintEngineCommand::ReplaceCanvas(ls, false))
-    {
-        warn!(
-            "Couldn't send replace command to paint engine thread {:?}",
-            err
-        );
-        return CanvasIoError::PaintEngineCrashed;
+    if dp.send(PaintEngineCommand::ReplaceCanvas(ls, false)) {
+        CanvasIoError::NoError
+    } else {
+        CanvasIoError::PaintEngineCrashed
     }
-
-    CanvasIoError::NoError
 }
 
 /// Open a recording for playback
@@ -1434,34 +1399,30 @@ pub extern "C" fn paintengine_load_recording(
         }
     };
 
-    if let Err(err) = dp.engine_channel.send(PaintEngineCommand::ReplaceCanvas(
+    if dp.send(PaintEngineCommand::ReplaceCanvas(
         Box::new(LayerStack::new(0, 0)),
         false,
     )) {
-        warn!(
-            "Couldn't send replace command to paint engine thread {:?}",
-            err
-        );
-        return CanvasIoError::PaintEngineCrashed;
+        dp.player = Some(player);
+        dp.player_index = None;
+        dp.player_path = path.into();
+
+        compatibility
+    } else {
+        CanvasIoError::PaintEngineCrashed
     }
-
-    dp.player = Some(player);
-    dp.player_index = None;
-    dp.player_path = path.into();
-
-    compatibility
 }
 
 /// Stop recording playback
 #[no_mangle]
-pub extern "C" fn paintengine_close_recording(dp: &mut PaintEngine) {
+pub extern "C" fn paintengine_close_recording(dp: &mut PaintEngine) -> bool {
     dp.player = None;
     dp.player_index = None;
 
     // Stopping a recording is similar to logging out of an
     // online session, so do the same cleanup to ensure there
     // are no dangling temporary layers etc.
-    paintengine_cleanup(dp);
+    paintengine_cleanup(dp)
 }
 
 /// Try opening the index file for the currently open recording.
@@ -1737,14 +1698,18 @@ pub extern "C" fn paintengine_stop_recording(dp: &mut PaintEngine) {
 /// If "sequences" is true, whole undo sequences are stepped instead of
 /// single messages. The playback callback will be called at the end.
 #[no_mangle]
-pub extern "C" fn paintengine_playback_step(dp: &mut PaintEngine, mut steps: i32, sequences: bool) {
+pub extern "C" fn paintengine_playback_step(
+    dp: &mut PaintEngine,
+    mut steps: i32,
+    sequences: bool,
+) -> bool {
     if steps < 0 {
         let pos = dp.player.as_deref().unwrap().current_index();
         if pos > 0 {
-            paintengine_playback_jump(dp, (pos - 1) as u32, false);
+            return paintengine_playback_jump(dp, (pos - 1) as u32, false);
         }
 
-        return;
+        return true;
     }
 
     let mut interval: u32 = 0;
@@ -1757,17 +1722,10 @@ pub extern "C" fn paintengine_playback_step(dp: &mut PaintEngine, mut steps: i32
             }
             rec_reader::ReadMessage::IoError(e) => {
                 warn!("An IO error occurred while playing back recording: {}", e);
-                return;
+                return false;
             }
             rec_reader::ReadMessage::Eof => {
-                if let Err(err) = dp
-                    .engine_channel
-                    .send(PaintEngineCommand::PlaybackPaused(-1, 0))
-                {
-                    warn!("Couldn't send command to paint engine thread {:?}", err);
-                    return;
-                }
-                return;
+                return dp.send(PaintEngineCommand::PlaybackPaused(-1, 0));
             }
         };
 
@@ -1791,9 +1749,8 @@ pub extern "C" fn paintengine_playback_step(dp: &mut PaintEngine, mut steps: i32
 
         match msg {
             Message::Command(m) => {
-                if let Err(err) = dp.engine_channel.send(PaintEngineCommand::RemoteMessage(m)) {
-                    warn!("Couldn't send command to paint engine thread {:?}", err);
-                    return;
+                if !dp.send(PaintEngineCommand::RemoteMessage(m)) {
+                    return false;
                 }
             }
             Message::ServerMeta(m) => {
@@ -1819,25 +1776,20 @@ pub extern "C" fn paintengine_playback_step(dp: &mut PaintEngine, mut steps: i32
         (player.current_progress() * 100.0) as i64
     };
 
-    if let Err(err) = dp
-        .engine_channel
-        .send(PaintEngineCommand::PlaybackPaused(pos, interval))
-    {
-        warn!("Couldn't send command to paint engine thread {:?}", err);
-    }
+    dp.send(PaintEngineCommand::PlaybackPaused(pos, interval))
 }
 
 /// Jump to a position in the recording.
 ///
 /// The recording must have been indexed.
 #[no_mangle]
-pub extern "C" fn paintengine_playback_jump(dp: &mut PaintEngine, pos: u32, exact: bool) {
+pub extern "C" fn paintengine_playback_jump(dp: &mut PaintEngine, pos: u32, exact: bool) -> bool {
     if let Some(index) = &mut dp.player_index {
         let (msg_idx, msg_offset, layerstack) = match index.load_snapshot(pos) {
             Ok(s) => s,
             Err(e) => {
                 warn!("Couldn't jump to index {} in recording: {}", pos, e);
-                return;
+                return false;
             }
         };
 
@@ -1846,19 +1798,14 @@ pub extern "C" fn paintengine_playback_jump(dp: &mut PaintEngine, pos: u32, exac
         let current_index = dp.player.as_deref().unwrap().current_index() as u32;
         if current_index >= msg_idx && current_index < pos {
             // No need to reset if we're already within the snapshot
-            paintengine_playback_step(dp, (pos - current_index) as i32, false);
-            return;
+            return paintengine_playback_step(dp, (pos - current_index) as i32, false);
         }
 
-        if let Err(err) = dp.engine_channel.send(PaintEngineCommand::ReplaceCanvas(
+        if !dp.send(PaintEngineCommand::ReplaceCanvas(
             Box::new(layerstack),
             false,
         )) {
-            warn!(
-                "Couldn't send reset canvas command to paint engine thread {:?}",
-                err
-            );
-            return;
+            return false;
         }
 
         dp.player
@@ -1867,14 +1814,13 @@ pub extern "C" fn paintengine_playback_jump(dp: &mut PaintEngine, pos: u32, exac
             .seek_to(msg_idx, msg_offset);
 
         if exact && pos > msg_idx {
-            paintengine_playback_step(dp, (pos - msg_idx) as i32, false);
-        } else if let Err(err) = dp
-            .engine_channel
-            .send(PaintEngineCommand::PlaybackPaused(msg_idx as i64, 0))
-        {
-            warn!("Couldn't send command to paint engine thread {:?}", err);
+            return paintengine_playback_step(dp, (pos - msg_idx) as i32, false);
+        } else {
+            return dp.send(PaintEngineCommand::PlaybackPaused(msg_idx as i64, 0));
         }
     }
+
+    true
 }
 
 #[no_mangle]
@@ -1942,7 +1888,7 @@ pub extern "C" fn paintengine_paint_changes(
 }
 
 impl PaintEngine {
-    fn handle_servermeta(&mut self, msg: ServerMetaMessage) {
+    fn handle_servermeta(&mut self, msg: ServerMetaMessage) -> bool {
         use ServerMetaMessage::*;
         match msg {
             Join(u, m) => {
@@ -1991,12 +1937,7 @@ impl PaintEngine {
             }
             SoftReset(_) => {
                 // The (soft) reset point is the beginning of the new history
-                if let Err(err) = self
-                    .engine_channel
-                    .send(PaintEngineCommand::TruncateHistory)
-                {
-                    warn!("Couldn't send command to paint engine thread {:?}", err);
-                }
+                return self.send(PaintEngineCommand::TruncateHistory);
 
                 // TODO support Thick Server. Send a soft reset trigger command
                 // if this user is the resetter.
@@ -2005,6 +1946,8 @@ impl PaintEngine {
             // Handled by the ACL filter:
             SessionOwner(_, _) | TrustedUsers(_, _) => (),
         }
+
+        true
     }
 
     fn handle_clientmeta(&mut self, msg: ClientMetaMessage) {
@@ -2031,4 +1974,39 @@ impl PaintEngine {
             Marker(_, _) => (), // removed feature
         }
     }
+
+    fn send(&mut self, command: PaintEngineCommand) -> bool {
+        if let Some(sender) = &self.engine_channel {
+            if sender.send(command).is_ok() {
+                true
+            } else {
+                if let Some(handle) = self.thread_handle.take() {
+                    if let Err(err) = handle.join() {
+                        let message = panic_message_c_str(&err);
+                        (self.notify_error)(self.context_object, message.as_ptr());
+                    }
+                }
+                false
+            }
+        } else {
+            warn!("sent to a dead thread");
+            false
+        }
+    }
+}
+
+fn panic_message(err: &Box<dyn core::any::Any + Send>) -> &str {
+    if let Some(err) = err.downcast_ref::<String>() {
+        err
+    } else if let Some(err) = err.downcast_ref::<&str>() {
+        err
+    } else {
+        "unknown panic"
+    }
+}
+
+fn panic_message_c_str(err: &Box<dyn core::any::Any + Send>) -> CString {
+    let message = panic_message(err);
+    CString::new(message)
+        .unwrap_or_else(|nul_err| CString::new(&message[..nul_err.nul_position()]).unwrap())
 }
