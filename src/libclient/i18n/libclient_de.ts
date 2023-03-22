@@ -67,7 +67,7 @@
 <context>
     <name>FfmpegExporter</name>
     <message>
-        <location filename="../export/ffmpegexporter.cpp" line="+122"/>
+        <location filename="../export/ffmpegexporter.cpp" line="+123"/>
         <source>Couldn&apos;t start ffmpeg!</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>ffmpeg kann nicht gestartet werden!</translation>
@@ -135,17 +135,27 @@
 <context>
     <name>SessionListingModel</name>
     <message>
-        <location filename="../net/sessionlistingmodel.cpp" line="+74"/>
-        <source>%1h %2m</source>
-        <translation>%1h %2m</translation>
+        <location filename="../net/sessionlistingmodel.cpp" line="+72"/>
+        <source>%1d%2h%3m</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="+5"/>
+        <source>%1h%2m</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>%1m</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+72"/>
         <source>(untitled)</source>
         <translation>(unbenannt)</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+31"/>
         <source>New version</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Neue Version</translation>
@@ -163,7 +173,7 @@
         <translation>Inkompatible Version (%1)</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+29"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
@@ -206,83 +216,83 @@
         <translation>Unterhalb</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+16"/>
         <source>Multiply</source>
         <translation>Multiplikation</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+21"/>
         <source>Screen</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Bildschirm</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+16"/>
         <source>Overlay</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Ineinanderkopieren</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+31"/>
         <source>Divide</source>
         <translation>Division</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-63"/>
         <source>Burn</source>
         <translation>Nachbelichten</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+21"/>
         <source>Dodge</source>
         <translation>Abwedeln</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-31"/>
         <source>Darken</source>
         <translation>Nur Abdunkeln</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+21"/>
         <source>Lighten</source>
         <translation>Nur Aufhellen</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+47"/>
         <source>Subtract</source>
         <translation>Subtraktion</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-32"/>
         <source>Add</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Addition</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-42"/>
         <source>Erase</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+58"/>
         <source>Hard Light</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Hartes Licht</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-5"/>
         <source>Soft Light</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Weiches Licht</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-32"/>
         <source>Linear Burn</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Linear nachbelichten</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+42"/>
         <source>Linear Light</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Lineares Licht</translation>
@@ -293,7 +303,7 @@
         <translation>Leuchtkraft (SAI)</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+17"/>
         <source>Hue</source>
         <translation>Farbton</translation>
     </message>
@@ -303,13 +313,13 @@
         <translation>Sättigung</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>Luminosity</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Leuchtkraft</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-5"/>
         <source>Color</source>
         <translation>Farbe</translation>
     </message>
@@ -399,7 +409,22 @@
 <context>
     <name>canvas::LayerListModel</name>
     <message>
-        <location filename="../canvas/layerlist.cpp" line="+55"/>
+        <location filename="../canvas/layerlist.cpp" line="+52"/>
+        <source>Default layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Invisible to you</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Censored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+32"/>
         <source>Group</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Gruppe</translation>
@@ -409,6 +434,14 @@
         <source>Layer</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Ebene</translation>
+    </message>
+</context>
+<context>
+    <name>canvas::TimelineModel</name>
+    <message>
+        <location filename="../canvas/timelinemodel.cpp" line="+62"/>
+        <source>%1 / %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -697,7 +730,7 @@
 <context>
     <name>sessionlisting::ListServerModel</name>
     <message>
-        <location filename="../utils/listservermodel.cpp" line="+37"/>
+        <location filename="../utils/listservermodel.cpp" line="+40"/>
         <source>%1
 
 %2

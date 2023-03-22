@@ -75,7 +75,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../gui/serversummarypage.h" line="+44"/>
+        <location filename="../gui/serversummarypage.h" line="+45"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -85,7 +85,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../gui/userlistpage.h" line="+39"/>
+        <location filename="../gui/userlistpage.h" line="+40"/>
         <source>Users</source>
         <translation type="unfinished"></translation>
     </message>
@@ -326,7 +326,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+24"/>
         <location line="+6"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
@@ -373,7 +373,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+24"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -614,7 +614,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+42"/>
         <source>Started</source>
         <translation type="unfinished"></translation>
     </message>
@@ -685,7 +685,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+17"/>
         <source>Send message</source>
         <translation type="unfinished"></translation>
     </message>
@@ -780,25 +780,25 @@
     </message>
     <message>
         <location line="+4"/>
-        <location line="+104"/>
+        <location line="+103"/>
         <source>Change password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-100"/>
+        <location line="-99"/>
         <source>Retitle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <location line="+29"/>
-        <location line="+101"/>
+        <location line="+100"/>
         <location line="+38"/>
         <source>Send message</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-158"/>
+        <location line="-157"/>
         <source>Users</source>
         <translation type="unfinished"></translation>
     </message>
@@ -818,7 +818,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+23"/>
         <source>Terminate session?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -910,7 +910,7 @@
 <context>
     <name>server::gui::UserListPage</name>
     <message>
-        <location filename="../gui/userlistpage.cpp" line="+49"/>
+        <location filename="../gui/userlistpage.cpp" line="+45"/>
         <source>Users</source>
         <translation type="unfinished"></translation>
     </message>

@@ -120,14 +120,14 @@
     <message>
         <location line="+24"/>
         <location line="+14"/>
-        <location line="+215"/>
+        <location line="+212"/>
         <location line="+21"/>
         <source>Pressure sensitivity</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Drucksensitivität</translation>
     </message>
     <message>
-        <location line="-215"/>
+        <location line="-212"/>
         <source>Gain:</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Verstärkung:</translation>
@@ -139,13 +139,22 @@
         <translation>Stabilisator:</translation>
     </message>
     <message>
-        <location line="+23"/>
-        <location line="+284"/>
+        <location line="+7"/>
+        <location line="+16"/>
+        <location line="+20"/>
+        <location line="+66"/>
+        <location line="+13"/>
+        <location line="+182"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location line="-106"/>
+        <location line="-228"/>
+        <source>1/</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+122"/>
         <source>Pigment:</source>
         <translation>Pigment:</translation>
     </message>
@@ -173,17 +182,17 @@
         <translation>Radius:</translation>
     </message>
     <message>
-        <location line="-299"/>
+        <location line="-296"/>
         <source>Hardness:</source>
         <translation>Härte:</translation>
     </message>
     <message>
-        <location line="+69"/>
+        <location line="+66"/>
         <source>Opacity:</source>
         <translation>Deckkraft:</translation>
     </message>
     <message>
-        <location line="-119"/>
+        <location line="-116"/>
         <source>Size:</source>
         <translation>Größe:</translation>
     </message>
@@ -193,7 +202,7 @@
         <translation>Abstand:</translation>
     </message>
     <message>
-        <location line="+211"/>
+        <location line="+208"/>
         <source>Smudging:</source>
         <translation>Verwischen:</translation>
     </message>
@@ -371,7 +380,7 @@ to 64x64 pixels.</source>
 <context>
     <name>DrawpileApp</name>
     <message>
-        <location filename="../main.cpp" line="+306"/>
+        <location filename="../main.cpp" line="+317"/>
         <source>Override read-only data directory.</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Überschreiben Sie das schreibgeschützte Datenverzeichnis.</translation>
@@ -387,15 +396,6 @@ to 64x64 pixels.</source>
         <source>Filename or URL.</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Dateiname oder URL.</translation>
-    </message>
-</context>
-<context>
-    <name>FileFormatOptions</name>
-    <message>
-        <location filename="../dialogs/avatarimport.cpp" line="+60"/>
-        <location filename="../dialogs/brushpresetproperties.cpp" line="+50"/>
-        <source>Images (%1)</source>
-        <translation>Bilder (%1)</translation>
     </message>
 </context>
 <context>
@@ -645,13 +645,7 @@ to 64x64 pixels.</source>
         <translation>Sie verwenden eine veraltete Version von Drawpile. Einige Server werden nicht verfügbar sein.</translation>
     </message>
     <message>
-        <location line="+23"/>
-        <source>&lt;p&gt;You haven’t added any servers yet. Find some at &lt;a href=&quot;https://drawpile.net/communities/&quot;&gt;drawpile.net/communities&lt;/a&gt;, or try pub.drawpile.net.&lt;/p&gt;</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>Sie haben noch keine Server hinzugefügt. Finden Sie einige bei &lt;a href=&quot;https://drawpile.net/communities/&quot;&gt;drawpile.net/communities&lt;/a&gt;, oder versuchen Sie pub.drawpile.net.&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <location line="+15"/>
+        <location line="+35"/>
         <source>Filter</source>
         <translation>Filter</translation>
     </message>
@@ -680,7 +674,7 @@ to 64x64 pixels.</source>
         <translation>NSFW</translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="+38"/>
         <source>Enter a host address, session URL, or room code to join a session:</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Geben Sie eine Hostadresse, eine Sitzungs-URL oder einen Raumcode ein, um einer Sitzung beizutreten:</translation>
@@ -802,30 +796,30 @@ to 64x64 pixels.</source>
 <context>
     <name>LoginDialog</name>
     <message>
-        <location filename="../ui/logindialog.ui" line="+152"/>
+        <location filename="../ui/logindialog.ui" line="+189"/>
         <source>Incorrect password.</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Falsches Passwort.</translation>
     </message>
     <message>
-        <location line="-13"/>
+        <location line="-25"/>
         <source>Password</source>
         <translation>Passwort</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+38"/>
         <source>Remember my password</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Mein Passwort merken</translation>
     </message>
     <message>
-        <location line="-39"/>
+        <location line="-51"/>
         <source>Username</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Benutzername</translation>
     </message>
     <message>
-        <location line="+63"/>
+        <location line="+75"/>
         <source>Filter</source>
         <translation>Filter</translation>
     </message>
@@ -879,8 +873,8 @@ to 64x64 pixels.</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../mainwindow.cpp" line="+443"/>
-        <location line="+1012"/>
+        <location filename="../mainwindow.cpp" line="+441"/>
+        <location line="+1028"/>
         <source>Untitled</source>
         <translation>Unbenannt</translation>
     </message>
@@ -955,7 +949,7 @@ to 64x64 pixels.</source>
         <translation>Bild gespeichert</translation>
     </message>
     <message>
-        <location line="+1187"/>
+        <location line="+1196"/>
         <source>Pause</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Pausieren</translation>
@@ -966,13 +960,29 @@ to 64x64 pixels.</source>
         <translation>Abspielen</translation>
     </message>
     <message>
-        <location line="-1040"/>
+        <location line="-1049"/>
         <location line="+70"/>
         <source>Invalid address</source>
         <translation>Ungültige Adresse</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="-1231"/>
+        <source>Paint engine has crashed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Reset engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+52"/>
+        <location line="+73"/>
+        <source>%L1MiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1123"/>
         <source>Really leave the session?</source>
         <translation>Wollen Sie die Sitzung wirklich verlassen?</translation>
     </message>
@@ -992,7 +1002,7 @@ to 64x64 pixels.</source>
         <translation>Es gibt noch nicht übertragene Änderungen! Bitte warten Sie bis die Übertragung abgeschlossen ist!</translation>
     </message>
     <message>
-        <location line="+165"/>
+        <location line="+168"/>
         <source>Would you like to join the session instead?</source>
         <translation>Möchten Sie stattdessen der Sitzung beitreten?</translation>
     </message>
@@ -1002,13 +1012,13 @@ to 64x64 pixels.</source>
         <translation>Beitreten</translation>
     </message>
     <message>
-        <location line="+22"/>
+        <location line="+23"/>
         <source>Reconnect</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Erneut verbinden</translation>
     </message>
     <message>
-        <location line="+50"/>
+        <location line="+55"/>
         <source>Board is locked</source>
         <translation>Das Zeichenbrett ist gesperrt</translation>
     </message>
@@ -1058,13 +1068,13 @@ to 64x64 pixels.</source>
         <translation>Aufzeichnen...</translation>
     </message>
     <message>
-        <location line="-2144"/>
+        <location line="-2165"/>
         <source>Server out of space</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Server hat keinen Speicherplatz mehr</translation>
     </message>
     <message>
-        <location line="+1233"/>
+        <location line="+1245"/>
         <source>Become Operator</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Operator werden</translation>
@@ -1089,19 +1099,19 @@ to 64x64 pixels.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+1291"/>
+        <location line="+1328"/>
         <source>Terminate</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Beenden</translation>
     </message>
     <message>
-        <location line="-1180"/>
+        <location line="-1213"/>
         <source>Disconnected:</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Getrennt:</translation>
     </message>
     <message>
-        <location line="+63"/>
+        <location line="+68"/>
         <source>Session blocked by parental controls</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Von der Kindersicherung blockierte Sitzung</translation>
@@ -1318,7 +1328,7 @@ to 64x64 pixels.</source>
         <translation>Eigenschaften…</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+40"/>
         <source>Frame</source>
         <translation>Frame</translation>
     </message>
@@ -1406,7 +1416,7 @@ to 64x64 pixels.</source>
         <translation>Zeichenwerkzeuge</translation>
     </message>
     <message>
-        <location line="-169"/>
+        <location line="-197"/>
         <source>User Pointers</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Benutzerpointer</translation>
@@ -1436,7 +1446,7 @@ to 64x64 pixels.</source>
         <translation>Ebene entfernen</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+43"/>
         <source>Solo</source>
         <translation>Solo</translation>
     </message>
@@ -1452,18 +1462,18 @@ to 64x64 pixels.</source>
         <translation>Zensierte Ebenen anzeigen</translation>
     </message>
     <message>
-        <location line="-22"/>
+        <location line="-25"/>
         <source>Layer</source>
         <translation>Ebene</translation>
     </message>
     <message>
-        <location line="+95"/>
+        <location line="+98"/>
         <source>Lock Everything</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Alles sperren</translation>
     </message>
     <message>
-        <location line="-1810"/>
+        <location line="-1847"/>
         <source>Open Image</source>
         <translation>Bild öffnen</translation>
     </message>
@@ -1480,22 +1490,22 @@ to 64x64 pixels.</source>
         <translation>Sitzung aufzeichnen</translation>
     </message>
     <message>
-        <location line="+1106"/>
+        <location line="+1115"/>
         <source>Stop Recording</source>
         <translation>Aufzeichnung beenden</translation>
     </message>
     <message>
-        <location line="-1032"/>
+        <location line="-1041"/>
         <source>Host Session</source>
         <translation>Sitzung bereitstellen</translation>
     </message>
     <message>
-        <location line="+244"/>
+        <location line="+247"/>
         <source>Could not connect to server</source>
         <translation>Konnte nicht mit dem Server verbinden</translation>
     </message>
     <message>
-        <location line="+428"/>
+        <location line="+434"/>
         <source>Paste Image</source>
         <translation>Bild einfügen</translation>
     </message>
@@ -1620,7 +1630,7 @@ to 64x64 pixels.</source>
         <translation>&amp;Vollbild</translation>
     </message>
     <message>
-        <location line="+302"/>
+        <location line="+330"/>
         <source>Pick colors from the image</source>
         <translation>Farben aus dem Bild aufnehmen</translation>
     </message>
@@ -1635,13 +1645,13 @@ to 64x64 pixels.</source>
         <translation>&amp;Gerade</translation>
     </message>
     <message>
-        <location line="-2400"/>
+        <location line="-2453"/>
         <source>🙋 %1 joined!</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>🙋 %1 beigetreten!</translation>
     </message>
     <message>
-        <location line="-227"/>
+        <location line="-223"/>
         <source>Server is running out of history space and session has grown too large to automatically reset! (Limit is %1)
 Simplify the canvas and reset manually before space runs out.</source>
         <translatorcomment>machine-translated</translatorcomment>
@@ -1649,14 +1659,7 @@ Simplify the canvas and reset manually before space runs out.</source>
 Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speicherplatz erschöpft ist.</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <location line="+73"/>
-        <source>%1MiB</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>%1MiB</translation>
-    </message>
-    <message>
-        <location line="+890"/>
+        <location line="+976"/>
         <source>Export Animated GIF</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Animiertes GIF exportieren</translation>
@@ -1674,7 +1677,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Animation speichern...</translation>
     </message>
     <message>
-        <location line="+547"/>
+        <location line="+556"/>
         <source>Couldn&apos;t open file</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Datei konnte nicht geöffnet werden</translation>
@@ -1710,8 +1713,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Bild konnte nicht entschlüsselt werden</translation>
     </message>
     <message>
-        <location line="-1603"/>
-        <location line="+1606"/>
+        <location line="+3"/>
         <source>Paint engine has crashed! Save your work and restart the application.</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Das Malprogramm ist abgestürzt! Speichern Sie Ihre Arbeit und starten Sie die Anwendung neu.</translation>
@@ -1740,7 +1742,12 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Löschen</translation>
     </message>
     <message>
-        <location line="+270"/>
+        <location line="+189"/>
+        <source>Blend Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+109"/>
         <source>Event Log</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Ereignisprotokoll</translation>
@@ -2095,10 +2102,9 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>QFileDialog</name>
     <message>
-        <location filename="../dialogs/avatarimport.cpp" line="+1"/>
-        <location filename="../dialogs/settingsdialog.cpp" line="+613"/>
+        <location filename="../dialogs/settingsdialog.cpp" line="+626"/>
         <location filename="../dialogs/videoexportdialog.cpp" line="+171"/>
-        <location filename="../docks/colorpalette.cpp" line="+225"/>
+        <location filename="../docks/colorpalette.cpp" line="+222"/>
         <source>All Files (*)</source>
         <translation>Alle Dateien (*)</translation>
     </message>
@@ -2476,22 +2482,22 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Voreinstellungen</translation>
     </message>
     <message>
-        <location line="+700"/>
+        <location line="+716"/>
         <source>s</source>
         <translation>s</translation>
     </message>
     <message>
-        <location line="-651"/>
+        <location line="-667"/>
         <source>Network</source>
         <translation>Netzwerk</translation>
     </message>
     <message>
-        <location line="+844"/>
+        <location line="+860"/>
         <source>Session history:</source>
         <translation>Sitzungsverlauf:</translation>
     </message>
     <message>
-        <location line="-869"/>
+        <location line="-885"/>
         <source>User Interface</source>
         <translation>Benutzeroberfläche</translation>
     </message>
@@ -2537,7 +2543,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Thema:</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+33"/>
         <source>Logging:</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Protokollierung:</translation>
@@ -2549,7 +2555,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Logdatei schreiben</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+23"/>
         <source>Tablet:</source>
         <translation>Zeichentablett:</translation>
     </message>
@@ -2571,7 +2577,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Relativen Stiftmodus aktivieren hack (nur Wintab)</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+17"/>
         <source>Detect eraser tip</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Radiererspitze erkennen</translation>
@@ -2597,7 +2603,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Zwei Finger Drehen</translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+59"/>
         <source>Brush cursor:</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Pinselzeiger:</translation>
@@ -2621,7 +2627,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Pfeil</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+44"/>
         <source>Tools:</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Werkzeuge:</translation>
@@ -2639,7 +2645,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Gemeinsame Nutzung von Farbe in verschiedenen Pinselfächern</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="-189"/>
         <source>Enable this workaround if your cursor doesn&apos;t update when you move it into the canvas with the tablet pen.</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Aktivieren Sie diese Abhilfe, wenn Ihr Cursor nicht aktualisiert wird, wenn Sie ihn mit dem Tablettstift in die Leinwand bewegen.</translation>
@@ -2651,29 +2657,13 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Leinwand-Ansichtsfenster-Eingabe-Hack aktivieren</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+136"/>
         <source>Brush outline width:</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Breite des Pinselumrisses:</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>System</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>System</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Fusion</source>
-        <translation>Fusion</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Fusion Dark</source>
-        <translation>Fusion Dunkel</translation>
-    </message>
-    <message>
-        <location line="+18"/>
+        <location line="+67"/>
         <location line="+12"/>
         <location line="+19"/>
         <source>The maximum value for the brush size slider. You can always enter larger values manually or via keyboard shortcuts.</source>
@@ -2820,19 +2810,24 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Zeitstempel hinzufügen</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+12"/>
         <source> minutes</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation> minuten</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="-3"/>
         <source>every </source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>alle </translation>
     </message>
     <message>
-        <location line="+161"/>
+        <location line="-633"/>
+        <source>Force dark mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+797"/>
         <source>Account passwords:</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Konto-Passwörter:</translation>
@@ -2933,7 +2928,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Scrollen Sie, um die Ansicht zu drehen:</translation>
     </message>
     <message>
-        <location line="+101"/>
+        <location line="+107"/>
         <source>Move up</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Nach oben bewegen</translation>
@@ -3010,7 +3005,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Löschen</translation>
     </message>
     <message>
-        <location line="-693"/>
+        <location line="-699"/>
         <source>Record pauses</source>
         <translation>Aufnahmepausen</translation>
     </message>
@@ -3020,23 +3015,23 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Standard Serverport:</translation>
     </message>
     <message>
-        <location line="-603"/>
-        <location line="+587"/>
+        <location line="-580"/>
+        <location line="+564"/>
         <source> s</source>
         <translation> s</translation>
     </message>
     <message>
-        <location line="-594"/>
+        <location line="-571"/>
         <source>Autosave interval:</source>
         <translation>Zeit zwischen Sicherungen:</translation>
     </message>
     <message>
-        <location line="-204"/>
+        <location line="-243"/>
         <source>Animation</source>
         <translation>Animation</translation>
     </message>
     <message>
-        <location line="+745"/>
+        <location line="+761"/>
         <source> below</source>
         <translation> darunter</translation>
     </message>
@@ -3057,17 +3052,17 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Einfärbungsebenen</translation>
     </message>
     <message>
-        <location line="-767"/>
+        <location line="-783"/>
         <source>Shortcuts</source>
         <translation>Tastaturkürzel</translation>
     </message>
     <message>
-        <location line="+892"/>
+        <location line="+908"/>
         <source>Filter</source>
         <translation>Filter</translation>
     </message>
     <message>
-        <location line="-882"/>
+        <location line="-898"/>
         <source>Known Hosts</source>
         <translatorcomment>What&apos;s the distinction between server and host in this context?</translatorcomment>
         <translation>Bekannte Hosts</translation>
@@ -3078,7 +3073,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Listenserver</translation>
     </message>
     <message>
-        <location line="+1080"/>
+        <location line="+1096"/>
         <source>Import trusted...</source>
         <translation>Zertifikat importieren...</translation>
     </message>
@@ -3089,13 +3084,13 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Verbindungsunterbrechung:</translation>
     </message>
     <message>
-        <location line="-776"/>
+        <location line="-792"/>
         <source>Canvas Shortcuts</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Canvas-Tastaturkürzel</translation>
     </message>
     <message>
-        <location line="+813"/>
+        <location line="+829"/>
         <source>Announce with Zeroconf</source>
         <translation>Über Zeroconf bekanntmachen</translation>
     </message>
@@ -3123,7 +3118,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
     </message>
     <message>
         <location line="+14"/>
-        <location line="+67"/>
+        <location line="+73"/>
         <source>Remove</source>
         <translation>Entfernen</translation>
     </message>
@@ -3195,7 +3190,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>ToolSettings</name>
     <message>
-        <location filename="../docks/toolsettingsdock.cpp" line="+81"/>
+        <location filename="../docks/toolsettingsdock.cpp" line="+82"/>
         <source>Freehand</source>
         <translation>Freihand</translation>
     </message>
@@ -3551,8 +3546,8 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>dialogs::AvatarImport</name>
     <message>
-        <location filename="../dialogs/avatarimport.cpp" line="-2"/>
-        <location line="+10"/>
+        <location filename="../dialogs/avatarimport.cpp" line="+55"/>
+        <location line="+9"/>
         <location line="+5"/>
         <source>Import Avatar</source>
         <translatorcomment>machine-translated</translatorcomment>
@@ -3574,7 +3569,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>dialogs::BrushPresetProperties</name>
     <message>
-        <location filename="../dialogs/brushpresetproperties.cpp" line="-1"/>
+        <location filename="../dialogs/brushpresetproperties.cpp" line="+43"/>
         <source>Select brush thumbnail</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Pinselminiaturbild auswählen</translation>
@@ -3597,7 +3592,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>dialogs::Flipbook</name>
     <message>
-        <location filename="../dialogs/flipbook.cpp" line="+57"/>
+        <location filename="../dialogs/flipbook.cpp" line="+56"/>
         <source>Timeline: manual</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Zeitleiste: manuell</translation>
@@ -3607,6 +3602,11 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <source>Timeline: automatic</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Zeitleiste: automatisch</translation>
+    </message>
+    <message>
+        <location line="+60"/>
+        <source>/%1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3656,7 +3656,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>dialogs::JoinDialog</name>
     <message>
-        <location filename="../dialogs/joindialog.cpp" line="+46"/>
+        <location filename="../dialogs/joindialog.cpp" line="+49"/>
         <source>Join</source>
         <translation>Beitreten</translation>
     </message>
@@ -3675,13 +3675,18 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
     <message>
         <location line="-2"/>
         <location line="+11"/>
-        <location line="+360"/>
+        <location line="+364"/>
         <source>Loading...</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Laden…</translation>
     </message>
     <message>
-        <location line="-216"/>
+        <location line="-362"/>
+        <source>&lt;p&gt;You haven’t added any list servers yet. Find some at %1, or try %2.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+146"/>
         <source>Searching...</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Suche…</translation>
@@ -3712,7 +3717,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Schließen</translation>
     </message>
     <message>
-        <location line="+217"/>
+        <location line="+214"/>
         <source>Log in with %1 credentials%2</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Mit %1 Anmeldeinformationen anmelden%2</translation>
@@ -3733,23 +3738,23 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
     </message>
     <message>
         <location line="+1"/>
-        <source>%1ms</source>
-        <translation>%1ms</translation>
+        <source>%L1ms</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+30"/>
-        <source>%1b</source>
-        <translation>%1b</translation>
+        <source>%L1b</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>%1KiB</source>
-        <translation>%1KiB</translation>
+        <source>%L1KiB</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>%1MiB</source>
-        <translation>%1MiB</translation>
+        <source>%L1MiB</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3779,8 +3784,8 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
     </message>
     <message>
         <location line="+4"/>
-        <source>%1×</source>
-        <translation>%1×</translation>
+        <source>%L1×</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+125"/>
@@ -3803,7 +3808,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>dialogs::ResetDialog</name>
     <message>
-        <location filename="../dialogs/resetdialog.cpp" line="+97"/>
+        <location filename="../dialogs/resetdialog.cpp" line="+96"/>
         <source>Reset Session</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Sitzung zurücksetzen</translation>
@@ -3862,8 +3867,8 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
     <name>dialogs::SessionSettingsDialog</name>
     <message>
         <location filename="../dialogs/sessionsettings.cpp" line="+73"/>
-        <source>+ %1MiB</source>
-        <translation>+ %1MiB</translation>
+        <source>+ %L1MiB</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+213"/>
@@ -3948,9 +3953,9 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>dialogs::SettingsDialog</name>
     <message>
-        <location filename="../dialogs/settingsdialog.cpp" line="-538"/>
-        <source>%1%%</source>
-        <translation>%1%%</translation>
+        <location filename="../dialogs/settingsdialog.cpp" line="-551"/>
+        <source>%L1%</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3965,19 +3970,19 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Voreinstellung</translation>
     </message>
     <message>
-        <location line="+95"/>
+        <location line="+103"/>
         <source>Unlock</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Entsperren</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+523"/>
+        <location line="+528"/>
         <source>Lock</source>
         <translation>Sperren</translation>
     </message>
     <message>
-        <location line="-479"/>
+        <location line="-481"/>
         <source>Reset settings</source>
         <translation>Einstellungen zurücksetzen</translation>
     </message>
@@ -3987,7 +3992,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Alle Einstellungen löschen?</translation>
     </message>
     <message>
-        <location line="+383"/>
+        <location line="+385"/>
         <location line="+10"/>
         <location line="+5"/>
         <source>Import trusted certificate</source>
@@ -4068,15 +4073,15 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>dialogs::VersionCheckDialog</name>
     <message>
-        <location filename="../dialogs/versioncheckdialog.cpp" line="+30"/>
+        <location filename="../dialogs/versioncheckdialog.cpp" line="+29"/>
         <source>Download %1 (%2)</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Herunterladen %1 (%2)</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>%1MiB</source>
-        <translation>%1MiB</translation>
+        <source>%L1MiB</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
@@ -4160,12 +4165,12 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>docks::BrushPalette</name>
     <message>
-        <location filename="../docks/brushpalettedock.cpp" line="+67"/>
+        <location filename="../docks/brushpalettedock.cpp" line="+66"/>
         <source>Brushes</source>
         <translation>Pinsel</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+11"/>
         <source>Search</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Suche</translation>
@@ -4235,8 +4240,8 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
     </message>
     <message>
         <location line="+5"/>
-        <source>%1×%1</source>
-        <translation>%1×%1</translation>
+        <source>%L1×%L1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
@@ -4277,29 +4282,26 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
     </message>
     <message numerus="yes">
         <location line="+15"/>
-        <source>Import of %n MyPaint brush(es).</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>
-            <numerusform>Importieren von %n MyPaint-Pinsel.</numerusform>
-            <numerusform>Import von %n MyPaint-Pinseln.</numerusform>
+        <source>Import of %Ln MyPaint brush(es).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
-        <source>%n successfully imported: %1</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>
-            <numerusform>%n erfolgreich importiert: %1</numerusform>
-            <numerusform>%n erfolgreich importiert: %1</numerusform>
+        <source>%Ln successfully imported: %1</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+4"/>
-        <source>%n failed to import: %1</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>
-            <numerusform>%n konnte nicht importiert werden: %1</numerusform>
-            <numerusform>%n konnten nicht importiert werden: %1</numerusform>
+        <source>%Ln failed to import: %1</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -4312,13 +4314,13 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>docks::ColorPaletteDock</name>
     <message>
-        <location filename="../docks/colorpalette.cpp" line="-134"/>
+        <location filename="../docks/colorpalette.cpp" line="-132"/>
         <source>Palette</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Palette</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+35"/>
         <source>New</source>
         <translation>Neu</translation>
     </message>
@@ -4441,15 +4443,24 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>docks::LayerAclMenu</name>
     <message>
-        <location filename="../docks/layeraclmenu.cpp" line="+27"/>
-        <source>Lock this layer</source>
-        <translation>Diese Ebene sperren</translation>
+        <location filename="../docks/layeraclmenu.cpp" line="+25"/>
+        <source>User Access</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Lock Layer</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>Censor</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>Zensieren</translation>
+        <source>Censor Layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Default Layer</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
@@ -4486,15 +4497,28 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>docks::LayerList</name>
     <message>
-        <location filename="../docks/layerlistdock.cpp" line="+45"/>
+        <location filename="../docks/layerlistdock.cpp" line="+47"/>
         <source>Layers</source>
         <translation>Ebenen</translation>
     </message>
 </context>
 <context>
+    <name>docks::LayerListDelegate</name>
+    <message>
+        <location filename="../docks/layerlistdelegate.cpp" line="+221"/>
+        <source>%L1% opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+64"/>
+        <source>%L1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>docks::Navigator</name>
     <message>
-        <location filename="../docks/navigator.cpp" line="+312"/>
+        <location filename="../docks/navigator.cpp" line="+311"/>
         <source>Navigator</source>
         <translation>Navigator</translation>
     </message>
@@ -4552,9 +4576,17 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
     </message>
 </context>
 <context>
+    <name>drawingboard::CanvasScene</name>
+    <message>
+        <location filename="../scene/canvasscene.cpp" line="+291"/>
+        <source>#%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>tools::AnnotationSettings</name>
     <message>
-        <location filename="../toolwidgets/annotationsettings.cpp" line="+64"/>
+        <location filename="../toolwidgets/annotationsettings.cpp" line="+63"/>
         <source>Protect</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Schützen</translation>
@@ -4658,7 +4690,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>widgets::ChatWidget</name>
     <message>
-        <location filename="../chat/chatwidget.cpp" line="+128"/>
+        <location filename="../chat/chatwidget.cpp" line="+129"/>
         <source>Public</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Öffentlich</translation>
@@ -4674,7 +4706,12 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
         <translation>Chat…</translation>
     </message>
     <message>
-        <location line="+351"/>
+        <location line="+160"/>
+        <source>User #%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+191"/>
         <source>%1 joined the session</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>%1 ist der Sitzung beigetreten</translation>
@@ -4761,7 +4798,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>widgets::NetStatus</name>
     <message>
-        <location filename="../widgets/netstatus.cpp" line="+61"/>
+        <location filename="../widgets/netstatus.cpp" line="+60"/>
         <source>not connected</source>
         <translation>nicht verbunden</translation>
     </message>
@@ -4957,9 +4994,8 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
     </message>
     <message>
         <location line="+5"/>
-        <source>%1 X=%2 Y=%3 B=%4 P=%5%</source>
-        <translatorcomment>machine-translated</translatorcomment>
-        <translation>%1 X=%2 Y=%3 S=%4 D=%5%</translation>
+        <source>%1 X=%2 Y=%3 B=%4 P=%L5%</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
@@ -4977,7 +5013,7 @@ Vereinfachen Sie den Canvas und setzen Sie ihn manuell zurück, bevor der Speich
 <context>
     <name>widgets::UserItemDelegate</name>
     <message>
-        <location filename="../chat/useritemdelegate.cpp" line="+32"/>
+        <location filename="../chat/useritemdelegate.cpp" line="+31"/>
         <source>User</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Benutzer</translation>

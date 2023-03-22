@@ -62,7 +62,7 @@
 <context>
     <name>protocol::DisconnectExt</name>
     <message>
-        <location filename="../net/control.h" line="+267"/>
+        <location filename="../net/control.h" line="+253"/>
         <source>Kicked by %1</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Gekickt von %1</translation>
@@ -89,7 +89,7 @@
 <context>
     <name>protocol::Error</name>
     <message>
-        <location filename="../net/error.h" line="+193"/>
+        <location filename="../net/error.h" line="+192"/>
         <source>Unknown error</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Unbekannter Fehler</translation>
@@ -403,7 +403,7 @@
 <context>
     <name>protocol::Shutdown</name>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>Unknown</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Unbekannt</translation>
@@ -430,7 +430,7 @@
 <context>
     <name>protocol::SystemChat</name>
     <message>
-        <location filename="../net/chat.h" line="+47"/>
+        <location filename="../net/chat.h" line="+46"/>
         <source>Unknown message received from server</source>
         <translatorcomment>machine-translated</translatorcomment>
         <translation>Unbekannte Nachricht vom Server erhalten</translation>

@@ -29,14 +29,60 @@
     </message>
 </context>
 <context>
-    <name>protocol::Error</name>
+    <name>protocol::ChatActor</name>
     <message>
-        <location filename="../net/error.h" line="+147"/>
-        <source>Unknown error</source>
+        <location filename="../net/chat.h" line="+48"/>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>the server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <source>the server admin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>password</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>protocol::DisconnectExt</name>
+    <message>
+        <location filename="../net/control.h" line="+253"/>
+        <source>Kicked by %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Server error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Closing session: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Unknown error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>protocol::Error</name>
+    <message>
+        <location filename="../net/error.h" line="+192"/>
+        <source>Unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Expected one argument: opword</source>
         <translation type="unfinished"></translation>
     </message>
@@ -275,11 +321,54 @@
         <source>This server is full.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location line="+1"/>
+        <source>invalid message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>De-opped while resetting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>History limit exceeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>protocol::Shutdown</name>
+    <message>
+        <location line="-209"/>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Logged out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Session terminated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Server shutting down</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>protocol::SystemChat</name>
     <message>
-        <location filename="../net/chat.h" line="+40"/>
+        <location filename="../net/chat.h" line="+46"/>
+        <source>Unknown message received from server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Session reset failed!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -299,37 +388,37 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>%1 kicked by %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>Session shut down by moderator (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>%1 trusted by %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>%1 untrusted by %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>%1 made operator by %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>%1 deopped by %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>History size limit reached! Session must be reset to continue.</source>
         <translation type="unfinished"></translation>
     </message>

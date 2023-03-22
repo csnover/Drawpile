@@ -324,7 +324,7 @@
     <name>server::ThinSession</name>
     <message>
         <location filename="../thinsession.cpp" line="+51"/>
-        <source>Autoreset threshold (%1, effectively %2 MB) reached.</source>
+        <source>Autoreset threshold (%L1, effectively %L2MiB) reached.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

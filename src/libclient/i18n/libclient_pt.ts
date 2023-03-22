@@ -4,188 +4,56 @@
 <context>
     <name>AnimationSaverRunnable</name>
     <message>
-        <location filename="../export/animationsaverrunnable.cpp" line="55"/>
+        <location filename="../export/animationsaverrunnable.cpp" line="+40"/>
         <source>Couldn&apos;t open file for writing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../export/animationsaverrunnable.cpp" line="56"/>
+        <location line="+1"/>
         <source>An error occurred while saving image</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>AnnouncementListModel</name>
-    <message>
-        <location filename="../net/announcementlist.cpp" line="48"/>
-        <source>Private</source>
-        <translation type="unfinished">Privada</translation>
-    </message>
-    <message>
-        <location filename="../net/announcementlist.cpp" line="48"/>
-        <source>Public</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../net/announcementlist.cpp" line="72"/>
-        <source>Server</source>
-        <translation type="unfinished">Servidor</translation>
-    </message>
-    <message>
-        <location filename="../net/announcementlist.cpp" line="73"/>
-        <source>Room code</source>
-        <translation type="unfinished">Código da Sala</translation>
-    </message>
-    <message>
-        <location filename="../net/announcementlist.cpp" line="74"/>
-        <source>Mode</source>
-        <translation type="unfinished">Modo</translation>
     </message>
 </context>
 <context>
     <name>AvatarListModel</name>
     <message>
-        <location filename="../utils/avatarlistmodel.cpp" line="105"/>
+        <location filename="../utils/avatarlistmodel.cpp" line="+99"/>
         <source>No avatar</source>
         <translation>Sem Avatar</translation>
     </message>
 </context>
 <context>
-    <name>BanlistModel</name>
-    <message>
-        <location filename="../net/banlistmodel.cpp" line="76"/>
-        <source>User</source>
-        <translation type="unfinished">Usuário</translation>
-    </message>
-    <message>
-        <location filename="../net/banlistmodel.cpp" line="77"/>
-        <source>IP address</source>
-        <translation type="unfinished">Endereço IP</translation>
-    </message>
-    <message>
-        <location filename="../net/banlistmodel.cpp" line="78"/>
-        <source>Banned by</source>
-        <translation type="unfinished">Banido por</translation>
-    </message>
-</context>
-<context>
-    <name>BrushPresetModel</name>
-    <message>
-        <location filename="../brushes/brushpresetmodel.cpp" line="608"/>
-        <source>Default</source>
-        <translation type="unfinished">Padrão</translation>
-    </message>
-</context>
-<context>
-    <name>BrushPresetTagModel</name>
-    <message>
-        <location filename="../brushes/brushpresetmodel.cpp" line="508"/>
-        <source>All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../brushes/brushpresetmodel.cpp" line="510"/>
-        <source>Untagged</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../brushes/brushpresetmodel.cpp" line="517"/>
-        <source>Show all brushes, regardless of tagging.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../brushes/brushpresetmodel.cpp" line="519"/>
-        <source>Show brushes not assigned to any tag.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../brushes/brushpresetmodel.cpp" line="687"/>
-        <location filename="../brushes/brushpresetmodel.cpp" line="719"/>
-        <source>Default</source>
-        <translation type="unfinished">Padrão</translation>
-    </message>
-    <message>
-        <location filename="../brushes/brushpresetmodel.cpp" line="707"/>
-        <source>Classic Brush %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../brushes/brushpresetmodel.cpp" line="708"/>
-        <source>Converted from %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../brushes/brushpresetmodel.cpp" line="729"/>
-        <location filename="../brushes/brushpresetmodel.cpp" line="764"/>
-        <location filename="../brushes/brushpresetmodel.cpp" line="776"/>
-        <source>Round Pixel Brush %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../brushes/brushpresetmodel.cpp" line="730"/>
-        <location filename="../brushes/brushpresetmodel.cpp" line="743"/>
-        <location filename="../brushes/brushpresetmodel.cpp" line="754"/>
-        <location filename="../brushes/brushpresetmodel.cpp" line="765"/>
-        <location filename="../brushes/brushpresetmodel.cpp" line="777"/>
-        <location filename="../brushes/brushpresetmodel.cpp" line="789"/>
-        <location filename="../brushes/brushpresetmodel.cpp" line="803"/>
-        <source>Default brush %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../brushes/brushpresetmodel.cpp" line="742"/>
-        <location filename="../brushes/brushpresetmodel.cpp" line="753"/>
-        <location filename="../brushes/brushpresetmodel.cpp" line="788"/>
-        <location filename="../brushes/brushpresetmodel.cpp" line="802"/>
-        <source>Soft Brush %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>CanvasSaverRunnable</name>
     <message>
-        <location filename="../export/canvassaverrunnable.cpp" line="40"/>
+        <location filename="../export/canvassaverrunnable.cpp" line="+25"/>
         <source>Couldn&apos;t open file for writing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../export/canvassaverrunnable.cpp" line="41"/>
+        <location line="+1"/>
         <source>An error occurred while saving image</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>Client</name>
-    <message>
-        <location filename="../net/client.cpp" line="65"/>
-        <source>A server error occurred!</source>
-        <translation type="unfinished">Um erro aconteceu no servidor!</translation>
-    </message>
-    <message>
-        <location filename="../net/client.cpp" line="68"/>
-        <source>The server is shutting down!</source>
-        <translation type="unfinished">O servidor está desligando!</translation>
-    </message>
-</context>
-<context>
     <name>CustomShortcutModel</name>
     <message>
-        <location filename="../utils/customshortcutmodel.cpp" line="97"/>
+        <location filename="../utils/customshortcutmodel.cpp" line="+81"/>
         <source>Action</source>
         <translation>Ação</translation>
     </message>
     <message>
-        <location filename="../utils/customshortcutmodel.cpp" line="98"/>
+        <location line="+1"/>
         <source>Shortcut</source>
         <translation>Atalho</translation>
     </message>
     <message>
-        <location filename="../utils/customshortcutmodel.cpp" line="99"/>
+        <location line="+1"/>
         <source>Alternate</source>
         <translation>Alternar</translation>
     </message>
     <message>
-        <location filename="../utils/customshortcutmodel.cpp" line="100"/>
+        <location line="+1"/>
         <source>Default</source>
         <translation>Padrão</translation>
     </message>
@@ -193,473 +61,658 @@
 <context>
     <name>FfmpegExporter</name>
     <message>
-        <location filename="../export/ffmpegexporter.cpp" line="138"/>
+        <location filename="../export/ffmpegexporter.cpp" line="+123"/>
         <source>Couldn&apos;t start ffmpeg!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../export/ffmpegexporter.cpp" line="141"/>
+        <location line="+3"/>
         <source>Ffmpeg crashed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../export/ffmpegexporter.cpp" line="144"/>
+        <location line="+3"/>
         <source>Ffmpeg process error</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>LoginHandler</name>
+    <name>FileFormatOptions</name>
     <message>
-        <location filename="../net/login.cpp" line="114"/>
-        <location filename="../net/login.cpp" line="372"/>
-        <source>Invalid state</source>
-        <translation type="unfinished">Estado inválido</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="139"/>
-        <location filename="../net/login.cpp" line="146"/>
-        <location filename="../net/login.cpp" line="210"/>
-        <location filename="../net/login.cpp" line="409"/>
-        <location filename="../net/login.cpp" line="530"/>
-        <location filename="../net/login.cpp" line="572"/>
-        <source>Incompatible server</source>
-        <translation type="unfinished">Servidor incompatível</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="153"/>
-        <source>Server is for a different Drawpile version!</source>
-        <translation type="unfinished">Este servidor é para uma versão diferente de Drawpile!</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="195"/>
-        <source>Secure mode not enabled on a trusted host!</source>
-        <translation type="unfinished">O modo seguro não foi ativado num hospedeiro confiável!</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="236"/>
-        <source>This server does not allow guest logins</source>
-        <translation type="unfinished">Esse servidor não aceita logins de visitantes</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="238"/>
-        <source>Password needed to log in as &quot;%1&quot;</source>
-        <translation type="unfinished">Senha necessária para entrar como &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="305"/>
-        <location filename="../net/login.cpp" line="311"/>
-        <source>Auth server error: %1</source>
-        <translation type="unfinished">Erro no servidor de autenticação: %1</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="330"/>
-        <source>Group membership needed</source>
-        <translation type="unfinished">Você tem que fazer parte de um grupo</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="333"/>
-        <source>Unexpected ext-auth response: %1</source>
-        <translation type="unfinished">Resposta do servidor ext-auth não esperada: %1</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="355"/>
-        <source>Server misconfiguration: invalid ext-auth URL</source>
-        <translation type="unfinished">Configuração errada do servidor: Link ext-auth  inválido</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="360"/>
-        <source>Unsupported ext-auth URL scheme</source>
-        <translation type="unfinished">Link de ext-auth não suportada</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="449"/>
-        <source>New version</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="453"/>
-        <source>Unknown version</source>
-        <translation type="unfinished">Versão desconhecida</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="494"/>
-        <source>Session not yet started!</source>
-        <translation type="unfinished">O servidor não foi iniciado ainda!</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="497"/>
-        <source>Blocked by parental controls</source>
-        <translation type="unfinished">Bloqueado pelo controle parental</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="500"/>
-        <source>Session for a different Drawpile version (%s) in progress!</source>
-        <translation type="unfinished">Uma sessão para uma versão diferente de Drawpile (%s) está acontecendo!</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="685"/>
-        <location filename="../net/login.cpp" line="705"/>
-        <source>Invalid SSL certificate for host %1</source>
-        <translation type="unfinished">Certificado SSL para o hospedeiro %1 inválido</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="688"/>
-        <source>Certificate of a trusted server has changed!</source>
-        <translation type="unfinished">O certificado de um servidor confiável mudou!</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="746"/>
-        <source>Cancelled</source>
-        <translation type="unfinished">Cancelado</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="755"/>
-        <source>Session not found!</source>
-        <translation type="unfinished">Sessão não encontrada!</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="757"/>
-        <source>Incorrect password!</source>
-        <translation type="unfinished">Senha incorreta!</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="760"/>
-        <source>Invalid username!</source>
-        <translation type="unfinished">Usuário inválido!</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="762"/>
-        <source>This username has been locked</source>
-        <translation type="unfinished">Esse usuário foi bloqueado</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="764"/>
-        <source>Username already taken!</source>
-        <translation type="unfinished">Este nome de usuário já existe!</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="766"/>
-        <source>Session is closed!</source>
-        <translation type="unfinished">A sessão foi fechada!</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="766"/>
-        <source>Server is full!</source>
-        <translation type="unfinished">Este servidor está cheio!</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="768"/>
-        <source>Hosting not authorized</source>
-        <translation type="unfinished">Essa hospedagem não é autorizada</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="770"/>
-        <source>You have been banned from this session!</source>
-        <translation type="unfinished">Você foi banido dessa sessão!</translation>
-    </message>
-    <message>
-        <location filename="../net/login.cpp" line="772"/>
-        <source>Session alias is reserved!</source>
-        <translation type="unfinished">O atalho da sessão é reservado!</translation>
-    </message>
-</context>
-<context>
-    <name>LoginSessionModel</name>
-    <message>
-        <location filename="../net/loginsessions.cpp" line="73"/>
-        <source>(untitled)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../net/loginsessions.cpp" line="97"/>
-        <source>Incompatible version (%1)</source>
-        <translation type="unfinished">Versão incompatível (%1)</translation>
-    </message>
-    <message>
-        <location filename="../net/loginsessions.cpp" line="138"/>
-        <source>Title</source>
-        <translation type="unfinished">Nome</translation>
-    </message>
-    <message>
-        <location filename="../net/loginsessions.cpp" line="139"/>
-        <source>Started by</source>
-        <translation type="unfinished">Iniciado por</translation>
-    </message>
-    <message>
-        <location filename="../net/loginsessions.cpp" line="140"/>
-        <source>Users</source>
-        <translation type="unfinished">Usuários</translation>
-    </message>
-</context>
-<context>
-    <name>QGuiApplication</name>
-    <message>
-        <location filename="../net/sessionlistingmodel.cpp" line="91"/>
-        <source>%1h %2m</source>
-        <translation>%1hora %2min</translation>
-    </message>
-    <message>
-        <location filename="../utils/images.cpp" line="104"/>
+        <location filename="../utils/images.cpp" line="+89"/>
         <source>Images (%1)</source>
-        <translation>Imagens (%1)</translation>
+        <translation type="unfinished">Imagens (%1)</translation>
     </message>
     <message>
-        <location filename="../utils/images.cpp" line="112"/>
+        <location line="+8"/>
         <source>Binary Recordings (%1)</source>
-        <translation>Gravações em binário (%1)</translation>
+        <translation type="unfinished">Gravações em binário (%1)</translation>
     </message>
     <message>
-        <location filename="../utils/images.cpp" line="113"/>
+        <location line="+1"/>
         <source>Text Recordings (%1)</source>
-        <translation>Gravações de texto (%1)</translation>
+        <translation type="unfinished">Gravações de texto (%1)</translation>
     </message>
     <message>
-        <location filename="../utils/images.cpp" line="120"/>
+        <location line="+7"/>
         <source>Recordings (%1)</source>
-        <translation>Gravações (%1)</translation>
+        <translation type="unfinished">Gravações (%1)</translation>
     </message>
     <message>
-        <location filename="../utils/images.cpp" line="127"/>
+        <location line="+7"/>
         <source>All Supported Files (%1)</source>
-        <translation>Arquivos suportados (%1)</translation>
+        <translation type="unfinished">Arquivos suportados (%1)</translation>
     </message>
+</context>
+<context>
+    <name>NewVersionCheck</name>
     <message>
-        <location filename="../utils/images.cpp" line="133"/>
+        <location filename="../utils/newversion.cpp" line="+482"/>
+        <source>Failed to parse version list</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QFileDialog</name>
+    <message>
+        <location filename="../utils/images.cpp" line="+6"/>
         <source>All Files (*)</source>
-        <translation>Todos os arquivos (*)</translation>
+        <translation type="unfinished">Todos os arquivos (*)</translation>
     </message>
 </context>
 <context>
     <name>SessionListingModel</name>
     <message>
-        <location filename="../net/sessionlistingmodel.cpp" line="123"/>
+        <location filename="../net/sessionlistingmodel.cpp" line="+72"/>
+        <source>%1d%2h%3m</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>%1h%2m</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>%1m</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+72"/>
         <source>(untitled)</source>
         <translation>(sem nome)</translation>
     </message>
     <message>
-        <location filename="../net/sessionlistingmodel.cpp" line="144"/>
+        <location line="+31"/>
         <source>New version</source>
         <translation>Versão nova</translation>
     </message>
     <message>
-        <location filename="../net/sessionlistingmodel.cpp" line="148"/>
+        <location line="+4"/>
         <source>Unknown version</source>
         <translation>Versão desconhecida</translation>
     </message>
     <message>
-        <location filename="../net/sessionlistingmodel.cpp" line="150"/>
+        <location line="+2"/>
         <source>Incompatible version (%1)</source>
         <translation>Versão incompatível (%1)</translation>
     </message>
     <message>
-        <location filename="../net/sessionlistingmodel.cpp" line="190"/>
+        <location line="+29"/>
         <source>Title</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../net/sessionlistingmodel.cpp" line="191"/>
+        <location line="+1"/>
         <source>Server</source>
         <translation>Servidor</translation>
     </message>
     <message>
-        <location filename="../net/sessionlistingmodel.cpp" line="192"/>
+        <location line="+1"/>
         <source>Users</source>
         <translation>Usuários</translation>
     </message>
     <message>
-        <location filename="../net/sessionlistingmodel.cpp" line="193"/>
+        <location line="+1"/>
         <source>Owner</source>
         <translation>Dono</translation>
     </message>
     <message>
-        <location filename="../net/sessionlistingmodel.cpp" line="194"/>
+        <location line="+1"/>
         <source>Age</source>
         <translation>Idade</translation>
     </message>
 </context>
 <context>
-    <name>TcpServer</name>
+    <name>blendmode</name>
     <message>
-        <location filename="../net/tcpserver.cpp" line="118"/>
-        <source>Received invalid data</source>
-        <translation type="unfinished">Os dados recebidos são inválidos</translation>
+        <location filename="../canvas/blendmodes.cpp" line="+37"/>
+        <source>Normal</source>
+        <translation type="unfinished">Normal</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Recolor</source>
+        <translation type="unfinished">Recolorir</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Behind</source>
+        <translation type="unfinished">Por trás</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Multiply</source>
+        <translation type="unfinished">Multiplicar</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Divide</source>
+        <translation type="unfinished">Dividir</translation>
+    </message>
+    <message>
+        <location line="-63"/>
+        <source>Burn</source>
+        <translation type="unfinished">Queimar</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Dodge</source>
+        <translation type="unfinished">Evitar</translation>
+    </message>
+    <message>
+        <location line="-31"/>
+        <source>Darken</source>
+        <translation type="unfinished">Escurecer</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Lighten</source>
+        <translation type="unfinished">Iluminar</translation>
+    </message>
+    <message>
+        <location line="+47"/>
+        <source>Subtract</source>
+        <translation type="unfinished">Subtrair</translation>
+    </message>
+    <message>
+        <location line="-32"/>
+        <source>Add</source>
+        <translation type="unfinished">Adicionar</translation>
+    </message>
+    <message>
+        <location line="-42"/>
+        <source>Erase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+58"/>
+        <source>Hard Light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-5"/>
+        <source>Soft Light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-32"/>
+        <source>Linear Burn</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+42"/>
+        <source>Linear Light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Luminosity/Shine (SAI)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Hue</source>
+        <translation type="unfinished">Matiz</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Saturation</source>
+        <translation type="unfinished">Saturação</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Luminosity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-5"/>
+        <source>Color</source>
+        <translation type="unfinished">Cor</translation>
     </message>
 </context>
 <context>
-    <name>UserListModel</name>
+    <name>brushes::BrushPresetModel</name>
     <message>
-        <location filename="../canvas/userlist.cpp" line="74"/>
+        <location filename="../brushes/brushpresetmodel.cpp" line="+592"/>
+        <source>Default</source>
+        <translation type="unfinished">Padrão</translation>
+    </message>
+</context>
+<context>
+    <name>brushes::BrushPresetTagModel</name>
+    <message>
+        <location line="-100"/>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Untagged</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Show all brushes, regardless of tagging.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Show brushes not assigned to any tag.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+168"/>
+        <location line="+32"/>
+        <source>Default</source>
+        <translation type="unfinished">Padrão</translation>
+    </message>
+    <message>
+        <location line="-12"/>
+        <source>Classic Brush %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Converted from %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <location line="+35"/>
+        <location line="+12"/>
+        <source>Round Pixel Brush %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-46"/>
+        <location line="+13"/>
+        <location line="+11"/>
+        <location line="+11"/>
+        <location line="+12"/>
+        <location line="+12"/>
+        <location line="+14"/>
+        <source>Default brush %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-61"/>
+        <location line="+11"/>
+        <location line="+35"/>
+        <location line="+14"/>
+        <source>Soft Brush %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>canvas::LayerListModel</name>
+    <message>
+        <location filename="../canvas/layerlist.cpp" line="+52"/>
+        <source>Default layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Invisible to you</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Censored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>canvas::TimelineModel</name>
+    <message>
+        <location filename="../canvas/timelinemodel.cpp" line="+62"/>
+        <source>%1 / %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>canvas::UserListModel</name>
+    <message>
+        <location filename="../canvas/userlist.cpp" line="+57"/>
         <source>Moderator</source>
         <translation type="unfinished">Moderador</translation>
     </message>
     <message>
-        <location filename="../canvas/userlist.cpp" line="76"/>
+        <location line="+2"/>
         <source>Operator</source>
         <translation type="unfinished">Operador</translation>
     </message>
     <message>
-        <location filename="../canvas/userlist.cpp" line="78"/>
+        <location line="+2"/>
         <source>Trusted</source>
         <translation type="unfinished">Confiável</translation>
     </message>
     <message>
-        <location filename="../canvas/userlist.cpp" line="80"/>
+        <location line="+2"/>
         <source>Registered</source>
         <translation type="unfinished">Registrado</translation>
     </message>
     <message>
-        <location filename="../canvas/userlist.cpp" line="84"/>
+        <location line="+4"/>
         <source>Online</source>
         <translation type="unfinished">Online</translation>
     </message>
     <message>
-        <location filename="../canvas/userlist.cpp" line="84"/>
+        <location line="+0"/>
         <source>Offline</source>
         <translation type="unfinished">Offline</translation>
     </message>
     <message>
-        <location filename="../canvas/userlist.cpp" line="114"/>
+        <location line="+30"/>
         <source>User</source>
         <translation type="unfinished">Usuário</translation>
     </message>
     <message>
-        <location filename="../canvas/userlist.cpp" line="115"/>
+        <location line="+1"/>
         <source>Type</source>
         <translation type="unfinished">Tipo</translation>
     </message>
     <message>
-        <location filename="../canvas/userlist.cpp" line="116"/>
+        <location line="+1"/>
         <source>Status</source>
         <translation type="unfinished">Status</translation>
     </message>
     <message>
-        <location filename="../canvas/userlist.cpp" line="291"/>
+        <location line="+175"/>
         <source>Server</source>
         <translation type="unfinished">Servidor</translation>
     </message>
     <message>
-        <location filename="../canvas/userlist.cpp" line="298"/>
+        <location line="+7"/>
         <source>User #%1</source>
         <translation type="unfinished">Usuário #%1</translation>
     </message>
 </context>
 <context>
-    <name>blendmode</name>
+    <name>net::AnnouncementListModel</name>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="53"/>
-        <source>Normal</source>
-        <translation type="unfinished">Normal</translation>
+        <location filename="../net/announcementlist.cpp" line="+32"/>
+        <source>Private</source>
+        <translation type="unfinished">Privada</translation>
     </message>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="58"/>
-        <source>Recolor</source>
-        <translation type="unfinished">Recolorir</translation>
-    </message>
-    <message>
-        <location filename="../canvas/blendmodes.cpp" line="63"/>
-        <source>Behind</source>
-        <translation type="unfinished">Por trás</translation>
-    </message>
-    <message>
-        <location filename="../canvas/blendmodes.cpp" line="68"/>
-        <source>Multiply</source>
-        <translation type="unfinished">Multiplicar</translation>
-    </message>
-    <message>
-        <location filename="../canvas/blendmodes.cpp" line="73"/>
-        <source>Screen</source>
+        <location line="+0"/>
+        <source>Public</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="78"/>
-        <source>Overlay</source>
+        <location line="+24"/>
+        <source>Server</source>
+        <translation type="unfinished">Servidor</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Room code</source>
+        <translation type="unfinished">Código da Sala</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Mode</source>
+        <translation type="unfinished">Modo</translation>
+    </message>
+</context>
+<context>
+    <name>net::BanlistModel</name>
+    <message>
+        <location filename="../net/banlistmodel.cpp" line="+60"/>
+        <source>User</source>
+        <translation type="unfinished">Usuário</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>IP address</source>
+        <translation type="unfinished">Endereço IP</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Banned by</source>
+        <translation type="unfinished">Banido por</translation>
+    </message>
+</context>
+<context>
+    <name>net::LoginHandler</name>
+    <message>
+        <location filename="../net/login.cpp" line="+98"/>
+        <location line="+258"/>
+        <source>Invalid state</source>
+        <translation type="unfinished">Estado inválido</translation>
+    </message>
+    <message>
+        <location line="-233"/>
+        <location line="+7"/>
+        <location line="+64"/>
+        <location line="+199"/>
+        <location line="+121"/>
+        <location line="+42"/>
+        <source>Incompatible server</source>
+        <translation type="unfinished">Servidor incompatível</translation>
+    </message>
+    <message>
+        <location line="-419"/>
+        <source>Server is for a different Drawpile version!</source>
+        <translation type="unfinished">Este servidor é para uma versão diferente de Drawpile!</translation>
+    </message>
+    <message>
+        <location line="+42"/>
+        <source>Secure mode not enabled on a trusted host!</source>
+        <translation type="unfinished">O modo seguro não foi ativado num hospedeiro confiável!</translation>
+    </message>
+    <message>
+        <location line="+41"/>
+        <source>This server does not allow guest logins</source>
+        <translation type="unfinished">Esse servidor não aceita logins de visitantes</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Password needed to log in as &quot;%1&quot;</source>
+        <translation type="unfinished">Senha necessária para entrar como &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <location line="+67"/>
+        <location line="+6"/>
+        <source>Auth server error: %1</source>
+        <translation type="unfinished">Erro no servidor de autenticação: %1</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Group membership needed</source>
+        <translation type="unfinished">Você tem que fazer parte de um grupo</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Unexpected ext-auth response: %1</source>
+        <translation type="unfinished">Resposta do servidor ext-auth não esperada: %1</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Server misconfiguration: invalid ext-auth URL</source>
+        <translation type="unfinished">Configuração errada do servidor: Link ext-auth  inválido</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Unsupported ext-auth URL scheme</source>
+        <translation type="unfinished">Link de ext-auth não suportada</translation>
+    </message>
+    <message>
+        <location line="+89"/>
+        <source>New version</source>
+        <translation type="unfinished">Versão nova</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Unknown version</source>
+        <translation type="unfinished">Versão desconhecida</translation>
+    </message>
+    <message>
+        <location line="+41"/>
+        <source>Session not yet started!</source>
+        <translation type="unfinished">O servidor não foi iniciado ainda!</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Blocked by parental controls</source>
+        <translation type="unfinished">Bloqueado pelo controle parental</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Session for a different Drawpile version (%s) in progress!</source>
+        <translation type="unfinished">Uma sessão para uma versão diferente de Drawpile (%s) está acontecendo!</translation>
+    </message>
+    <message>
+        <location line="+185"/>
+        <location line="+20"/>
+        <source>Invalid SSL certificate for host %1</source>
+        <translation type="unfinished">Certificado SSL para o hospedeiro %1 inválido</translation>
+    </message>
+    <message>
+        <location line="-17"/>
+        <source>Certificate of a trusted server has changed!</source>
+        <translation type="unfinished">O certificado de um servidor confiável mudou!</translation>
+    </message>
+    <message>
+        <location line="+58"/>
+        <source>Cancelled</source>
+        <translation type="unfinished">Cancelado</translation>
+    </message>
+</context>
+<context>
+    <name>net::LoginSessionModel</name>
+    <message>
+        <location filename="../net/loginsessions.cpp" line="+66"/>
+        <source>(untitled)</source>
+        <translation type="unfinished">(sem nome)</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 [%2]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="83"/>
-        <source>Divide</source>
-        <translation type="unfinished">Dividir</translation>
+        <location line="+25"/>
+        <source>Incompatible version (%1)</source>
+        <translation type="unfinished">Versão incompatível (%1)</translation>
     </message>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="88"/>
-        <source>Burn</source>
-        <translation type="unfinished">Queimar</translation>
+        <location line="+47"/>
+        <source>Status</source>
+        <translation type="unfinished">Status</translation>
     </message>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="93"/>
-        <source>Dodge</source>
-        <translation type="unfinished">Evitar</translation>
+        <location line="+1"/>
+        <source>Title</source>
+        <translation type="unfinished">Nome</translation>
     </message>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="98"/>
-        <source>Darken</source>
-        <translation type="unfinished">Escurecer</translation>
+        <location line="+1"/>
+        <source>Started by</source>
+        <translation type="unfinished">Iniciado por</translation>
     </message>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="103"/>
-        <source>Lighten</source>
-        <translation type="unfinished">Iluminar</translation>
+        <location line="+1"/>
+        <source>Users</source>
+        <translation type="unfinished">Usuários</translation>
     </message>
+</context>
+<context>
+    <name>net::TcpServer</name>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="108"/>
-        <source>Subtract</source>
-        <translation type="unfinished">Subtrair</translation>
+        <location filename="../net/tcpserver.cpp" line="+105"/>
+        <source>Received invalid data</source>
+        <translation type="unfinished">Os dados recebidos são inválidos</translation>
     </message>
+</context>
+<context>
+    <name>sessionlisting::ListServerModel</name>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="113"/>
-        <source>Add</source>
-        <translation type="unfinished">Adicionar</translation>
-    </message>
-    <message>
-        <location filename="../canvas/blendmodes.cpp" line="118"/>
-        <source>Erase</source>
+        <location filename="../utils/listservermodel.cpp" line="+40"/>
+        <source>%1
+
+%2
+
+URL: %3
+Read-only: %4, public: %5, private: %6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="123"/>
-        <source>Hard Light</source>
+        <location line="+4"/>
+        <source>yes</source>
+        <comment>readonly</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="128"/>
-        <source>Soft Light</source>
+        <location line="+0"/>
+        <source>no</source>
+        <comment>readonly</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="133"/>
-        <source>Linear Burn</source>
+        <location line="+1"/>
+        <source>yes</source>
+        <comment>public</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="138"/>
-        <source>Linear Light</source>
+        <location line="+0"/>
+        <source>no</source>
+        <comment>public</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="143"/>
-        <source>Luminosity/Shine (SAI)</source>
+        <location line="+1"/>
+        <source>yes</source>
+        <comment>private</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../canvas/blendmodes.cpp" line="148"/>
-        <source>Hue</source>
-        <translation type="unfinished">Matiz</translation>
-    </message>
-    <message>
-        <location filename="../canvas/blendmodes.cpp" line="153"/>
-        <source>Saturation</source>
-        <translation type="unfinished">Saturação</translation>
-    </message>
-    <message>
-        <location filename="../canvas/blendmodes.cpp" line="158"/>
-        <source>Luminosity</source>
+        <location line="+0"/>
+        <source>no</source>
+        <comment>private</comment>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../canvas/blendmodes.cpp" line="163"/>
-        <source>Color</source>
-        <translation type="unfinished">Cor</translation>
     </message>
 </context>
 </TS>

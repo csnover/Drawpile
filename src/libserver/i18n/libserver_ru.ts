@@ -4,7 +4,7 @@
 <context>
     <name>server::Client</name>
     <message>
-        <location filename="../client.cpp" line="+319"/>
+        <location filename="../client.cpp" line="+317"/>
         <source>Got non-login message (type=%1) in login state</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19,13 +19,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../opcommands.cpp" line="+249"/>
-        <source>Muted by </source>
+        <location filename="../opcommands.cpp" line="+251"/>
+        <source>Muted by %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Unmuted by </source>
+        <source>Unmuted by %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -206,12 +206,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+131"/>
+        <location line="+132"/>
         <source>Received server-to-user only command %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+18"/>
         <source>Tried to change session ownership</source>
         <translation type="unfinished"></translation>
     </message>
@@ -262,7 +262,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+234"/>
+        <location line="+231"/>
         <source>Abuse report about user %1 received: %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -324,7 +324,7 @@
     <name>server::ThinSession</name>
     <message>
         <location filename="../thinsession.cpp" line="+51"/>
-        <source>Autoreset threshold (%1, effectively %2 MB) reached.</source>
+        <source>Autoreset threshold (%L1, effectively %L2MiB) reached.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
