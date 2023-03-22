@@ -8,9 +8,11 @@
 
 #include <QApplication>
 #include <QIcon>
-#include <QMouseEvent>
 #include <QLineEdit>
+#include <QLinearGradient>
+#include <QMouseEvent>
 #include <QPainter>
+#include <QPainterPath>
 #include <QTreeView>
 #if QT_CONFIG(tooltip)
 #include <QToolTip>
@@ -42,6 +44,41 @@ static inline auto getMetric(QStyle::PixelMetric pm, const QStyleOptionViewItem 
 static inline auto getRect(QStyle::SubElement se, const QStyleOptionViewItem &option)
 {
 	return getStyle(option).subElementRect(se, &option, option.widget);
+}
+
+QColor color(const QStyleOptionViewItem &option, bool fore)
+{
+	auto cg = option.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
+
+	if (cg == QPalette::Normal && !(option.state & QStyle::State_Active))
+		cg = QPalette::Inactive;
+
+	return option.palette.color(cg, (option.state & QStyle::State_Selected)
+		? (fore ? QPalette::HighlightedText : QPalette::Highlight)
+		: (fore ? QPalette::Text : QPalette::Base)
+	);
+}
+
+// Input affordance to make it easier to interact with the opacity wedge control
+static constexpr auto OPACITY_AFFORDANCE = 2;
+
+QPainterPath opacityPath(const QRect &rect, bool forInput)
+{
+	QPainterPath path;
+
+	// input affordance
+	const auto d = forInput ? OPACITY_AFFORDANCE : 0;
+
+	if (forInput) {
+		path.moveTo(rect.bottomLeft() + QPoint(-d, d));
+		path.lineTo(rect.bottomLeft() + QPoint(-d, rect.height() / -3));
+	} else {
+		path.moveTo(rect.bottomLeft());
+	}
+	path.lineTo(rect.topRight() + QPoint(d, -d));
+	path.lineTo(rect.bottomRight() + QPoint(d, d));
+	path.closeSubpath();
+	return path;
 }
 
 void LayerListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -117,8 +154,9 @@ bool LayerListDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, co
 		if (me->button() != Qt::LeftButton) {
 			break;
 		}
+		const auto opt = setOptions(index, option);
 		const auto pos = me->pos();
-		switch (region(setOptions(index, option), pos)) {
+		switch (region(opt, pos)) {
 		case Decoration: {
 			const auto &layer = index.data(Model::ItemRole).value<canvas::LayerListItem>();
 			emit toggleVisibility(layer.id, layer.hidden);
@@ -131,12 +169,19 @@ bool LayerListDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, co
 			// does not know to keep sending events to the item delegate
 			qApp->installEventFilter(this);
 			m_editor.region = Opacity;
+			{
+				const auto rect = regionRect(opt, Opacity, true);
+				m_editor.path = opacityPath(QRect(
+					opt.widget->mapToGlobal(rect.topLeft()),
+					rect.size()
+				), true);
+			}
 			m_editor.controlPoint = compat::globalPos(*me);
-			m_editor.popupAt = option.widget->mapToGlobal(regionRect(option, Opacity, true).topLeft());
+			m_editor.dragging = false;
 			m_editor.value = index.data(Model::OpacityRole).toFloat();
 			m_editor.model = model;
 			m_editor.index = index;
-			m_editor.popup.reset(new widgets::PopupMessage(1, option.widget));
+			m_editor.popup.reset(new widgets::PopupMessage(1, opt.widget));
 			event->accept();
 			return true;
 		case Text:
@@ -173,7 +218,7 @@ bool LayerListDelegate::helpEvent(QHelpEvent *event, QAbstractItemView *view, co
 		QString tooltip;
 		switch(region(setOptions(index, option), event->pos())) {
 		case Opacity:
-			tooltip = tr("%1% opacity").arg(
+			tooltip = tr("%L1% opacity").arg(
 				index.data(Model::OpacityRole).toFloat() * 100.f,
 				0, 'f', 0
 			);
@@ -206,6 +251,19 @@ bool LayerListDelegate::eventFilter(QObject *object, QEvent *event)
 
 	if (!m_editor.index.isValid() || (event->type() == QEvent::MouseButtonRelease && static_cast<QMouseEvent *>(event)->button() == Qt::LeftButton)) {
 		qApp->removeEventFilter(this);
+
+		if (!m_editor.dragging && m_editor.index.isValid()) {
+			const auto pos = compat::globalPos(*static_cast<QMouseEvent *>(event));
+			if (m_editor.path.contains(pos)) {
+				const auto rect = m_editor.path.controlPointRect();
+				const auto x = rect.x() + OPACITY_AFFORDANCE * 2;
+				const auto w = qMax(1., rect.width() - OPACITY_AFFORDANCE * 4);
+				const auto opacity = qBound(0., double(pos.x()) - x, w) / w;
+				m_editor.model->setData(m_editor.index, opacity, Model::OpacityRole);
+				m_editor.model->submit();
+			}
+		}
+
 		m_editor.region = None;
 		m_editor.popup.reset(nullptr);
 		event->accept();
@@ -213,16 +271,23 @@ bool LayerListDelegate::eventFilter(QObject *object, QEvent *event)
 	} else if (event->type() == QEvent::MouseMove) {
 		auto *me = static_cast<QMouseEvent *>(event);
 		const auto delta = compat::globalPos(*me) - m_editor.controlPoint;
-		// TODO: Do y-amplification
-		const auto dx = delta.x() * 0.01;
 
-		const auto opacity = qBound(0., m_editor.value + dx, 1.);
-		m_editor.popup->showMessage(
-			m_editor.popupAt,
-			tr("%1%").arg(opacity * 100, 0, 'f', 0)
-		);
-		m_editor.model->setData(m_editor.index, opacity, Model::OpacityRole);
-		m_editor.model->submit();
+		if (delta.manhattanLength() >= QApplication::startDragDistance()) {
+			m_editor.dragging = true;
+		}
+
+		if (m_editor.dragging) {
+			const auto dx = delta.x() * 0.015f;
+
+			const auto opacity = qBound(0.f, m_editor.value + dx, 1.f);
+			m_editor.popup->showMessage(
+				m_editor.path.controlPointRect().topRight().toPoint(),
+				tr("%L1%").arg(opacity * 100.f, 0, 'f', 0)
+			);
+			m_editor.model->setData(m_editor.index, opacity, Model::OpacityRole);
+			m_editor.model->submit();
+		}
+
 		event->accept();
 		return true;
 	}
@@ -249,23 +314,48 @@ void LayerListDelegate::drawDisplay(QPainter *painter, const QStyleOptionViewIte
 
 void LayerListDelegate::drawOpacity(QPainter *painter, const QStyleOptionViewItem &option, qreal opacity) const
 {
-	const auto icon = QIcon::fromTheme("view-visible");
-	const auto pixmap = icon.pixmap(icon.actualSize(option.decorationSize));
+	const auto rect = regionRect(option, Opacity, true);
+	const auto path = opacityPath(rect, false);
+	const auto fillColor = color(option, true);
+	const auto clipColor = color(option, false);
+	auto clipRect = rect;
+	clipRect.setWidth(rect.width() * opacity);
 
 	painter->save();
-	painter->setOpacity(0.25 + opacity * 0.75);
-	drawIcon(painter, option, regionRect(option, Opacity, true), pixmap);
+	painter->setRenderHint(QPainter::Antialiasing);
+
+	const auto iconSize = option.rect.height() / 2 + 1;
+	const auto icon = QIcon::fromTheme("view-visible").pixmap(iconSize);
+	drawIcon(painter, option, QRect(
+		rect.x(), option.rect.y() + 2, iconSize, iconSize
+	), icon);
+
+	painter->setClipping(true);
+	painter->setClipRect(clipRect);
+	painter->setPen(Qt::NoPen);
+
+	QLinearGradient fillGradient(rect.x(), 0, rect.x() + rect.width(), 0);
+	QColor first(fillColor);
+	first.setAlphaF(0);
+	fillGradient.setColorAt(0.2, first);
+	fillGradient.setColorAt(1, fillColor);
+	painter->setBrush(fillGradient);
+	painter->drawPath(path);
+
+	QPen outlinePen(clipColor);
+	outlinePen.setWidth(3);
+	painter->setPen(outlinePen);
+	painter->setBrush(Qt::NoBrush);
+	painter->setClipping(false);
+	painter->drawPath(path);
+	painter->setPen(fillColor);
+	painter->drawPath(path);
 	painter->restore();
 }
 
 void LayerListDelegate::drawIcon(QPainter *painter, const QStyleOptionViewItem &option, const QRect &rect, const QPixmap &pixmap) const
 {
-	auto cg = option.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
-
-	if (cg == QPalette::Normal && !(option.state & QStyle::State_Active))
-		cg = QPalette::Inactive;
-
-	const auto fill = option.palette.color(cg, (option.state & QStyle::State_Selected) ? QPalette::HighlightedText : QPalette::Text);
+	const auto fill = color(option, true);
 
 	// Paints go directly to the window surface so tinting compositing needs
 	// to be done separately. QTBUG-111936
@@ -310,13 +400,20 @@ QStyleOptionViewItem LayerListDelegate::setOptions(const QModelIndex &index, con
 QRect LayerListDelegate::regionRect(const QStyleOptionViewItem &option, Region region, bool forLayout) const
 {
 	const auto decorationRect = getRect(QStyle::SE_ItemViewItemDecoration, option);
+	const auto opacityWidth = decorationRect.width() * 2;
 
 	switch (region) {
 	case Text: {
 		const auto rtl = (option.direction == Qt::RightToLeft);
+
+		// horizontal margin between the actual text and the text box
 		const auto textMargin = getMetric(QStyle::PM_FocusFrameHMargin, option);
+
+		// spacing between the right edge of the viewport and the opacity slider
 		const auto endMargin = getMetric(QStyle::PM_ToolBarItemSpacing, option);
-		const auto dx = endMargin + decorationRect.width();
+
+		// total space used for the opacity slider
+		const auto dx = endMargin + opacityWidth;
 		const auto dx1 = rtl ? dx : 0;
 		const auto dx2 = rtl ? 0 : dx;
 
@@ -345,11 +442,21 @@ QRect LayerListDelegate::regionRect(const QStyleOptionViewItem &option, Region r
 		return decorationRect;
 	case Opacity: {
 		const auto textRect = regionRect(option, Text, true);
-		const auto textMargin = getMetric(QStyle::PM_FocusFrameHMargin, option) * 2;
+
+		// horizontal margins of the text box
+		const auto textMargin = getMetric(QStyle::PM_FocusFrameHMargin, option);
+
 		const auto dir = option.direction == Qt::RightToLeft ? -1 : 1;
-		return decorationRect.translated(
-			(decorationRect.width() + textRect.width() + textMargin) * dir,
-			0
+
+		const auto dx = (dir == 1)
+			? textRect.width() + textMargin
+			: -textMargin - opacityWidth;
+
+		return QRect(
+			textRect.x() + dx,
+			decorationRect.y(),
+			opacityWidth,
+			decorationRect.height()
 		);
 	}
 	default: Q_UNREACHABLE();
@@ -362,10 +469,13 @@ LayerListDelegate::Region LayerListDelegate::region(const QStyleOptionViewItem &
 		return Decoration;
 	} else if (regionRect(option, Text, false).contains(pos)) {
 		return Text;
-	} else if (regionRect(option, Opacity, false).contains(pos)) {
-		return Opacity;
 	} else {
-		return None;
+		const auto rect = regionRect(option, Opacity, false);
+		if (rect.contains(pos) && opacityPath(rect, true).contains(pos)) {
+			return Opacity;
+		} else {
+			return None;
+		}
 	}
 }
 

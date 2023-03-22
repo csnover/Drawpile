@@ -144,7 +144,7 @@ void LayerList::setLayerEditActions(QAction *addLayer, QAction *addGroup, QActio
 
 	auto *titlebar = static_cast<TitleWidget*>(titleBarWidget());
 
-	titlebar->addSpace();
+	titlebar->addSpace(style()->pixelMetric(QStyle::PM_ButtonMargin, nullptr, this));
 
 	auto *addLayerButton = new widgets::GroupedToolButton(widgets::GroupedToolButton::GroupLeft, titlebar);
 	addLayerButton->setDefaultAction(addLayer);

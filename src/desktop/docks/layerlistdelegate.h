@@ -8,6 +8,7 @@
 #include <QIcon>
 #include <QItemDelegate>
 #include <QModelIndex>
+#include <QPainterPath>
 #include <QRect>
 #include <memory>
 
@@ -67,8 +68,9 @@ private:
 
 	struct {
 		Region region = None;
+		QPainterPath path;
 		QPoint controlPoint;
-		QPoint popupAt;
+		bool dragging = false;
 		float value = 0;
 		QAbstractItemModel *model = nullptr;
 		QModelIndex index;
