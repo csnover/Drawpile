@@ -215,14 +215,15 @@ void AnnotationSettings::setUiEnabled(bool enabled)
 void AnnotationSettings::setEditorBackgroundColor(const QColor &color)
 {
 	// Blend transparent colors with white
-	const QColor c = QColor::fromRgbF(
+	const auto c = QColor::fromRgbF(
 		color.redF() * color.alphaF() + (1-color.alphaF()),
 		color.greenF() * color.alphaF() + (1-color.alphaF()),
 		color.blueF() * color.alphaF() + (1-color.alphaF())
 	);
 
-	// We need to use the stylesheet because native styles ignore the palette.
-	m_ui->content->setStyleSheet("background-color: " + c.name());
+	auto pal = m_ui->content->palette();
+	pal.setColor(QPalette::Base, c);
+	m_ui->content->setPalette(pal);
 }
 
 void AnnotationSettings::updateStyleButtons()

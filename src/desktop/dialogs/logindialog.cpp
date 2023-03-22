@@ -24,6 +24,7 @@
 #endif
 #endif
 
+#include <QPalette>
 #include <QPushButton>
 #include <QMessageBox>
 #include <QSettings>
@@ -330,19 +331,16 @@ void LoginDialog::onUsernameNeeded(bool canSelectAvatar)
 void LoginDialog::Private::setLoginMode(const QString &prompt)
 {
 	m_ui->loginPromptLabel->setText(prompt);
-	if(extauthurl.isValid())
-		m_ui->loginPromptLabel->setStyleSheet(QStringLiteral(
-			"background: #3498db;"
-			"color: #fcfcfc;"
-			"padding: 16px"
-			));
-	else
-		m_ui->loginPromptLabel->setStyleSheet(QStringLiteral(
-			"background: #fdbc4b;"
-			"color: #31363b;"
-			"padding: 16px"
-			));
 
+	auto pal = m_ui->loginPromptLabel->palette();
+	if (extauthurl.isValid()) {
+		pal.setColor(QPalette::Window, QColor::fromRgb(0x34, 0x98, 0xdb));
+		pal.setColor(QPalette::WindowText, QColor::fromRgb(0xfc, 0xfc, 0xfc));
+	} else {
+		pal.setColor(QPalette::Window, QColor::fromRgb(0xfd, 0xbc, 0x4b));
+		pal.setColor(QPalette::WindowText, QColor::fromRgb(0x31, 0x36, 0x3b));
+	}
+	m_ui->loginPromptLabel->setPalette(pal);
 	resetMode(Mode::authenticate);
 
 #ifdef HAVE_QTKEYCHAIN
