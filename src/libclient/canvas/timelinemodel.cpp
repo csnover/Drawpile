@@ -59,7 +59,7 @@ void TimelineModel::setLayers(const QVector<LayerListItem> &layers)
 		m_layers << TimelineLayer {
 			l.id,
 			l.left < prefixUntil ? prefixUntil : 0,
-			l.left < prefixUntil ? QStringLiteral("%1 / %2").arg(prefix, l.title) : l.title
+			l.left < prefixUntil ? tr("%1 / %2").arg(prefix, l.title) : l.title
 		};
 		m_layerIdsToRows[l.id] = m_layers.size() - 1;
 	}

@@ -769,11 +769,11 @@
              <layout class="QHBoxLayout">
               <item>
                <widget class="QSpinBox" name="timestampInterval">
-                <property name="suffix">
-                 <string> minutes</string>
-                </property>
                 <property name="prefix">
                  <string>every </string>
+                </property>
+                <property name="suffix">
+                 <string> minutes</string>
                 </property>
                 <property name="minimum">
                  <number>1</number>

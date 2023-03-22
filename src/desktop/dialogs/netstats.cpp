@@ -23,7 +23,7 @@ NetStats::NetStats(QWidget *parent)
 		m_ui->lagLabel->setText(
 			lag == -1
 			? tr("not connected")
-			: tr("%1ms").arg(lag)
+			: tr("%L1ms").arg(lag)
 		);
 	}, -1);
 }
@@ -53,11 +53,11 @@ void NetStats::setDisconnected()
 QString NetStats::formatKb(int bytes)
 {
 	if(bytes < 1024)
-		return tr("%1b").arg(bytes);
+		return tr("%L1b").arg(bytes);
 	else if(bytes < 1024*1024)
-		return tr("%1KiB").arg(bytes / 1024);
+		return tr("%L1KiB").arg(bytes / 1024);
 	else
-		return tr("%1MiB").arg(float(bytes) / (1024*1024), 0, 'f', 1);
+		return tr("%L1MiB").arg(float(bytes) / (1024*1024), 0, 'f', 1);
 }
 
 }

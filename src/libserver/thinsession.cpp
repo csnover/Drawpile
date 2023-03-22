@@ -48,7 +48,7 @@ void ThinSession::addToHistory(protocol::MessagePtr msg)
 	const uint autoResetThreshold = history()->effectiveAutoResetThreshold();
 	if(autoResetThreshold>0 && m_autoResetRequestStatus == AutoResetState::NotSent && history()->sizeInBytes() > autoResetThreshold) {
 		log(Log().about(Log::Level::Info, Log::Topic::Status).message(
-			tr("Autoreset threshold (%1, effectively %2 MB) reached.")
+			tr("Autoreset threshold (%L1, effectively %L2MiB) reached.")
 				.arg(history()->autoResetThreshold()/(1024.0*1024.0), 0, 'g', 1)
 				.arg(autoResetThreshold/(1024.0*1024.0), 0, 'g', 1)
 		));

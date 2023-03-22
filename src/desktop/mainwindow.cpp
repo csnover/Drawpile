@@ -272,7 +272,7 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 					QMessageBox::Warning,
 					tr("Server out of space"),
 					tr("Server is running out of history space and session has grown too large to automatically reset! (Limit is %1)\nSimplify the canvas and reset manually before space runs out.")
-						.arg(tr("%1MiB").arg(maxSize / double(1024*1024), 0, 'f', 2)),
+						.arg(tr("%L1MiB").arg(maxSize / double(1024*1024), 0, 'f', 2)),
 					QMessageBox::Ok,
 					this
 					);
@@ -345,7 +345,7 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 	connect(m_doc, &Document::catchupProgress, m_netstatus, &widgets::NetStatus::setCatchupProgress);
 
 	connect(m_doc->client(), &net::Client::serverStatusUpdate, sessionHistorySize, [sessionHistorySize](int size) {
-		sessionHistorySize->setText(tr("%1MiB").arg(size / float(1024*1024), 0, 'f', 2));
+		sessionHistorySize->setText(tr("%L1MiB").arg(size / float(1024*1024), 0, 'f', 2));
 	});
 
 	connect(m_chatbox, &widgets::ChatBox::message, m_doc->client(), &net::Client::sendEnvelope);

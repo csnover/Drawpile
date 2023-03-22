@@ -18,6 +18,7 @@
 #include <QTextBrowser>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QLocale>
 #include <QDateTime>
 #include <QTextBlock>
 #include <QScrollBar>
@@ -302,7 +303,7 @@ void ChatWidget::openPrivateChat(int userId)
 static QString timestamp()
 {
 	return QStringLiteral("<span class=ts>%1</span>").arg(
-		QDateTime::currentDateTime().toString("HH:mm")
+		QDateTime::currentDateTime().toString(QLocale().timeFormat(QLocale::ShortFormat))
 	);
 }
 
@@ -322,7 +323,7 @@ QString ChatWidget::Private::usernameSpan(int userId)
 
 	return QStringLiteral("<span class=\"username %1\">%2</span>").arg(
 		userclass,
-		user.name.isEmpty() ? QStringLiteral("<s>User #%1</s>").arg(userId) : user.name.toHtmlEscaped()
+		user.name.isEmpty() ? QStringLiteral("<s>%1</s>").arg(tr("User #%1").arg(userId)) : user.name.toHtmlEscaped()
 	);
 }
 

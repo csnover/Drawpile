@@ -106,7 +106,7 @@ void TabletTester::tabletEvent(QTabletEvent *e)
 	}
 
 	const auto posF = compat::tabPosF(*e);
-	msg = tr("%1 X=%2 Y=%3 B=%4 P=%5%")
+	msg = tr("%1 X=%2 Y=%3 B=%4 P=%L5%")
 		.arg(msg)
 		.arg(posF.x(), 0, 'f', 2)
 		.arg(posF.y(), 0, 'f', 2)

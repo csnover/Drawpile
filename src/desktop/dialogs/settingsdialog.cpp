@@ -72,7 +72,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 {
 	m_volumeLabelText = makeTranslator(m_ui->notificationVolume, [=](int val) {
 		m_ui->volumeLabel->setText(val > 0
-			? tr("%1%").arg(val)
+			? tr("%L1%").arg(val)
 			: tr("off", "notifications sounds")
 		);
 	}, 0);

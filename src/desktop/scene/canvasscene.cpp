@@ -288,7 +288,7 @@ void CanvasScene::userCursorMoved(uint8_t userId, uint16_t layerId, int x, int y
 	if(!item) {
 		const auto user = m_model->userlist()->getUserById(userId);
 		item = new UserMarkerItem(userId);
-		item->setText(user.name.isEmpty() ? QStringLiteral("#%1").arg(int(userId)) : user.name);
+		item->setText(user.name.isEmpty() ? tr("#%1").arg(int(userId)) : user.name);
 		item->setShowText(m_showUserNames);
 		item->setShowSubtext(m_showUserLayers);
 		item->setAvatar(user.avatar);

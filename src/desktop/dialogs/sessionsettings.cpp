@@ -70,7 +70,7 @@ SessionSettingsDialog::SessionSettingsDialog(Document *doc, QWidget *parent)
 	m_ui->autoresetThreshold->setValue(m_doc->sessionResetThreshold());
 	m_baseResetThresholdText = makeTranslator(m_ui->baseResetThreshold, [=](double threshold) {
 		m_ui->baseResetThreshold->setText(
-			tr("+ %1MiB").arg(threshold/(1024.0*1024.0), 0, 'f', 1)
+			tr("+ %L1MiB").arg(threshold/(1024.0*1024.0), 0, 'f', 1)
 		);
 	}, m_doc->baseResetThreshold());
 

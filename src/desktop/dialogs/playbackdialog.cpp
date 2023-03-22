@@ -39,7 +39,7 @@ PlaybackDialog::PlaybackDialog(canvas::CanvasModel *canvas, QWidget *parent)
 	setWindowFlags(Qt::Tool);
 
 	m_speedLabelText = makeTranslator(m_ui->speedLabel, [=](qreal s) {
-		m_ui->speedLabel->setText(tr("%1×").arg(s, 0, 'f', 1));
+		m_ui->speedLabel->setText(tr("%L1×").arg(s, 0, 'f', 1));
 	}, 1.0);
 
 	connect(m_ui->buildIndexButton, &QAbstractButton::clicked, this, &PlaybackDialog::onBuildIndexClicked);

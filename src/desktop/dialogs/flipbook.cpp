@@ -113,7 +113,8 @@ void Flipbook::setPaintEngine(canvas::PaintEngine *pe)
 	m_ui->loopStart->setMaximum(max);
 	m_ui->loopEnd->setMaximum(max);
 	m_ui->layerIndex->setMaximum(max);
-	m_ui->layerIndex->setSuffix(QStringLiteral("/%1").arg(max));
+	m_ui->layerIndex->setPrefix(tr(""));
+	m_ui->layerIndex->setSuffix(tr("/%1").arg(max));
 	m_ui->loopEnd->setValue(max);
 
 	m_crop = QRect(QPoint(), pe->size());

@@ -285,7 +285,7 @@
      <item row="4" column="2">
       <widget class="QSpinBox" name="smudgingBox">
        <property name="suffix">
-        <string notr="true">%</string>
+        <string>%</string>
        </property>
        <property name="minimum">
         <number>0</number>
@@ -321,7 +321,7 @@
      <item row="3" column="2">
       <widget class="QSpinBox" name="hardnessBox">
        <property name="suffix">
-        <string notr="true">%</string>
+        <string>%</string>
        </property>
        <property name="minimum">
         <number>1</number>
@@ -354,7 +354,7 @@
      <item row="5" column="2">
       <widget class="QSpinBox" name="colorpickupBox">
        <property name="prefix">
-        <string notr="true">1/</string>
+        <string>1/</string>
        </property>
        <property name="minimum">
         <number>1</number>
@@ -366,9 +366,6 @@
      </item>
      <item row="7" column="2">
       <widget class="QSpinBox" name="gainBox">
-       <property name="suffix">
-        <string/>
-       </property>
        <property name="minimum">
         <number>-180</number>
        </property>
@@ -390,7 +387,7 @@
      <item row="2" column="2">
       <widget class="QSpinBox" name="opacityBox">
        <property name="suffix">
-        <string notr="true">%</string>
+        <string>%</string>
        </property>
        <property name="minimum">
         <number>1</number>
@@ -403,7 +400,7 @@
      <item row="6" column="2">
       <widget class="QSpinBox" name="brushspacingBox">
        <property name="suffix">
-        <string notr="true">%</string>
+        <string>%</string>
        </property>
        <property name="minimum">
         <number>1</number>

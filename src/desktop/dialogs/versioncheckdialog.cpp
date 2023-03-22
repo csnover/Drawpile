@@ -28,7 +28,7 @@ VersionCheckDialog::VersionCheckDialog(QWidget *parent)
 	m_downloadButtonText = makeTranslator(m_downloadButton, [=](QString version, int downloadSize) {
 		m_downloadButton->setText(tr("Download %1 (%2)")
 			.arg(version)
-			.arg(tr("%1MiB").arg(downloadSize / (1024.0 * 1024.0), 0, 'f', 2))
+			.arg(tr("%L1MiB").arg(downloadSize / (1024.0 * 1024.0), 0, 'f', 2))
 		);
 	}, QString(), 0);
 

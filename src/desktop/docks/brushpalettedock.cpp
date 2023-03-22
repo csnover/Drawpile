@@ -140,7 +140,7 @@ BrushPalette::BrushPalette(QWidget *parent)
 				menu.action([=](ActionBuilder action) {
 					action
 						.text([=] {
-							return tr("%1×%1").arg(dimension);
+							return tr("%L1×%L1").arg(dimension);
 						})
 						.checkable()
 						.data(dimension)
@@ -367,13 +367,13 @@ void BrushPalette::importMyPaintBrushes()
 		}
 
 		QStringList messages;
-		messages.append(tr("Import of %n MyPaint brush(es).", nullptr, files.count()));
+		messages.append(tr("Import of %Ln MyPaint brush(es).", nullptr, files.count()));
 		if(!successes.isEmpty()) {
-			messages.append(tr("%n successfully imported: %1", nullptr, successes.count())
+			messages.append(tr("%Ln successfully imported: %1", nullptr, successes.count())
 				.arg(successes.join(", ")));
 		}
 		if(!failures.isEmpty()) {
-			messages.append(tr("%n failed to import: %1", nullptr, failures.count())
+			messages.append(tr("%Ln failed to import: %1", nullptr, failures.count())
 				.arg(failures.join(", ")));
 		}
 

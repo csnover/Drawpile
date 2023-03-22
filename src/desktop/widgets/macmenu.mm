@@ -148,7 +148,7 @@ void MacMenu::quitAll()
 
 	if(dirty>1) {
 		QMessageBox box;
-		box.setText(MainWindow::tr("You have %n images with unsaved changes. Do you want to review these changes before quitting?", "", dirty));
+		box.setText(MainWindow::tr("You have %Ln images with unsaved changes. Do you want to review these changes before quitting?", "", dirty));
 		box.setInformativeText(MainWindow::tr("If you don't review your documents, all changes will be lost"));
 		box.addButton(MainWindow::tr("Review changes..."), QMessageBox::AcceptRole);
 		box.addButton(QMessageBox::Cancel);
