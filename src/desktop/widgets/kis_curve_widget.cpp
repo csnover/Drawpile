@@ -51,7 +51,7 @@ KisCurveWidget::KisCurveWidget(QWidget *parent, Qt::WindowFlags f)
     d->m_readOnlyMode   = false;
     d->m_guideVisible   = false;
     d->m_pixmapDirty = true;
-    d->m_pixmapCache = NULL;
+    d->m_pixmapCache = nullptr;
     d->setState(ST_NORMAL);
 
 	d->m_intIn = nullptr;

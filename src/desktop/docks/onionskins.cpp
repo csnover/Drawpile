@@ -16,10 +16,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Drawpile.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "onionskins.h"
-#include "dialogs/colordialog.h"
-#include "main.h"
-#include "titlewidget.h"
+#include "desktop/docks/onionskins.h"
+#include "desktop/dialogs/colordialog.h"
+#include "desktop/main.h"
+#include "desktop/docks/titlewidget.h"
 
 #include <QFrame>
 #include <QHBoxLayout>

@@ -1,8 +1,8 @@
 #ifndef MYPAINTINPUT_H
 #define MYPAINTINPUT_H
-#include "brushes/brush.h"
+#include "libclient/brushes/brush.h"
 #include <QWidget>
-#include <mypaint-brush-settings.h>
+#include <dpengine/libmypaint/mypaint-brush-settings.h>
 
 class KisCurveWidget;
 class KisDoubleSliderSpinBox;

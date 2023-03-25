@@ -194,15 +194,15 @@ else()
 	)
 endif()
 
+target_compile_definitions(dpclient PUBLIC HAVE_QT_GUI)
 target_link_libraries(dpclient
 	dpshared
 	${QT_PACKAGE_NAME}::Gui
 	${QT_PACKAGE_NAME}::Network
 	${QT_PACKAGE_NAME}::Sql
-	Drawdance::dpengine
-	Drawdance::dpengine_archive
-	Drawdance::dpmsg
 	Drawdance::dpcommon
+	Drawdance::dpengine
+	Drawdance::dpmsg
 )
 
 if(${QT_PACKAGE_NAME}LinguistTools_FOUND)

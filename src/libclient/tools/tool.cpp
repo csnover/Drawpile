@@ -25,7 +25,7 @@ void Tool::setHandlesRightClick(bool handlesRightClick)
 {
 	if(handlesRightClick != m_handlesRightClick) {
 		m_handlesRightClick = handlesRightClick;
-		emit owner.toolCapabilitiesChanged(
+		emit m_owner.toolCapabilitiesChanged(
 			m_allowColorPick, m_allowToolAdjust, m_handlesRightClick);
 	}
 }

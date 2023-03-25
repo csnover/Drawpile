@@ -17,9 +17,9 @@
  * along with Drawpile.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "canvasshortcutedit.h"
-#include "canvas/canvasshortcuts.h"
-#include "utils/canvasshortcutsmodel.h"
+#include "desktop/widgets/canvasshortcutedit.h"
+#include "libclient/canvas/canvasshortcuts.h"
+#include "libclient/utils/canvasshortcutsmodel.h"
 #include <QEvent>
 #include <QHBoxLayout>
 #include <QKeyEvent>

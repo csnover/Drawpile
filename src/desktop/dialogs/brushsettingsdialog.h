@@ -1,8 +1,9 @@
 #ifndef BRUSHEDITORDIALOG_H
 #define BRUSHEDITORDIALOG_H
 
-#include "brushes/brush.h"
-#include "widgets/mypaintinput.h"
+#include "libclient/brushes/brush.h"
+#include "desktop/widgets/mypaintinput.h"
+#include <dpengine/libmypaint/mypaint-brush-settings.h>
 #include <QDialog>
 
 class QListWidgetItem;

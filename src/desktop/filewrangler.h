@@ -1,7 +1,7 @@
 #ifndef FILEWRANGLER_H
 #define FILEWRANGLER_H
 
-#include "utils/images.h"
+#include "libclient/utils/images.h"
 #include <QObject>
 #include <QString>
 

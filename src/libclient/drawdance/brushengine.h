@@ -34,7 +34,7 @@ public:
 
     void flushDabs();
 
-    const drawdance::MessageList &messages() const { return m_messages; };
+    const drawdance::MessageList &messages() const { return m_messages; }
 
     void clearMessages() { m_messages.clear(); }
 

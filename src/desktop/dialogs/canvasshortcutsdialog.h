@@ -19,7 +19,7 @@
 #ifndef CANVASSHORTCUTSDIALOG_H
 #define CANVASSHORTCUTSDIALOG_H
 
-#include "canvas/canvasshortcuts.h"
+#include "libclient/canvas/canvasshortcuts.h"
 #include <QDialog>
 
 class CanvasShortcutsModel;

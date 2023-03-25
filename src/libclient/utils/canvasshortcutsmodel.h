@@ -19,7 +19,7 @@
 #ifndef CANVASSHORTCUTSMODEL_H
 #define CANVASSHORTCUTSMODEL_H
 
-#include "canvas/canvasshortcuts.h"
+#include "libclient/canvas/canvasshortcuts.h"
 #include <QAbstractTableModel>
 #include <QVector>
 

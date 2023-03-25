@@ -77,22 +77,6 @@ static const QVector<ImageFormat> &writableImageFormats()
 	return formats;
 }
 
-static const QString &readableImageFormatsGlobs()
-{
-	static QString globs{};
-	if(globs.isNull()) {
-		QStringList suffixes;
-		QString fmt{"*.%1"};
-		for(const ImageFormat &pair : readableImageFormats()) {
-			for(const QString &suffix : pair.second) {
-				suffixes.append(fmt.arg(suffix));
-			}
-		}
-		globs = suffixes.join(" ");
-	}
-	return globs;
-}
-
 bool isWritableFormat(const QString &filename)
 {
 	const int dot = filename.lastIndexOf('.');
