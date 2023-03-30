@@ -280,7 +280,7 @@ set_target_properties(drawpile PROPERTIES
 )
 
 # On Qt6, private headers are required to switch between Windows Ink and Wintab.
-if(QT_VERSION_MAJOR VERSION_EQUAL 6)
+if(WIN32 AND QT_VERSION_MAJOR VERSION_EQUAL 6)
 	# TODO: Check this is doing the right thing
 	target_include_directories(drawpile PRIVATE "${Qt6Gui_PRIVATE_INCLUDE_DIRS}")
 endif()
