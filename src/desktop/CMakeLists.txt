@@ -311,7 +311,7 @@ if(ENABLE_VERSION_CHECK)
 endif()
 
 if(KIS_TABLET)
-	target_sources(drawpile PRIVATE
+	set(sources
 		bundled/kis_tablet/debug.h
 		bundled/kis_tablet/kis_tablet_support_win_p.h
 		bundled/kis_tablet/kis_tablet_support_win.cpp
@@ -320,6 +320,10 @@ if(KIS_TABLET)
 		bundled/kis_tablet/kis_tablet_support_win8.h
 		bundled/kis_tablet/pktdef.h
 		bundled/kis_tablet/wintab.h
+	)
+	target_sources(drawpile PRIVATE ${sources})
+	set_source_files_properties(${sources} PROPERTIES
+		INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/bundled/kis_tablet"
 	)
 endif()
 
@@ -401,6 +405,7 @@ else()
 	target_sources(drawpile PRIVATE ${sources})
 	set_source_files_properties(${sources} PROPERTIES
 		COMPILE_OPTIONS "${IGNORE_WARNINGS_COMPILE_OPTIONS}"
+		INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/bundled/QtColorWidgets"
 	)
 	target_include_directories(drawpile SYSTEM PRIVATE
 		"${CMAKE_CURRENT_SOURCE_DIR}/bundled/QtColorWidgets/include"
