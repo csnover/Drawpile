@@ -394,7 +394,7 @@ public:
 
     void emitSignals() const
     {
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+#ifdef HAVE_QT_COMPAT_SPIN_BOX_TEXT_CHANGED
         emit m_q->textChanged(m_q->text());
 #else
         emit m_q->valueChanged(m_q->text());

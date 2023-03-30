@@ -23,6 +23,7 @@
 #include <QSettings>
 
 #include "libclient/export/ffmpegexporter.h"
+#include "libshared/util/qtcompat.h"
 
 FfmpegExporter::FfmpegExporter(QObject *parent)
 	: VideoExporter(parent), m_encoder(nullptr)
@@ -53,10 +54,12 @@ QStringList FfmpegExporter::getDefaultArguments()
 	return args;
 }
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-// Copied from Qt source code (LGPL licensed):
 static QStringList splitCommand(QStringView command)
 {
+#ifdef HAVE_QT_COMPAT_SPLIT_COMMAND
+	return QProcess::splitCommand(command);
+#else
+	// Copied from Qt source code (LGPL licensed):
 	QStringList args;
 	QString tmp;
 	int quoteCount = 0;
@@ -93,13 +96,8 @@ static QStringList splitCommand(QStringView command)
 		args += tmp;
 
 	return args;
-}
-#else
-static inline QStringList splitCommand(QStringView command)
-{
-	return QProcess::splitCommand(command);
-}
 #endif
+}
 
 void FfmpegExporter::initExporter()
 {

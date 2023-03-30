@@ -37,6 +37,8 @@ inline void setFontFamily(QTextCharFormat &format, const QString &family) {
 #endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#define HAVE_QT_COMPAT_SPIN_BOX_TEXT_CHANGED
+
 inline auto widgetScreen(const QWidget &widget) {
 	return widget.screen();
 }

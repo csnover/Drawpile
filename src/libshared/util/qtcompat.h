@@ -21,6 +21,7 @@ const auto SkipEmptyParts = QString::SkipEmptyParts;
 #endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+#define HAVE_QT_COMPAT_SPLIT_COMMAND
 const auto SocketError = &QAbstractSocket::errorOccurred;
 #else
 const auto SocketError = QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error);
