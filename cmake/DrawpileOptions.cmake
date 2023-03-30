@@ -36,8 +36,5 @@ add_feature_info("Unit tests (TESTS)" TESTS "")
 option(DIST_BUILD "Build for stand-alone distribution")
 add_feature_info("Distribution build (DIST_BUILD)" DIST_BUILD "")
 
-option(ADDRESS_SANITIZER "Enable address sanitizer" OFF)
-add_feature_info("Address sanitizer (ADDRESS_SANITIZER)" ADDRESS_SANITIZER "")
-
 option(ENABLE_VERSION_CHECK "Enable code to check for updates" ON)
 add_feature_info("Automatic update checking code (ENABLE_VERSION_CHECK)" ENABLE_VERSION_CHECK "")
