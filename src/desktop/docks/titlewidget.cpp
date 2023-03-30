@@ -20,7 +20,6 @@
 #include "desktop/docks/titlewidget.h"
 #include "libclient/utils/icon.h"
 #include "desktop/widgets/groupedtoolbutton.h"
-#include "libshared/qtshims.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -78,7 +77,6 @@ void TitleWidget::addCustomWidget(QWidget *widget, bool stretch)
 	if(stretch)
 		m_layout->setStretchFactor(widget, 1);
 }
-
 
 void TitleWidget::addSpace(int space)
 {

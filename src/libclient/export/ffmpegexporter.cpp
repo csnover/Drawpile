@@ -23,7 +23,6 @@
 #include <QSettings>
 
 #include "libclient/export/ffmpegexporter.h"
-#include "libshared/qtshims.h"
 
 FfmpegExporter::FfmpegExporter(QObject *parent)
 	: VideoExporter(parent), m_encoder(nullptr)
@@ -151,7 +150,7 @@ void FfmpegExporter::writeFrame(const QImage &image, int repeat)
 {
 	qInfo("Writing frame (repeat %d)", repeat);
 	if(!m_writebuffer.isEmpty()) {
-		qWarning("FfmpegExporter: tried to write frame while not yet ready! (%lld of %lld of buffered bytes written", m_written, shim::cast<long long>(m_writebuffer.length()));
+		qWarning("FfmpegExporter: tried to write frame while not yet ready! (%lld of %d of buffered bytes written", m_written, m_writebuffer.length());
 		return;
 	}
 

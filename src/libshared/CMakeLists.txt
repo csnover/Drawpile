@@ -1,5 +1,4 @@
 add_library(dpshared STATIC
-	qtshims.h
 	listings/announcementapi.cpp
 	listings/announcementapi.h
 	listings/listserverfinder.cpp

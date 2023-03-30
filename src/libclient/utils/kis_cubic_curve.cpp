@@ -19,7 +19,6 @@
  */
 
 #include "libclient/utils/kis_cubic_curve.h"
-#include "libshared/qtshims.h"
 
 #include <QPointF>
 #include <QList>

@@ -303,7 +303,7 @@ void KisAngleGauge::keyPressEvent(QKeyEvent *e)
     }
 }
 
-void KisAngleGauge::enterEvent(shim::EnterEvent *e)
+void KisAngleGauge::enterEvent(QEvent *e)
 {
     m_d->isMouseHover = true;
     update();

@@ -28,7 +28,6 @@
 #include "desktop/utils/hidedocktitlebarseventfilter.h"
 #include "desktop/notifications.h"
 #include "desktop/dialogs/versioncheckdialog.h"
-#include "libshared/qtshims.h"
 #include "libshared/util/paths.h"
 #include "libclient/drawdance/global.h"
 
@@ -99,13 +98,17 @@ DrawpileApp::~DrawpileApp()
 bool DrawpileApp::event(QEvent *e) {
 	if(e->type() == QEvent::TabletEnterProximity || e->type() == QEvent::TabletLeaveProximity) {
 		QTabletEvent *te = static_cast<QTabletEvent*>(e);
-		if(te->pointerType() == shim::ERASER_TYPE)
+		if(te->pointerType()==QTabletEvent::Eraser)
 			emit eraserNear(e->type() == QEvent::TabletEnterProximity);
 		return true;
 
 	} else if(e->type() == QEvent::FileOpen) {
 		QFileOpenEvent *fe = static_cast<QFileOpenEvent*>(e);
+
+		// Note. This is currently broken in Qt 5.3.1:
+		// https://bugreports.qt-project.org/browse/QTBUG-39972
 		openUrl(fe->url());
+
 		return true;
 
 	}
@@ -269,7 +272,7 @@ static void initTranslations(DrawpileApp &app, const QLocale &locale)
 	QTranslator *translator;
 	// Qt's own translations
 	translator = new QTranslator(&app);
-	if(translator->load("qt_" + preferredLang, shim::translationsPath())) {
+	if(translator->load("qt_" + preferredLang, QLibraryInfo::location(QLibraryInfo::TranslationsPath))) {
 		qApp->installTranslator(translator);
 	} else {
 		delete translator;
@@ -409,10 +412,8 @@ static QStringList initApp(DrawpileApp &app)
 }
 
 int main(int argc, char *argv[]) {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	// Set attributes that must be set before QApplication is constructed
 	QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
 
 #ifdef Q_OS_ANDROID
 	// Android has a weird title bar by default, we want a menu bar instead.

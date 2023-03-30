@@ -18,7 +18,6 @@
 */
 
 #include "libclient/net/servercmd.h"
-#include "libshared/qtshims.h"
 
 namespace net {
 
@@ -75,9 +74,9 @@ drawdance::Message ServerCommand::toMessage() const
 	// TODO we should have a message type for splitting up overlong messages
 	if(payload.length() > 0xffff - DP_MESSAGE_HEADER_LENGTH) {
 		qWarning(
-			"ServerCommand::toEnvelope(%s) produced a message that is too long! (%lld bytes)",
+			"ServerCommand::toEnvelope(%s) produced a message that is too long! (%d bytes)",
 			qPrintable(cmd),
-			shim::cast<long long>(payload.length())
+			payload.length()
 		);
 		return drawdance::Message{};
 	}

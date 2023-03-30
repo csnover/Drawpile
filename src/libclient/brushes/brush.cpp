@@ -21,7 +21,6 @@
 #include "libclient/canvas/blendmodes.h"
 #include "libclient/drawdance/brushengine.h"
 #include "libclient/utils/icon.h"
-#include "libshared/qtshims.h"
 
 #include <cmath>
 #include <dpengine/libmypaint/mypaint-brush.h>

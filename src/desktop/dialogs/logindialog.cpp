@@ -33,11 +33,7 @@
 #include "ui_logindialog.h"
 
 #ifdef HAVE_QTKEYCHAIN
-#	if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#		include <qt5keychain/keychain.h>
-#	else
-#		include <qt6keychain/keychain.h>
-#	endif
+#include <qt5keychain/keychain.h>
 #endif
 
 #include <QPushButton>

@@ -425,7 +425,7 @@ void CanvasView::drawForeground(QPainter *painter, const QRectF& rect)
 	}
 }
 
-void CanvasView::enterEvent(shim::EnterEvent *event)
+void CanvasView::enterEvent(QEvent *event)
 {
 	QGraphicsView::enterEvent(event);
 	m_showoutline = true;
@@ -1202,10 +1202,10 @@ bool CanvasView::viewportEvent(QEvent *event)
 	else if(type == QEvent::TabletPress && m_enableTablet) {
 		QTabletEvent *tabev = static_cast<QTabletEvent*>(event);
 		DP_EVENT_LOG(
-			"tablet_press x=%d y=%d pressure=%f xtilt=%f ytilt=%f rotation=%f buttons=0x%x modifiers=0x%x pendown=%d touching=%d",
-			tabev->x(), tabev->y(), tabev->pressure(), double(tabev->xTilt()),
-			double(tabev->yTilt()), tabev->rotation(), unsigned(tabev->buttons()),
-			unsigned(tabev->modifiers()), m_pendown, m_touching);
+			"tablet_press x=%d y=%d pressure=%f xtilt=%d ytilt=%d rotation=%f buttons=0x%x modifiers=0x%x pendown=%d touching=%d",
+			tabev->x(), tabev->y(), tabev->pressure(), tabev->xTilt(), tabev->yTilt(),
+			tabev->rotation(), unsigned(tabev->buttons()), unsigned(tabev->modifiers()),
+			m_pendown, m_touching);
 
 		// Note: it is possible to get a mouse press event for a tablet event (even before
 		// the tablet event is received or even though tabev->accept() is called), but
@@ -1231,10 +1231,10 @@ bool CanvasView::viewportEvent(QEvent *event)
 	else if(type == QEvent::TabletMove && m_enableTablet) {
 		QTabletEvent *tabev = static_cast<QTabletEvent*>(event);
 		DP_EVENT_LOG(
-			"tablet_move x=%d y=%d pressure=%f xtilt=%f ytilt=%f rotation=%f buttons=0x%x modifiers=0x%x pendown=%d touching=%d",
-			tabev->x(), tabev->y(), tabev->pressure(), double(tabev->xTilt()),
-			double(tabev->yTilt()), tabev->rotation(), unsigned(tabev->buttons()),
-			unsigned(tabev->modifiers()), m_pendown, m_touching);
+			"tablet_move x=%d y=%d pressure=%f xtilt=%d ytilt=%d rotation=%f buttons=0x%x modifiers=0x%x pendown=%d touching=%d",
+			tabev->x(), tabev->y(), tabev->pressure(), tabev->xTilt(), tabev->yTilt(),
+			tabev->rotation(), unsigned(tabev->buttons()), unsigned(tabev->modifiers()),
+			m_pendown, m_touching);
 
 #ifndef PASS_PEN_EVENTS
 		tabev->accept();
