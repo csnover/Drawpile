@@ -10,7 +10,7 @@ if(CMAKE_INTERPROCEDURAL_OPTIMIZATION)
 	include(CheckIPOSupported)
 	check_ipo_supported(RESULT CMAKE_INTERPROCEDURAL_OPTIMIZATION LANGUAGES CXX)
 endif()
-add_feature_info("Interprocedural optimization" CMAKE_INTERPROCEDURAL_OPTIMIZATION "")
+add_feature_info("Interprocedural optimization (CMAKE_INTERPROCEDURAL_OPTIMIZATION)" CMAKE_INTERPROCEDURAL_OPTIMIZATION "")
 
 if (MSVC)
 	add_compile_options(/utf-8 /W4)
