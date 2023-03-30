@@ -101,7 +101,7 @@ else()
 	endif()
 
 	get_directory_property(IGNORE_WARNINGS_COMPILE_OPTIONS COMPILE_OPTIONS)
-	list(TRANSFORM IGNORE_WARNINGS_COMPILE_OPTIONS REPLACE "-W([^=]+)(=.*$)?" "-Wno-\\1")
+	list(TRANSFORM IGNORE_WARNINGS_COMPILE_OPTIONS REPLACE "-W(no-)?([^=]+)(=.*$)?" "-Wno-\\2")
 endif()
 
 foreach(lang IN ITEMS C CXX OBJC OBJCXX)
