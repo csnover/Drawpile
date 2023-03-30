@@ -20,6 +20,7 @@
 #include "desktop/dialogs/colordialog.h"
 #include "desktop/main.h"
 #include "desktop/docks/titlewidget.h"
+#include "desktop/utils/qtguicompat.h"
 
 #include <QFrame>
 #include <QHBoxLayout>

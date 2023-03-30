@@ -1,4 +1,4 @@
-#include "androidfiledialog.h"
+#include "desktop/dialogs/androidfiledialog.h"
 #include <QPushButton>
 
 namespace dialogs {

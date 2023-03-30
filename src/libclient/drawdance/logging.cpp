@@ -1,7 +1,7 @@
 extern "C" {
 #include <dpcommon/common.h>
 }
-#include "logging.h"
+#include "libclient/drawdance/logging.h"
 #include <QLoggingCategory>
 
 namespace drawdance {

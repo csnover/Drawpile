@@ -1,7 +1,7 @@
 #ifndef DRAWDANCE_BRUSH_ENGINE_H
 #define DRAWDANCE_BRUSH_ENGINE_H
 
-#include "message.h"
+#include "libclient/drawdance/message.h"
 
 struct DP_BrushEngine;
 struct DP_ClassicBrush;

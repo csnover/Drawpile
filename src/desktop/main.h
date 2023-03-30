@@ -21,7 +21,7 @@
 
 #include <QApplication>
 #include <QMap>
-#include "notifications.h"
+#include "desktop/notifications.h"
 
 class MainWindow;
 class QSoundEffect;

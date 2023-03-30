@@ -4,7 +4,7 @@ extern "C" {
 #include <dpengine/draw_context.h>
 }
 
-#include "global.h"
+#include "libclient/drawdance/global.h"
 #include <QLoggingCategory>
 
 namespace drawdance {

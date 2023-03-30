@@ -1,4 +1,4 @@
-#include "androidutils.h"
+#include "libshared/util/androidutils.h"
 #include <QAndroidJniEnvironment>
 #include <QAndroidJniObject>
 #include <QString>
