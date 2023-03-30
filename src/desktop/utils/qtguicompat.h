@@ -10,6 +10,7 @@
 #include <QTabletEvent>
 #include <QTextCharFormat>
 #include <QTouchEvent>
+#include <QWheelEvent>
 #include <QWidget>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QEventPoint>
@@ -39,9 +40,17 @@ inline void setFontFamily(QTextCharFormat &format, const QString &family) {
 inline auto widgetScreen(const QWidget &widget) {
 	return widget.screen();
 }
+
+inline auto wheelPosition(const QWheelEvent &event) {
+	return event.position();
+}
 #else
 inline auto widgetScreen(const QWidget &) {
 	return qApp->primaryScreen();
+}
+
+inline auto wheelPosition(const QWheelEvent &event) {
+	return event.posF();
 }
 #endif
 

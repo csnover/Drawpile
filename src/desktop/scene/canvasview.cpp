@@ -842,21 +842,13 @@ void CanvasView::wheelEvent(QWheelEvent *event)
 	// Color and layer picking by spinning the scroll wheel is weird, but okay.
 	case CanvasShortcuts::COLOR_PICK:
 		if(m_allowColorPick && m_scene->hasImage()) {
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-			QPointF p = mapToSceneInterpolate(mapFromGlobal(QCursor::pos()));
-#else
-			QPointF p = mapToSceneInterpolate(event->position());
-#endif
+			QPointF p = mapToSceneInterpolate(compat::wheelPosition(*event));
 			m_scene->model()->pickColor(p.x(), p.y(), 0, 0);
 		}
 		break;
 	case CanvasShortcuts::LAYER_PICK: {
 		if(m_scene->hasImage()) {
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-			QPointF p = mapToSceneInterpolate(mapFromGlobal(QCursor::pos()));
-#else
-			QPointF p = mapToSceneInterpolate(event->position());
-#endif
+			QPointF p = mapToSceneInterpolate(compat::wheelPosition(*event));
 			m_scene->model()->pickLayer(p.x(), p.y());
 		}
 		break;

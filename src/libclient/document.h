@@ -49,12 +49,6 @@ namespace net {
 
 namespace tools { class ToolController; }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-Q_MOC_INCLUDE("libclient/canvas/canvasmodel.h")
-Q_MOC_INCLUDE("libclient/net/banlistmodel.h")
-Q_MOC_INCLUDE("libclient/net/announcementlist.h")
-#endif
-
 /**
  * @brief An active document and its associated data, including the network connection
  *

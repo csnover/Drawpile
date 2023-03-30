@@ -69,8 +69,6 @@ inline T cast(T value) {
 	return value;
 }
 #else
-#define Q_MOC_INCLUDE(moc)
-
 using NativeEventResult = long *;
 using RetrieveDataMetaType = QVariant::Type;
 using sizetype = int;

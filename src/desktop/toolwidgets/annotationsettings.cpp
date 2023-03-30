@@ -310,11 +310,7 @@ void AnnotationSettings::resetContentFont(bool resetFamily, bool resetSize, bool
 
 void AnnotationSettings::setFontFamily(QTextCharFormat &fmt)
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-	fmt.setFontFamily(m_ui->font->currentText());
-#else
-	fmt.setFontFamilies({m_ui->font->currentText()});
-#endif
+	compat::setFontFamily(fmt, m_ui->font->currentText());
 }
 
 void AnnotationSettings::setSelectionId(uint16_t id)
