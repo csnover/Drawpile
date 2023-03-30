@@ -31,6 +31,7 @@
 #include "libshared/util/paths.h"
 #include "libclient/drawdance/global.h"
 #include "libshared/util/qtcompat.h"
+#include "desktop/utils/qtguicompat.h"
 
 #ifdef Q_OS_MACOS
 #include "desktop/widgets/macmenu.h"

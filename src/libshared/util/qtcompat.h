@@ -37,6 +37,7 @@ using StringView = QString;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 using NativeEventResult = qintptr *;
 using RetrieveDataMetaType = QMetaType;
+using sizetype = qsizetype;
 
 inline auto castSize(size_t size) {
 	Q_ASSERT(size <= size_t(std::numeric_limits<qsizetype>().max()));
@@ -72,6 +73,7 @@ inline T cast(T value) {
 
 using NativeEventResult = long *;
 using RetrieveDataMetaType = QVariant::Type;
+using sizetype = int;
 
 inline auto castSize(size_t size) {
 	Q_ASSERT(size < std::numeric_limits<int>().max());

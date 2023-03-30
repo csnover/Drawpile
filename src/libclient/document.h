@@ -50,9 +50,9 @@ namespace net {
 namespace tools { class ToolController; }
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-Q_MOC_INCLUDE("canvas/canvasmodel.h")
-Q_MOC_INCLUDE("net/banlistmodel.h")
-Q_MOC_INCLUDE("net/announcementlist.h")
+Q_MOC_INCLUDE("libclient/canvas/canvasmodel.h")
+Q_MOC_INCLUDE("libclient/net/banlistmodel.h")
+Q_MOC_INCLUDE("libclient/net/announcementlist.h")
 #endif
 
 /**

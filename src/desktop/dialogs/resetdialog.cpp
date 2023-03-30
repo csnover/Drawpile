@@ -21,6 +21,7 @@
 #include "libclient/canvas/paintengine.h"
 #include "libclient/utils/icon.h"
 #include "libclient/utils/images.h"
+#include "libshared/util/qtcompat.h"
 
 #include "ui_resetsession.h"
 
@@ -76,7 +77,7 @@ struct ResetDialog::Private {
 	const canvas::PaintEngine *paintEngine;
 	QPushButton *resetButton;
 	QVector<ResetPoint> resetPoints;
-	int selection;
+	compat::sizetype selection;
 
 	Private(const canvas::PaintEngine *pe)
 		: ui{new Ui_ResetDialog}

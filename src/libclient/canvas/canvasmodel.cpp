@@ -367,7 +367,7 @@ QImage CanvasModel::selectionToImage(int layerId) const
 		drawdance::LayerContent layerContent = canvasState.searchLayerContent(layerId);
 		if(layerContent.isNull()) {
 			qWarning("selectionToImage: layer %d not found", layerId);
-			QImage img(rect.size(), QImage::Format_ARGB32_Premultiplied);
+			img = QImage(rect.size(), QImage::Format_ARGB32_Premultiplied);
 			img.fill(0);
 			return img;
 		}

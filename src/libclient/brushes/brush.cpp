@@ -21,6 +21,7 @@
 #include "libclient/canvas/blendmodes.h"
 #include "libclient/drawdance/brushengine.h"
 #include "libclient/utils/icon.h"
+#include "libshared/util/qtcompat.h"
 
 #include <cmath>
 #include <dpengine/libmypaint/mypaint-brush.h>
@@ -31,7 +32,7 @@ namespace {
 
 void setDrawdanceColorToQColor(DP_UPixelFloat &r, const QColor &q)
 {
-	r = {shim::cast<float>(q.blueF()), shim::cast<float>(q.greenF()), shim::cast<float>(q.redF()), shim::cast<float>(q.alphaF())};
+	r = {compat::cast<float>(q.blueF()), compat::cast<float>(q.greenF()), compat::cast<float>(q.redF()), compat::cast<float>(q.alphaF())};
 }
 
 QColor drawdanceColorToQColor(const DP_UPixelFloat &color)

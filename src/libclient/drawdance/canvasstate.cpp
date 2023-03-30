@@ -13,6 +13,8 @@ extern "C" {
 #include "layergroup.h"
 #include "layerprops.h"
 
+#include <QObject>
+
 namespace drawdance {
 
 CanvasState CanvasState::null()

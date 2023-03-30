@@ -26,7 +26,7 @@
 #include <QVector>
 #include <algorithm>
 
-Q_DECLARE_METATYPE(dialogs::LayoutsDialog::Layout *);
+Q_DECLARE_METATYPE(dialogs::LayoutsDialog::Layout *)
 
 namespace dialogs {
 
