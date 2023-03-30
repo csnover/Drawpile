@@ -27,7 +27,6 @@
 #include "libshared/net/image.h"
 #include "libshared/net/recording.h"
 #include "libshared/net/undo.h"
-#include "libshared/qtshims.h"
 
 namespace protocol {
 namespace text {
@@ -50,7 +49,11 @@ Parser::Result Parser::parseLine(const QString &line)
 			return Result { Result::Skip, nullptr };
 		}
 
-		QStringList tokens = line.split(' ', shim::SKIP_EMPTY_PARTS);
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+		QStringList tokens = line.split(' ', QString::SkipEmptyParts);
+#else
+		QStringList tokens = line.split(' ', Qt::SkipEmptyParts);
+#endif
 		if(tokens.length() < 2) {
 			m_error = "Expected at least two tokens";
 			return Result { Result::Error, nullptr };

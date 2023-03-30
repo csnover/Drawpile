@@ -22,7 +22,6 @@
 
 #include "libclient/utils/icon.h"
 #include "libshared/util/paths.h"
-#include "libshared/qtshims.h"
 #include "libclient/drawdance/ziparchive.h"
 
 #include <QBuffer>
@@ -766,7 +765,7 @@ bool BrushPresetTagModel::importMyPaintBrushPack(
 	}
 
 	QStringList order = orderFile.readUtf8()
-		.split(QRegularExpression{"\\s*\n\\s*"}, shim::SKIP_EMPTY_PARTS);
+		.split(QRegularExpression{"\\s*\n\\s*"}, Qt::SkipEmptyParts);
 	int orderCount = order.size();
 	if(orderCount < 2) {
 		outErrors.append(tr("Invalid brush pack: order.conf contains no brushes"));

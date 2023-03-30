@@ -21,7 +21,6 @@
 #include "thinsrv/gui/accountlistmodel.h"
 #include "thinsrv/gui/subheaderwidget.h"
 #include "thinsrv/gui/server.h"
-#include "libshared/qtshims.h"
 
 #include "ui_accountdialog.h"
 
@@ -165,11 +164,13 @@ void AccountListPage::editSelectedAccount()
 
 	ui.username->setText(account["username"].toString());
 	ui.locked->setChecked(account["locked"].toBool());
-	{
-		const QStringList flags = account["flags"].toString().split(',', shim::SKIP_EMPTY_PARTS);
-		ui.flagHost->setChecked(flags.contains("HOST"));
-		ui.flagMod->setChecked(flags.contains("MOD"));
-	}
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+	const QStringList flags = account["flags"].toString().split(',', QString::SkipEmptyParts);
+#else
+	const QStringList flags = account["flags"].toString().split(',', Qt::SkipEmptyParts);
+#endif
+	ui.flagHost->setChecked(flags.contains("HOST"));
+	ui.flagMod->setChecked(flags.contains("MOD"));
 
 	connect(dlg, &QDialog::accepted, this, [this, ui, id]() {
 		QJsonObject body;

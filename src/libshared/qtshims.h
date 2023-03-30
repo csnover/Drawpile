@@ -19,69 +19,49 @@
 #ifndef QTSHIMS_H
 #define QTSHIMS_H
 #include <QLibraryInfo>
-#include <QString>
+#include <QKeyEvent>
 #include <QtGlobal>
-#ifdef HAVE_QT_GUI
-#	include <QEvent>
-#	include <QKeyEvent>
-#	include <QTabletEvent>
-#endif
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 
 namespace shim {
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-template <typename T>
-inline T cast(T value) {
-	return value;
-}
-#else
-template <typename T, typename U>
-inline auto cast(U value) {
-	return static_cast<T>(value);
-}
-#endif
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-constexpr QString::SplitBehavior SKIP_EMPTY_PARTS = QString::SkipEmptyParts;
-#else
-constexpr Qt::SplitBehavior SKIP_EMPTY_PARTS = Qt::SkipEmptyParts;
-#endif
-
-inline QString translationsPath()
-{
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-	return QLibraryInfo::location(QLibraryInfo::TranslationsPath);
-#else
-	return QLibraryInfo::path(QLibraryInfo::TranslationsPath);
-#endif
-}
-
-#ifdef HAVE_QT_GUI
-
-#	if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 using EnterEvent = QEvent;
-#	else
-using EnterEvent = QEnterEvent;
-#	endif
 
-#	if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-constexpr QTabletEvent::PointerType ERASER_TYPE = QTabletEvent::Eraser;
-#	else
-constexpr QPointingDevice::PointerType ERASER_TYPE =
-	QPointingDevice::PointerType::Eraser;
-#	endif
+constexpr auto ERASER_TYPE = QTabletEvent::Eraser;
 
 inline int getKey(const QKeyEvent *e)
 {
-#	if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	return e->key();
-#	else
+}
+
+inline QString translationsPath()
+{
+    return QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+}
+
+}
+
+#else
+
+namespace shim {
+
+using EnterEvent = QEnterEvent;
+
+constexpr auto ERASER_TYPE = QPointingDevice::PointerType::Eraser;
+
+inline QKeyCombination getKey(const QKeyEvent *e)
+{
 	return e->keyCombination();
-#	endif
+}
+
+inline QString translationsPath()
+{
+    return QLibraryInfo::path(QLibraryInfo::TranslationsPath);
+}
+
 }
 
 #endif
-
-}
 
 #endif
