@@ -5,24 +5,12 @@ list(APPEND CMAKE_MODULE_PATH
 	${CMAKE_CURRENT_LIST_DIR}/../../cmake
 )
 
-set(BUILD_TYPE "release" CACHE STRING
-	"The type of build ('debug' or 'release')")
 set(LIBMICROHTTPD "0.9.75" CACHE STRING
 	"The version of libmicrohttpd to build")
 set(LIBSODIUM "1.0.18" CACHE STRING
 	"The version of libsodium to build")
 set(QTKEYCHAIN "c6f0b66318f8da6917fb4681103f7303b1836194" CACHE STRING
 	"The Git refspec of QtKeychain to build")
-
-string(TOLOWER "${BUILD_TYPE}" BUILD_TYPE)
-if(BUILD_TYPE STREQUAL "debug")
-	message(WARNING "This build type enables ASan for some dependencies!\n"
-		"You may need to use `-DCMAKE_EXE_LINKER_FLAGS_INIT=-fsanitize=address`"
-		" when linking to these libraries."
-	)
-elseif(NOT BUILD_TYPE STREQUAL "release")
-	message(FATAL_ERROR "Unknown build type '${BUILD_TYPE}'")
-endif()
 
 # Hack to get Qt version, since its `find_package` code does not support script
 # mode and this information is needed to set up QtKeychain and the macOS version
@@ -61,6 +49,10 @@ set_mac_deployment_target(${QT_VERSION})
 include(BuildDependency)
 
 if(LIBMICROHTTPD)
+	if(USE_ASAN)
+		set(extra_debug_flags --enable-sanitizers=address)
+	endif()
+
 	build_dependency(libmicrohttpd ${LIBMICROHTTPD} ${BUILD_TYPE}
 		URL https://ftpmirror.gnu.org/libmicrohttpd/libmicrohttpd-@version@.tar.gz
 		VERSIONS
@@ -76,7 +68,7 @@ if(LIBMICROHTTPD)
 		UNIX
 			AUTOMAKE
 				ALL --disable-doc --disable-examples --disable-curl
-				DEBUG --enable-asserts --enable-sanitizers=address
+				DEBUG --enable-asserts ${extra_debug_flags}
 	)
 endif()
 
@@ -99,7 +91,7 @@ endif()
 if(QTKEYCHAIN)
 	# macdeployqt does not search rpaths correctly so give a
 	# full path of the library instead
-	if(APPLE)
+	if(APPLE AND NOT ANDROID)
 		set(QTKEYCHAIN_FLAGS "-DCMAKE_INSTALL_NAME_DIR=${CMAKE_INSTALL_PREFIX}/lib")
 	endif()
 

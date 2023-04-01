@@ -5,11 +5,18 @@ list(APPEND CMAKE_MODULE_PATH
 	${CMAKE_CURRENT_LIST_DIR}/../../cmake
 )
 
-set(BUILD_TYPE "release" CACHE STRING
-	"The type of build ('debug', 'debugnoasan', or 'release')")
-set(QT_VERSION "" CACHE STRING
-	"The version of Qt to build")
+set(ANDROID_SDK_ROOT "" CACHE STRING "Path to Android SDK")
+set(ANDROID_NDK_ROOT "" CACHE STRING "Path to Android NDK")
+set(ANDROID_HOST_PATH "" CACHE STRING "Path to Qt host installation for Android builds")
+set(ANDROID_ABI "arm64-v8a" CACHE STRING "Android ABI to build")
+if(ANDROID_NDK_ROOT AND ANDROID_HOST_PATH AND ANDROID_SDK_ROOT)
+	set(ANDROID true)
+	set(OPENSSL "1.1.1t" CACHE STRING "The version of OpenSSL to build")
+else()
+	set(OPENSSL "" CACHE STRING "The version of OpenSSL to build")
+endif()
 
+set(QT_VERSION "" CACHE STRING "The version of Qt to build")
 option(BASE "Build qtbase" ON)
 option(MULTIMEDIA "Build qtmultimedia and dependencies" ON)
 option(SVG "Build qtsvg" ON)
@@ -21,17 +28,8 @@ if(NOT QT_VERSION)
 	message(FATAL_ERROR "-DQT_VERSION is required")
 endif()
 
-string(TOLOWER "${BUILD_TYPE}" BUILD_TYPE)
-if(BUILD_TYPE STREQUAL "debug")
-	set(USE_ASAN true)
-	message(WARNING "This build type enables ASan for some dependencies!\n"
-		"You may need to use `-DCMAKE_EXE_LINKER_FLAGS_INIT=-fsanitize=address`"
-		" when linking to these libraries."
-	)
-elseif(BUILD_TYPE STREQUAL "debugnoasan")
-	set(BUILD_TYPE "debug")
-elseif(NOT BUILD_TYPE STREQUAL "release")
-	message(FATAL_ERROR "Unknown build type '${BUILD_TYPE}'")
+if(QT_VERSION VERSION_LESS 6)
+	option(ANDROID_EXTRAS "Build qtandroidextras (Qt5 only)" ANDROID)
 endif()
 
 include(QtMacDeploymentTarget)
@@ -39,23 +37,67 @@ set_mac_deployment_target(${QT_VERSION})
 
 include(BuildDependency)
 
+if(ANDROID)
+	get_android_toolchain(android_toolchain_path "${ANDROID_NDK_ROOT}")
+
+	list(APPEND BASE_FLAGS
+		-android-ndk "${ANDROID_NDK_ROOT}"
+		-android-sdk "${ANDROID_SDK_ROOT}"
+	)
+
+	if(QT_VERSION VERSION_GREATER_EQUAL 6)
+		list(APPEND BASE_FLAGS
+			-platform android-clang
+			-qt-host-path "${ANDROID_HOST_PATH}"
+		)
+	else()
+		list(APPEND BASE_FLAGS
+			-xplatform android-clang
+			-no-warnings-are-errors
+			-disable-rpath
+			# Qt5 still uses minimum 21 but NDK 25 minimum is 23
+			-android-ndk-platform android-23
+			-hostprefix "${CMAKE_INSTALL_PREFIX}/xx-host"
+		)
+	endif()
+
+	if(ANDROID_ABI)
+		list(APPEND BASE_FLAGS
+			-android-abis "${ANDROID_ABI}"
+		)
+	endif()
+
+	if(NOT ANDROID_ABI OR ANDROID_ABI STREQUAL "armeabi-v7a")
+		set(abi arm)
+	elseif(ANDROID_ABI STREQUAL "arm64-v8a")
+		set(abi arm64)
+	elseif(ANDROID_ABI STREQUAL "x86")
+		set(abi x86)
+	elseif(ANDROID_ABI STREQUAL "x86_64")
+		set(abi x86_64)
+	else()
+		message(FATAL_ERROR "Unknown Android ABI '${ANDROID_ABI}' for OpenSSL")
+	endif()
+
+	list(APPEND OPENSSL_ENV
+		"ANDROID_NDK_HOME=${ANDROID_NDK_ROOT}"
+		"PATH=${android_toolchain_path}/bin:$ENV{PATH}"
+	)
+
+	list(APPEND OPENSSL_FLAGS
+		android-${abi}
+	)
+endif()
+
 if(WIN32)
 	set(SCRIPT_SUFFIX .bat)
 	list(APPEND BASE_FLAGS -mp -schannel)
 endif()
 
-if(UNIX AND NOT APPLE)
+if(UNIX AND NOT APPLE AND NOT ANDROID)
 	list(APPEND BASE_FLAGS -system-freetype -fontconfig)
 else()
 	list(APPEND BASE_FLAGS -qt-freetype)
-endif()
-
-if(QT_VERSION VERSION_GREATER_EQUAL 6.4)
-	list(APPEND BASE_FLAGS -no-feature-androiddeployqt)
-	list(APPEND MULTIMEDIA_FLAGS
-		-no-feature-ffmpeg
-		-no-feature-spatialaudio
-	)
 endif()
 
 # https://bugreports.qt.io/browse/QTBUG-72846 regressed in Qt6 due to
@@ -66,6 +108,13 @@ endif()
 
 if(USE_ASAN)
 	list(APPEND BASE_FLAGS -sanitize address)
+endif()
+
+if(QT_VERSION VERSION_GREATER_EQUAL 6.4)
+	list(APPEND MULTIMEDIA_FLAGS
+		-no-feature-ffmpeg
+		-no-feature-spatialaudio
+	)
 endif()
 
 if(QT_VERSION VERSION_GREATER_EQUAL 6)
@@ -79,7 +128,6 @@ if(QT_VERSION VERSION_GREATER_EQUAL 6)
 	)
 
 	list(APPEND BASE_FLAGS
-		-no-feature-androiddeployqt
 		-no-feature-qmake
 	)
 
@@ -87,12 +135,20 @@ if(QT_VERSION VERSION_GREATER_EQUAL 6)
 	# treating them as unknown extra defines
 	list(APPEND BASE_FLAGS --)
 
+	if(OPENSSL)
+		list(APPEND BASE_FLAGS "-DOPENSSL_ROOT_DIR=${CMAKE_INSTALL_PREFIX}")
+	endif()
+
 	set(TOOLS_FLAGS
 		-no-feature-clang
 		-no-feature-clangcpp
 	)
 else()
 	set(URL_LICENSE opensource-)
+
+	if(OPENSSL)
+		list(APPEND BASE_FLAGS "OPENSSL_PREFIX=${CMAKE_INSTALL_PREFIX}")
+	endif()
 
 	# Module feature flags must be passed as inputs instead of flags
 	set(FLAGS_SEPARATOR --)
@@ -115,6 +171,23 @@ endif()
 
 set(URL https://download.qt.io/archive/qt/@version_major@/@version@/submodules/@name@-everywhere-${URL_LICENSE}src-@version@.tar.xz)
 
+if(OPENSSL)
+	build_dependency(openssl ${OPENSSL} ${BUILD_TYPE}
+		URL "https://www.openssl.org/source/openssl-@version@.tar.gz"
+		SOURCE_DIR "openssl-@version@"
+		VERSIONS
+			1.1.1t
+			SHA384=ead831a5ccdae26e2f47f9a40dbf9ba74a073637c0fe51e137c01e7d49fc5619b71a950c8aea30020cf96710288b5d43
+		ALL_PLATFORMS
+			AUTOMAKE
+				CONFIGURATOR "Configure"
+				ASSIGN_PREFIX BROKEN_INSTALL
+				INSTALL_TARGET install_sw
+				ENV ${OPENSSL_ENV}
+				ALL shared no-tests ${OPENSSL_FLAGS}
+	)
+endif()
+
 if(BASE)
 	build_dependency(qtbase ${QT_VERSION} ${BUILD_TYPE}
 		URL "${URL}"
@@ -130,7 +203,7 @@ if(BASE)
 			${BASE_GENERATOR}
 				ALL
 					-release -opensource -confirm-license
-					-nomake examples
+					-nomake tests -nomake examples
 					-no-sql-mysql -no-sql-odbc -no-sql-psql -sql-sqlite
 					-qt-libjpeg -qt-libpng -qt-sqlite -qt-harfbuzz
 					${BASE_FLAGS}
@@ -240,6 +313,18 @@ if(TOOLS)
 					-no-feature-qtdiag
 					-no-feature-qtplugininfo
 					${TOOLS_FLAGS}
+	)
+endif()
+
+if(ANDROID_EXTRAS)
+	build_dependency(qtandroidextras ${QT_VERSION} ${BUILD_TYPE}
+		URL "${URL}"
+		SOURCE_DIR "@name@-everywhere-src-@version@"
+		VERSIONS
+			5.15.8
+			SHA384=23ecb7927f98683770320537fe825aedb41b9a6155efa28a32b53b82c3bc9df80e125f86f63b561492f0b698824f227d
+		ALL_PLATFORMS
+			${MODULE_GENERATOR}
 	)
 endif()
 
