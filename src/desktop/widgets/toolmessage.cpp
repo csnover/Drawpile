@@ -25,8 +25,6 @@ void ToolMessage::showText(const QString &text)
 	new ToolMessage{text};
 }
 
-ToolMessage::~ToolMessage() {}
-
 void ToolMessage::timerEvent(QTimerEvent *e)
 {
 	killTimer(e->timerId());

@@ -28,8 +28,6 @@ class CanvasShortcutsModel : public QAbstractTableModel {
 public:
 	explicit CanvasShortcutsModel(QObject *parent = nullptr);
 
-	~CanvasShortcutsModel();
-
 	void loadShortcuts(QSettings &cfg);
 	void saveShortcuts(QSettings &cfg);
 	void restoreDefaults();

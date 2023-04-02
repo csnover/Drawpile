@@ -26,14 +26,14 @@ class CanvasShortcutsModel;
 
 namespace dialogs {
 
-class CanvasShortcutsDialog : public QDialog {
+class CanvasShortcutsDialog final : public QDialog {
 	Q_OBJECT
 public:
 	explicit CanvasShortcutsDialog(
 		const CanvasShortcuts::Shortcut *s,
 		const CanvasShortcutsModel &canvasShortcuts, QWidget *parent);
 
-	~CanvasShortcutsDialog();
+	~CanvasShortcutsDialog() override;
 
 	CanvasShortcuts::Shortcut shortcut() const;
 

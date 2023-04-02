@@ -11,7 +11,7 @@ class QLabel;
 
 namespace widgets {
 
-class MyPaintInput : public QWidget {
+class MyPaintInput final : public QWidget {
 	Q_OBJECT
 public:
 	MyPaintInput(
@@ -19,7 +19,7 @@ public:
 		const MyPaintBrushSettingInfo *settingInfo,
 		const MyPaintBrushInputInfo *inputInfo, QWidget *parent = nullptr);
 
-	~MyPaintInput();
+	~MyPaintInput() override;
 
 	DP_MyPaintControlPoints controlPoints() const;
 	void setControlPoints(const DP_MyPaintControlPoints &cps);

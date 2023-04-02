@@ -74,9 +74,6 @@ CanvasShortcutEdit::CanvasShortcutEdit(QWidget *parent)
 		&CanvasShortcutEdit::toggleEdit);
 }
 
-CanvasShortcutEdit::~CanvasShortcutEdit() {}
-
-
 Qt::KeyboardModifiers CanvasShortcutEdit::mods() const
 {
 	return m_mods;

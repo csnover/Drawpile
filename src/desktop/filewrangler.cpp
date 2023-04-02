@@ -19,9 +19,6 @@ FileWrangler::FileWrangler(QWidget *parent)
 {
 }
 
-FileWrangler::~FileWrangler() {}
-
-
 QString FileWrangler::getOpenPath() const
 {
 	return showOpenFileDialog(

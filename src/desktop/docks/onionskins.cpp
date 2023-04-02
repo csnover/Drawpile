@@ -51,7 +51,7 @@ constexpr QRgb TINT_BELOW_DEFAULT = 0xffff3333u;
 constexpr QRgb TINT_ABOVE_DEFAULT = 0xff3333ffu;
 constexpr int DEBOUNCE_DELAY_MS = 500;
 
-class EqualizerSlider : public QSlider {
+class EqualizerSlider final : public QSlider {
 public:
 	EqualizerSlider(QWidget *parent)
 		: QSlider{Qt::Vertical, parent}
@@ -59,8 +59,6 @@ public:
 		setRange(0, 100);
 		setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	}
-
-	virtual ~EqualizerSlider() {}
 
 protected:
 	void paintEvent(QPaintEvent *e) override

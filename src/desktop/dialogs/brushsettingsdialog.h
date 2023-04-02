@@ -10,11 +10,11 @@ class QListWidgetItem;
 
 namespace dialogs {
 
-class BrushSettingsDialog : public QDialog {
+class BrushSettingsDialog final : public QDialog {
 	Q_OBJECT
 public:
 	explicit BrushSettingsDialog(QWidget *parent = nullptr);
-	~BrushSettingsDialog();
+	~BrushSettingsDialog() override;
 
 signals:
 	void brushSettingsChanged(const brushes::ActiveBrush &brush);

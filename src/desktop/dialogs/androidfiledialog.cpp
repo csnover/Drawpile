@@ -22,8 +22,6 @@ AndroidFileDialog::AndroidFileDialog(
 	updateUi();
 }
 
-AndroidFileDialog::~AndroidFileDialog() {}
-
 QString AndroidFileDialog::name() const
 {
 	return m_ui.nameEdit->text().trimmed();

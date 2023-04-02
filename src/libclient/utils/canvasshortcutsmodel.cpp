@@ -27,8 +27,6 @@ CanvasShortcutsModel::CanvasShortcutsModel(QObject *parent)
 {
 }
 
-CanvasShortcutsModel::~CanvasShortcutsModel() {}
-
 void CanvasShortcutsModel::loadShortcuts(QSettings &cfg)
 {
 	beginResetModel();
