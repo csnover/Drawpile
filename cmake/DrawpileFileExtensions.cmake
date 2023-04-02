@@ -72,6 +72,22 @@ set(_URL_VALUE_TOKENS NAME UTI SCHEME)
 set(_URL_ANY_TOKENS PROTOCOL ${_URL_VALUE_TOKENS})
 
 #[[
+Gets registered file extensions and URL protocols in a format suitable for use
+in AndroidManifest.xml.
+#]]
+function(get_android_extensions out_var)
+	_android_generate_extensions(exts)
+	_android_generate_urls(urls)
+	if(exts AND urls)
+		set(exts "${exts};")
+	endif()
+	set(indent "                ")
+	set(intents "${exts}${urls}")
+	list(JOIN intents "\n${indent}" intents)
+	set(${out_var} "${intents}" PARENT_SCOPE)
+endfunction()
+
+#[[
 Gets registered file extensions and URL protocols in a format suitable for
 use in Info.plist.
 #]]
@@ -185,6 +201,35 @@ function(generate_xdg_mime_info out_dir)
 			list(APPEND ${in_var} ${token})
 		endif()
 	endforeach()
+endfunction()
+
+function(_android_generate_extensions out_var)
+	set(mimes "")
+	set(in_var FALSE)
+	foreach(token IN LISTS SUPPORTED_FILE_TYPES)
+		if(token STREQUAL "MIME")
+			set(in_var TRUE)
+		elseif(token IN_LIST _FT_ANY_TOKENS)
+			set(in_var FALSE)
+		elseif(in_var)
+			list(APPEND mimes "<data android:mimeType=\"${token}\" />")
+		endif()
+	endforeach()
+	set(${out_var} ${mimes} PARENT_SCOPE)
+endfunction()
+
+function(_android_generate_urls out_var)
+	set(schemes "")
+	foreach(token IN LISTS SUPPORTED_URL_PROTOCOLS)
+		if(token STREQUAL "SCHEME")
+			set(in_var TRUE)
+		elseif(token IN_LIST _URL_ANY_TOKENS)
+			set(in_var FALSE)
+		elseif(in_var)
+			list(APPEND schemes "<data android:scheme=\"${token}\" />")
+		endif()
+	endforeach()
+	set(${out_var} "${schemes}" PARENT_SCOPE)
 endfunction()
 
 # CMake is an abomination for content generation

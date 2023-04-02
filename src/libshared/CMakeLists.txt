@@ -65,9 +65,12 @@ if(ANDROID)
 		util/androidutils.cpp
 		util/androidutils.h
 	)
-	target_link_libraries(dpshared PRIVATE
-		${QT_PACKAGE_NAME}::AndroidExtras
-	)
+	if(QT_VERSION VERSION_LESS 6)
+		find_package(${QT_PACKAGE_NAME} ${DP_MIN_QT_VERSION_GUI} REQUIRED COMPONENTS AndroidExtras)
+		target_link_libraries(dpshared
+			${QT_PACKAGE_NAME}::AndroidExtras
+		)
+	endif()
 endif()
 
 if(libsodium_FOUND)

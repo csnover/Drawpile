@@ -1,9 +1,21 @@
-find_package(${QT_PACKAGE_NAME} ${DP_MIN_QT_VERSION_GUI} REQUIRED COMPONENTS Widgets Multimedia)
+find_package(${QT_PACKAGE_NAME} ${DP_MIN_QT_VERSION_GUI} REQUIRED COMPONENTS Svg Widgets Multimedia)
 find_package(${QT_PACKAGE_NAME} ${DP_MIN_QT_VERSION_GUI} QUIET COMPONENTS LinguistTools)
 find_package(QtColorWidgets QUIET)
 find_package(${QT_PACKAGE_NAME}Keychain QUIET)
 
-add_executable(drawpile MACOSX_BUNDLE
+if(ANDROID)
+	if(QT_VERSION VERSION_GREATER_EQUAL 6)
+		qt_add_executable(drawpile)
+		qt_android_generate_deployment_settings(drawpile)
+		qt_android_add_apk_target(drawpile)
+	else()
+		add_library(drawpile MODULE)
+	endif()
+else()
+	add_executable(drawpile MACOSX_BUNDLE)
+endif()
+
+target_sources(drawpile PRIVATE
 	filewrangler.cpp
 	filewrangler.h
 	main.cpp
@@ -285,9 +297,9 @@ if(WIN32 AND QT_VERSION_MAJOR VERSION_EQUAL 6)
 	target_include_directories(drawpile PRIVATE "${Qt6Gui_PRIVATE_INCLUDE_DIRS}")
 endif()
 
-# Android doesn't sensibly support multiple windows, they just cover each other
-# up with no way to switch between them, so we don't allow that there.
 if(ANDROID)
+	# Android doesn't sensibly support multiple windows, they just cover each
+	# other up with no way to switch between them, so we don't allow that there.
 	target_compile_definitions(drawpile PRIVATE SINGLE_MAIN_WINDOW=1)
 	target_sources(drawpile PRIVATE
 		dialogs/androidfiledialog.cpp
@@ -296,8 +308,9 @@ if(ANDROID)
 	)
 endif()
 
-target_link_libraries(drawpile
+target_link_libraries(drawpile PRIVATE
 	dpclient
+	${QT_PACKAGE_NAME}::Svg
 	${QT_PACKAGE_NAME}::Widgets
 	${QT_PACKAGE_NAME}::Multimedia
 )
@@ -329,12 +342,12 @@ endif()
 
 if(${QT_PACKAGE_NAME}Keychain_FOUND)
 	target_compile_definitions(drawpile PRIVATE HAVE_QTKEYCHAIN)
-	target_link_libraries(drawpile ${QT_PACKAGE_NAME}Keychain::${QT_PACKAGE_NAME}Keychain)
+	target_link_libraries(drawpile PRIVATE ${QT_PACKAGE_NAME}Keychain::${QT_PACKAGE_NAME}Keychain)
 endif()
 add_feature_info("Client password manager" ${QT_PACKAGE_NAME}Keychain_FOUND "")
 
 if(QtColorWidgets_FOUND)
-	target_link_libraries(drawpile QtColorWidgets::QtColorWidgets)
+	target_link_libraries(drawpile PRIVATE QtColorWidgets::QtColorWidgets)
 else()
 	set(sources
 		bundled/QtColorWidgets/include/QtColorWidgets/abstract_widget_list.hpp
@@ -441,65 +454,95 @@ elseif(APPLE)
 	)
 	target_sources(drawpile PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/drawpile.icns")
 	set_property(TARGET drawpile APPEND PROPERTY RESOURCE "${CMAKE_CURRENT_BINARY_DIR}/drawpile.icns")
+elseif(ANDROID)
+	if(QT_VERSION VERSION_GREATER_EQUAL 6)
+		set_target_properties(drawpile PROPERTIES
+			QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/android")
+	else()
+		set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/android")
+	endif()
+
+	include(DrawpileFileExtensions)
+	get_android_extensions(INTENTS)
+	configure_file(AndroidManifest.xml.in
+		"${CMAKE_CURRENT_BINARY_DIR}/android/AndroidManifest.xml"
+	)
+	file(CREATE_LINK
+		"${CMAKE_CURRENT_SOURCE_DIR}/icons/android"
+		"${CMAKE_CURRENT_BINARY_DIR}/android/res"
+		SYMBOLIC
+	)
+	file(CREATE_LINK
+		"${CMAKE_CURRENT_SOURCE_DIR}/assets"
+		"${CMAKE_CURRENT_BINARY_DIR}/android/assets"
+		SYMBOLIC
+	)
 endif()
 
 include(AddResources)
 add_resources(drawpile
-	FILES initialbrushpresets.db
+	FILES
+		kritabright.colors
+		kritadark.colors
+		kritadarker.colors
+		nightmode.colors
+		initialbrushpresets.db
 	DIRS palettes sounds theme
 )
 
-install(TARGETS drawpile
-	BUNDLE DESTINATION "${INSTALL_BUNDLEDIR}"
-	RESOURCE DESTINATION "${INSTALL_APPDATADIR}"
-	COMPONENT drawpile
-)
-
-function(install_datarootdir target files destination)
-	install(
-		FILES ${files}
-		DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/${destination}"
-		COMPONENT ${target}
-		${ARGN}
-	)
-endfunction()
-
-if(UNIX AND NOT APPLE)
-	include(DrawpileFileExtensions)
-
-	get_xdg_extensions(MIME_TYPES)
-	configure_file(drawpile.desktop.in drawpile.desktop)
-	install_datarootdir(drawpile "${CMAKE_CURRENT_BINARY_DIR}/drawpile.desktop" applications
-		RENAME net.drawpile.drawpile.desktop
-	)
-	install_datarootdir(drawpile icons/drawpile.png icons/hicolor/256x256/apps)
-	install_datarootdir(drawpile icons/drawpile.svg icons/hicolor/scalable/apps)
-	install_datarootdir(drawpile appdata.xml metainfo
-		RENAME net.drawpile.drawpile.appdata.xml
-	)
-
-	generate_xdg_mime_info("${CMAKE_CURRENT_BINARY_DIR}/mime")
-	install(
-		DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/mime"
-		DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}"
+if(NOT ANDROID)
+	install(TARGETS drawpile
+		BUNDLE DESTINATION "${INSTALL_BUNDLEDIR}"
+		RESOURCE DESTINATION "${INSTALL_APPDATADIR}"
 		COMPONENT drawpile
 	)
-	install_datarootdir(drawpile icons/drawpile.png
-		icons/hicolor/256x256/mimetypes
-		RENAME application-vnd.drawpile.recording.png
-	)
-	install_datarootdir(drawpile icons/drawpile.svg
-		icons/hicolor/scalable/mimetypes
-		RENAME application-vnd.drawpile.recording.svg
-	)
-	install_datarootdir(drawpile icons/drawpile.png
-		icons/hicolor/256x256/mimetypes
-		RENAME text-vnd.drawpile.recording.png
-	)
-	install_datarootdir(drawpile icons/drawpile.svg
-		icons/hicolor/scalable/mimetypes
-		RENAME text-vnd.drawpile.recording.svg
-	)
+
+	function(install_datarootdir target files destination)
+		install(
+			FILES ${files}
+			DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/${destination}"
+			COMPONENT ${target}
+			${ARGN}
+		)
+	endfunction()
+
+	if(UNIX AND NOT APPLE)
+		include(DrawpileFileExtensions)
+
+		get_xdg_extensions(MIME_TYPES)
+		configure_file(drawpile.desktop.in drawpile.desktop)
+		install_datarootdir(drawpile "${CMAKE_CURRENT_BINARY_DIR}/drawpile.desktop" applications
+			RENAME net.drawpile.drawpile.desktop
+		)
+		install_datarootdir(drawpile icons/drawpile.png icons/hicolor/256x256/apps)
+		install_datarootdir(drawpile icons/drawpile.svg icons/hicolor/scalable/apps)
+		install_datarootdir(drawpile appdata.xml metainfo
+			RENAME net.drawpile.drawpile.appdata.xml
+		)
+
+		generate_xdg_mime_info("${CMAKE_CURRENT_BINARY_DIR}/mime")
+		install(
+			DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/mime"
+			DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}"
+			COMPONENT drawpile
+		)
+		install_datarootdir(drawpile icons/drawpile.png
+			icons/hicolor/256x256/mimetypes
+			RENAME application-vnd.drawpile.recording.png
+		)
+		install_datarootdir(drawpile icons/drawpile.svg
+			icons/hicolor/scalable/mimetypes
+			RENAME application-vnd.drawpile.recording.svg
+		)
+		install_datarootdir(drawpile icons/drawpile.png
+			icons/hicolor/256x256/mimetypes
+			RENAME text-vnd.drawpile.recording.png
+		)
+		install_datarootdir(drawpile icons/drawpile.svg
+			icons/hicolor/scalable/mimetypes
+			RENAME text-vnd.drawpile.recording.svg
+		)
+	endif()
 endif()
 
 target_auto_source_group(drawpile)

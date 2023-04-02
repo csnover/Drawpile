@@ -189,7 +189,7 @@ foreach(target IN LISTS ALL_TARGETS)
 	endif()
 endforeach()
 
-if(DIST_BUILD)
+if(DIST_BUILD AND NOT ANDROID)
 	if(APPLE)
 		set(helper_name macdeployqt)
 		set(helper_flags "-no-strip")

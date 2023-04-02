@@ -29,7 +29,7 @@ if(NOT QT_VERSION)
 endif()
 
 if(QT_VERSION VERSION_LESS 6)
-	option(ANDROID_EXTRAS "Build qtandroidextras (Qt5 only)" ANDROID)
+	option(ANDROID_EXTRAS "Build qtandroidextras (Qt5 only)" ${ANDROID})
 endif()
 
 include(QtMacDeploymentTarget)
@@ -57,7 +57,7 @@ if(ANDROID)
 			-disable-rpath
 			# Qt5 still uses minimum 21 but NDK 25 minimum is 23
 			-android-ndk-platform android-23
-			-hostprefix "${CMAKE_INSTALL_PREFIX}/xx-host"
+			-hostprefix "${CMAKE_INSTALL_PREFIX}"
 		)
 	endif()
 
@@ -214,6 +214,8 @@ if(BASE)
 				patches/qtbug-111538.diff
 			5.15.8
 				patches/cast_types_for_egl_x11_test.diff
+				patches/qmake_android_ltcg.diff
+				patches/qtbug-112504.diff
 	)
 endif()
 
