@@ -8,18 +8,19 @@ env:
   CLICOLOR_FORCE: 1
 
 jobs:
-  lint:
-    name: Lint Rust
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-      - name: Check formatting
-        run: cargo fmt -- --check
-      - name: Run clippy
-        run: cargo clippy --all-targets -- -D warnings
+  # TODO: Restore once there is Rust again
+  # lint:
+  #   name: Lint Rust
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check out code
+  #       uses: actions/checkout@v3
+  #       with:
+  #         submodules: true
+  #     - name: Check formatting
+  #       run: cargo fmt -- --check
+  #     - name: Run clippy
+  #       run: cargo clippy --all-targets -- -D warnings
 
   test:
     name: Test Qt ${{ matrix.qt }} on ${{ matrix.os }}
@@ -270,12 +271,13 @@ jobs:
         run: ctest -C RelWithDebInfo --output-on-failure
         working-directory: build
 
-      - name: Run Rust tests
-        run: cargo test --target-dir build/cargo --profile relwithdebinfo
-        env:
-          RUSTC_WRAPPER: sccache
-          SCCACHE_CACHE_SIZE: 400M
-          SCCACHE_DIR: ${{ github.workspace }}/.github/sccache/cache
+      # TODO: Restore once there is Rust again
+      # - name: Run Rust tests
+      #   run: cargo test --target-dir build/cargo --profile relwithdebinfo
+      #   env:
+      #     RUSTC_WRAPPER: sccache
+      #     SCCACHE_CACHE_SIZE: 400M
+      #     SCCACHE_DIR: ${{ github.workspace }}/.github/sccache/cache
 
       - name: Run packaging
         run: ${{ matrix.packager }}

@@ -59,9 +59,10 @@ if(SERVER)
 	list(APPEND helper_flags "${extra_exe_flag}\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/$<TARGET_FILE_NAME:drawpile-srv>")
 endif()
 
-if(TOOLS AND NOT WIN32)
-	list(APPEND helper_flags "${extra_exe_flag}\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/$<TARGET_FILE_NAME:drawpile-cli>")
-endif()
+# TODO: Restore once there are tools again
+# if(TOOLS AND NOT WIN32)
+# 	list(APPEND helper_flags "${extra_exe_flag}\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/$<TARGET_FILE_NAME:drawpile-cli>")
+# endif()
 
 if((SERVER OR TOOLS) AND UNIX AND NOT APPLE)
 	configure_file(
