@@ -1,0 +1,4 @@
+[submodule "extern/drawdance"]
+	path = extern/drawdance
+	url = https://github.com/csnover/Drawdance.git
+	branch = main
