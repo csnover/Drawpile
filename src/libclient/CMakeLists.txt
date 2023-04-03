@@ -182,6 +182,11 @@ target_sources(dpclient PRIVATE
 	utils/usernamevalidator.h
 )
 
+# TODO: Do what the warning says and stop passing a nonliteral to vasprintf
+set_property(SOURCE drawdance/global.cpp
+	APPEND PROPERTY COMPILE_OPTIONS "-Wno-format-nonliteral"
+)
+
 # https://gitlab.kitware.com/cmake/cmake/-/issues/19813
 if(WIN32)
 	target_sources(dpclient PRIVATE
