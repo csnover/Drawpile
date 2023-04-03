@@ -69,8 +69,6 @@ target_sources(dpclient PRIVATE
 	drawdance/layerprops.h
 	drawdance/layerpropslist.cpp
 	drawdance/layerpropslist.h
-	drawdance/logging.cpp
-	drawdance/logging.h
 	drawdance/message.cpp
 	drawdance/message.h
 	drawdance/paintengine.cpp
