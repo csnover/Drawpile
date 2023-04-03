@@ -1,7 +1,19 @@
+#[[
+This module defines versions and other similar constants that are used
+throughout the project.
+#]]
+
 set(DRAWPILE_PROTO_DEFAULT_PORT 27750)
 set(DRAWPILE_WEBADMIN_DEFAULT_PORT 27780)
-set(DP_MIN_QT_VERSION_GUI 5.12)
-set(DP_MIN_QT_VERSION_SERVER 5.11)
+
+if(CLIENT OR SERVERGUI)
+	set(DP_MIN_QT_VERSION 5.12)
+else()
+	# The minimum for headless servers is different than GUI because the current
+	# Debian LTS provides only this older version of Qt, but it is too painful
+	# to not have at least 5.12 when doing GUI stuff
+	set(DP_MIN_QT_VERSION 5.11)
+endif()
 
 file(STRINGS Cargo.toml dp_version LIMIT_COUNT 1 REGEX "^version[ \t]*=[ \t]*\"[^\"]*\"$")
 if(dp_version MATCHES "^version[ \t]*=[ \t]*\"([0-9]+\\.[0-9]+\\.[0-9]+)(-[A-Za-z0-9.-]*)?(\\+[A-Za-z0-9.-]*)?\"")

@@ -1,3 +1,8 @@
+#[[
+This module contains all the file extensions and URIs that are supported by
+Drawpile and functions for generating metadata to register them in the OS.
+#]]
+
 set(SUPPORTED_FILE_TYPES
 	TYPE
 		EXPORTED
@@ -27,8 +32,6 @@ set(SUPPORTED_FILE_TYPES
 		UTI org.krita.ora
 		EXT ora
 
-	# Drawpile supports whatever additional formats the Rust image crate is
-	# configured to support in dpimpex
 	TYPE
 		NAME PNG image
 		GROUP IMAGE

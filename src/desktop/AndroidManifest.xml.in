@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.drawpile"
+    package="${ANDROID_PACKAGE_NAMESPACE}"
     android:installLocation="auto"
     android:versionCode="-- %%INSERT_VERSION_CODE%% --"
     android:versionName="-- %%INSERT_VERSION_NAME%% --">
@@ -18,7 +18,8 @@
         android:requestLegacyExternalStorage="true"
         android:allowNativeHeapPointerTagging="false"
         android:allowBackup="true"
-        android:fullBackupOnly="false">
+        android:fullBackupOnly="false"
+        ${ANDROID_APPLICATION_ATTRIBUTES}>
         <activity
             android:name="org.qtproject.qt.android.bindings.QtActivity"
             android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
@@ -43,8 +44,9 @@
                 android:name="android.app.extract_android_style"
                 android:value="minimal" />
 
-            <!-- Customisations start here; everything above here -->
-            <!-- comes from the default Qt6 AndroidManifest.xml -->
+            <!-- Customisations start here; everything above that is -->
+            <!-- not a replacement string comes from the default Qt6 -->
+            <!-- AndroidManifest.xml -->
 
             <!-- Wire up Samsung S-Pen events -->
             <intent-filter>
@@ -58,7 +60,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                ${INTENTS}
+                ${ANDROID_VIEW_INTENTS}
             </intent-filter>
         </activity>
     </application>

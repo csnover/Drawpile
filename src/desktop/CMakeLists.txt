@@ -1,19 +1,24 @@
-find_package(${QT_PACKAGE_NAME} ${DP_MIN_QT_VERSION_GUI} REQUIRED COMPONENTS Svg Widgets Multimedia)
-find_package(${QT_PACKAGE_NAME} ${DP_MIN_QT_VERSION_GUI} QUIET COMPONENTS LinguistTools)
+find_package(${QT_PACKAGE_NAME} REQUIRED COMPONENTS Gui Svg Widgets Multimedia)
 find_package(QtColorWidgets QUIET)
 find_package(${QT_PACKAGE_NAME}Keychain QUIET)
 
 if(ANDROID)
 	if(QT_VERSION VERSION_GREATER_EQUAL 6)
 		qt_add_executable(drawpile)
-		qt_android_generate_deployment_settings(drawpile)
-		qt_android_add_apk_target(drawpile)
 	else()
 		add_library(drawpile MODULE)
+		add_dependencies(apk drawpile)
 	endif()
 else()
 	add_executable(drawpile MACOSX_BUNDLE)
 endif()
+
+set_target_properties(drawpile PROPERTIES
+	AUTOUIC_SEARCH_PATHS ui
+	VERSION ${PROJECT_VERSION}
+	PROJECT_LABEL drawpile-client
+	WIN32_EXECUTABLE $<NOT:$<CONFIG:Debug>>
+)
 
 target_sources(drawpile PRIVATE
 	filewrangler.cpp
@@ -272,6 +277,30 @@ target_sources(drawpile PRIVATE
 	widgets/viewstatus.h
 )
 
+target_link_libraries(drawpile PRIVATE
+	dpshared
+	dpclient
+	Drawdance::dpengine
+	Drawdance::dpmsg
+	${QT_PACKAGE_NAME}::Core
+	${QT_PACKAGE_NAME}::Gui
+	# Svg is used only indirectly as an image loader plugin, but e.g.
+	# androiddeployqt needs to see it linked in order to include the libraries
+	# in the output
+	${QT_PACKAGE_NAME}::Svg
+	${QT_PACKAGE_NAME}::Widgets
+	${QT_PACKAGE_NAME}::Multimedia
+)
+
+if(VERSION_CHECK)
+	target_sources(drawpile PRIVATE
+		dialogs/versioncheckdialog.cpp
+		dialogs/versioncheckdialog.h
+		ui/versioncheck.ui
+	)
+	target_compile_definitions(drawpile PRIVATE ENABLE_VERSION_CHECK)
+endif()
+
 # https://gitlab.kitware.com/cmake/cmake/-/issues/19813
 if(APPLE)
 	target_sources(drawpile PRIVATE
@@ -279,17 +308,6 @@ if(APPLE)
 		widgets/macmenu.h
 	)
 endif()
-
-if(${QT_PACKAGE_NAME}LinguistTools_FOUND)
-	add_subdirectory(i18n)
-endif()
-
-set_target_properties(drawpile PROPERTIES
-	AUTOUIC_SEARCH_PATHS ui
-	VERSION ${PROJECT_VERSION}
-	PROJECT_LABEL drawpile-client
-	WIN32_EXECUTABLE $<NOT:$<CONFIG:Debug>>
-)
 
 # On Qt6, private headers are required to switch between Windows Ink and Wintab.
 if(WIN32 AND QT_VERSION_MAJOR VERSION_EQUAL 6)
@@ -306,21 +324,9 @@ if(ANDROID)
 		dialogs/androidfiledialog.h
 		ui/androidfiledialog.ui
 	)
-endif()
-
-target_link_libraries(drawpile PRIVATE
-	dpclient
-	${QT_PACKAGE_NAME}::Svg
-	${QT_PACKAGE_NAME}::Widgets
-	${QT_PACKAGE_NAME}::Multimedia
-)
-
-if(ENABLE_VERSION_CHECK)
-	target_sources(drawpile PRIVATE
-		dialogs/versioncheckdialog.cpp
-		dialogs/versioncheckdialog.h
-		ui/versioncheck.ui
-	)
+	if(TARGET ${QT_PACKAGE_NAME}::AndroidExtras)
+		target_link_libraries(drawpile PRIVATE ${QT_PACKAGE_NAME}::AndroidExtras)
+	endif()
 endif()
 
 if(KIS_TABLET)
@@ -335,18 +341,19 @@ if(KIS_TABLET)
 		bundled/kis_tablet/wintab.h
 	)
 	target_sources(drawpile PRIVATE ${sources})
+	source_files_disable_warnings(drawpile ${sources})
 	set_source_files_properties(${sources} PROPERTIES
 		INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/bundled/kis_tablet"
 	)
 endif()
 
-if(${QT_PACKAGE_NAME}Keychain_FOUND)
+if(TARGET ${QT_PACKAGE_NAME}Keychain::${QT_PACKAGE_NAME}Keychain)
 	target_compile_definitions(drawpile PRIVATE HAVE_QTKEYCHAIN)
 	target_link_libraries(drawpile PRIVATE ${QT_PACKAGE_NAME}Keychain::${QT_PACKAGE_NAME}Keychain)
 endif()
-add_feature_info("Client password manager" ${QT_PACKAGE_NAME}Keychain_FOUND "")
+add_feature_info("Client password manager" "TARGET ${QT_PACKAGE_NAME}Keychain::${QT_PACKAGE_NAME}Keychain" "")
 
-if(QtColorWidgets_FOUND)
+if(TARGET QtColorWidgets::QtColorWidgets)
 	target_link_libraries(drawpile PRIVATE QtColorWidgets::QtColorWidgets)
 else()
 	set(sources
@@ -416,8 +423,8 @@ else()
 		bundled/QtColorWidgets/swatch.cpp
 	)
 	target_sources(drawpile PRIVATE ${sources})
+	source_files_disable_warnings(drawpile ${sources})
 	set_source_files_properties(${sources} PROPERTIES
-		COMPILE_OPTIONS "${IGNORE_WARNINGS_COMPILE_OPTIONS}"
 		INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/bundled/QtColorWidgets"
 	)
 	target_include_directories(drawpile SYSTEM PRIVATE
@@ -425,7 +432,30 @@ else()
 	)
 	target_compile_definitions(drawpile PRIVATE QTCOLORPICKER_STATICALLY_LINKED)
 endif()
-add_feature_info("External QtColorWidgets" QTCOLORWIDGETS_FOUND "")
+add_feature_info("External QtColorWidgets" "TARGET QtColorWidgets::QtColorWidgets" "")
+
+if(${QT_PACKAGE_NAME}LinguistTools_FOUND)
+	add_subdirectory(i18n)
+endif()
+
+include(AddResources)
+add_resources(drawpile
+	FILES
+		kritabright.colors
+		kritadark.colors
+		kritadarker.colors
+		nightmode.colors
+		initialbrushpresets.db
+	DIRS palettes sounds theme
+)
+
+if(NOT ANDROID)
+	install(TARGETS drawpile
+		BUNDLE DESTINATION "${INSTALL_BUNDLEDIR}"
+		RESOURCE DESTINATION "${INSTALL_APPDATADIR}"
+		COMPONENT drawpile
+	)
+endif()
 
 if(WIN32)
 	configure_file(drawpile.rc.in drawpile.rc)
@@ -456,14 +486,39 @@ elseif(APPLE)
 	set_property(TARGET drawpile APPEND PROPERTY RESOURCE "${CMAKE_CURRENT_BINARY_DIR}/drawpile.icns")
 elseif(ANDROID)
 	if(QT_VERSION VERSION_GREATER_EQUAL 6)
+		qt_android_generate_deployment_settings(drawpile)
+		qt_android_add_apk_target(drawpile)
 		set_target_properties(drawpile PROPERTIES
-			QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/android")
+			RUNTIME_OUTPUT_NAME Drawpile
+			QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/android"
+		)
+		add_custom_command(TARGET drawpile_make_apk POST_BUILD
+			BYPRODUCTS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Drawpile.apk"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				"android-build/Drawpile.apk"
+				"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Drawpile.apk"
+			COMMAND_EXPAND_LISTS
+			COMMENT "Copying APK to runtime output directory"
+			VERBATIM
+		)
 	else()
-		set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/android")
+		target_link_libraries(drawpile PRIVATE ${QT_PACKAGE_NAME}::AndroidExtras)
+		add_custom_target(drawpile_copy_apk ALL
+			BYPRODUCTS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}.apk"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				"${CMAKE_BINARY_DIR}/android-build/${PROJECT_NAME}.apk"
+				"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Drawpile.apk"
+			COMMAND_EXPAND_LISTS
+			COMMENT "Copying APK to runtime output directory"
+			VERBATIM
+		)
+		add_dependencies(drawpile_copy_apk apk)
 	endif()
 
 	include(DrawpileFileExtensions)
-	get_android_extensions(INTENTS)
+	set(ANDROID_APPLICATION_ATTRIBUTES "android:icon=\"@drawable/ic_launcher\"")
+	set(ANDROID_PACKAGE_NAMESPACE net.drawpile)
+	get_android_extensions(ANDROID_VIEW_INTENTS)
 	configure_file(AndroidManifest.xml.in
 		"${CMAKE_CURRENT_BINARY_DIR}/android/AndroidManifest.xml"
 	)
@@ -477,26 +532,7 @@ elseif(ANDROID)
 		"${CMAKE_CURRENT_BINARY_DIR}/android/assets"
 		SYMBOLIC
 	)
-endif()
-
-include(AddResources)
-add_resources(drawpile
-	FILES
-		kritabright.colors
-		kritadark.colors
-		kritadarker.colors
-		nightmode.colors
-		initialbrushpresets.db
-	DIRS palettes sounds theme
-)
-
-if(NOT ANDROID)
-	install(TARGETS drawpile
-		BUNDLE DESTINATION "${INSTALL_BUNDLEDIR}"
-		RESOURCE DESTINATION "${INSTALL_APPDATADIR}"
-		COMPONENT drawpile
-	)
-
+elseif(UNIX)
 	function(install_datarootdir target files destination)
 		install(
 			FILES ${files}
@@ -506,43 +542,40 @@ if(NOT ANDROID)
 		)
 	endfunction()
 
-	if(UNIX AND NOT APPLE)
-		include(DrawpileFileExtensions)
+	include(DrawpileFileExtensions)
+	get_xdg_extensions(MIME_TYPES)
+	configure_file(drawpile.desktop.in drawpile.desktop)
+	install_datarootdir(drawpile "${CMAKE_CURRENT_BINARY_DIR}/drawpile.desktop" applications
+		RENAME net.drawpile.drawpile.desktop
+	)
+	install_datarootdir(drawpile icons/drawpile.png icons/hicolor/256x256/apps)
+	install_datarootdir(drawpile icons/drawpile.svg icons/hicolor/scalable/apps)
+	install_datarootdir(drawpile appdata.xml metainfo
+		RENAME net.drawpile.drawpile.appdata.xml
+	)
 
-		get_xdg_extensions(MIME_TYPES)
-		configure_file(drawpile.desktop.in drawpile.desktop)
-		install_datarootdir(drawpile "${CMAKE_CURRENT_BINARY_DIR}/drawpile.desktop" applications
-			RENAME net.drawpile.drawpile.desktop
-		)
-		install_datarootdir(drawpile icons/drawpile.png icons/hicolor/256x256/apps)
-		install_datarootdir(drawpile icons/drawpile.svg icons/hicolor/scalable/apps)
-		install_datarootdir(drawpile appdata.xml metainfo
-			RENAME net.drawpile.drawpile.appdata.xml
-		)
-
-		generate_xdg_mime_info("${CMAKE_CURRENT_BINARY_DIR}/mime")
-		install(
-			DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/mime"
-			DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}"
-			COMPONENT drawpile
-		)
-		install_datarootdir(drawpile icons/drawpile.png
-			icons/hicolor/256x256/mimetypes
-			RENAME application-vnd.drawpile.recording.png
-		)
-		install_datarootdir(drawpile icons/drawpile.svg
-			icons/hicolor/scalable/mimetypes
-			RENAME application-vnd.drawpile.recording.svg
-		)
-		install_datarootdir(drawpile icons/drawpile.png
-			icons/hicolor/256x256/mimetypes
-			RENAME text-vnd.drawpile.recording.png
-		)
-		install_datarootdir(drawpile icons/drawpile.svg
-			icons/hicolor/scalable/mimetypes
-			RENAME text-vnd.drawpile.recording.svg
-		)
-	endif()
+	generate_xdg_mime_info("${CMAKE_CURRENT_BINARY_DIR}/mime")
+	install(
+		DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/mime"
+		DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}"
+		COMPONENT drawpile
+	)
+	install_datarootdir(drawpile icons/drawpile.png
+		icons/hicolor/256x256/mimetypes
+		RENAME application-vnd.drawpile.recording.png
+	)
+	install_datarootdir(drawpile icons/drawpile.svg
+		icons/hicolor/scalable/mimetypes
+		RENAME application-vnd.drawpile.recording.svg
+	)
+	install_datarootdir(drawpile icons/drawpile.png
+		icons/hicolor/256x256/mimetypes
+		RENAME text-vnd.drawpile.recording.png
+	)
+	install_datarootdir(drawpile icons/drawpile.svg
+		icons/hicolor/scalable/mimetypes
+		RENAME text-vnd.drawpile.recording.svg
+	)
 endif()
 
-target_auto_source_group(drawpile)
+directory_auto_source_groups()
