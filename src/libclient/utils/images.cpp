@@ -55,17 +55,6 @@ static void appendFormats(QVector<ImageFormat> &formats, const char *title, cons
 	formats.append(format);
 }
 
-static const QVector<ImageFormat> &readableImageFormats()
-{
-	static QVector<ImageFormat> formats;
-	if(formats.isEmpty()) {
-		for(const DP_LoadFormat *lf = DP_load_supported_formats(); lf->title; ++lf) {
-			appendFormats(formats, lf->title, lf->extensions);
-		}
-	}
-	return formats;
-}
-
 static const QVector<ImageFormat> &writableImageFormats()
 {
 	static QVector<ImageFormat> formats;
