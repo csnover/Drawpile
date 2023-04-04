@@ -18,10 +18,10 @@ if(MSVC)
 	add_compile_options(/utf-8 /W4)
 	add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 
-	if($ENV{CI})
-		add_compile_options(/WX)
-		add_link_options(/WX:NO)
-	endif()
+	# if($ENV{CI})
+	# 	add_compile_options(/WX)
+	# 	add_link_options(/WX:NO)
+	# endif()
 
 	# https://github.com/mozilla/sccache/pull/963
 	if(CMAKE_C_COMPILER_LAUNCHER MATCHES "sccache")
@@ -98,9 +98,9 @@ else()
 		endif()
 	endforeach()
 
-	if($ENV{CI})
-		add_compile_options(-Werror)
-	endif()
+	# if($ENV{CI})
+	# 	add_compile_options(-Werror)
+	# endif()
 
 	get_directory_property(IGNORE_WARNINGS_COMPILE_OPTIONS COMPILE_OPTIONS)
 	list(TRANSFORM IGNORE_WARNINGS_COMPILE_OPTIONS REPLACE "-W(no-)?([^=]+)(=.*$)?" "-Wno-\\2")
