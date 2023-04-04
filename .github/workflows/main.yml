@@ -200,22 +200,23 @@ jobs:
           path: .github/deps/other
           key: other-${{ runner.os }}-${{ matrix.libmicrohttpd }}-${{ matrix.libsodium }}-${{ matrix.qtkeychain }}-${{ matrix.qt }}-${{ matrix.libzip }}-${{ matrix.zlib }}
 
-      - name: Save/restore Cargo database from cache
-        uses: actions/cache@v3
-        id: cargo-cache
-        with:
-          path: |-
-            ~/.cargo/registry/index
-            ~/.cargo/registry/cache
-            ~/.cargo/git/db
-          key: cargo-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
-      - name: Install Cargo database
-        if: steps.cargo-cache.outputs.cache-hit != 'true'
-        run: bash .github/scripts/init-cargo.sh
-      - name: Use Cargo from cache
-        if: steps.cargo-cache.outputs.cache-hit == 'true'
-        run: echo "CARGO_NET_OFFLINE=1" >> $GITHUB_ENV
-        shell: bash
+      # TODO: Restore once there is Rust again
+      # - name: Save/restore Cargo database from cache
+      #   uses: actions/cache@v3
+      #   id: cargo-cache
+      #   with:
+      #     path: |-
+      #       ~/.cargo/registry/index
+      #       ~/.cargo/registry/cache
+      #       ~/.cargo/git/db
+      #     key: cargo-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+      # - name: Install Cargo database
+      #   if: steps.cargo-cache.outputs.cache-hit != 'true'
+      #   run: bash .github/scripts/init-cargo.sh
+      # - name: Use Cargo from cache
+      #   if: steps.cargo-cache.outputs.cache-hit == 'true'
+      #   run: echo "CARGO_NET_OFFLINE=1" >> $GITHUB_ENV
+      #   shell: bash
 
       - name: Restore sccache
         uses: actions/cache/restore@v3
