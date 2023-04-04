@@ -138,7 +138,7 @@ ServerReply ServerReply::fromMessage(const drawdance::Message &msg)
 
 	size_t len;
 	const char *data = DP_msg_server_command_msg(msg.toServerCommand(), &len);
-	QByteArray bytes = QByteArray::fromRawData(data, len);
+	QByteArray bytes = QByteArray::fromRawData(data, compat::castSize(len));
 
 	QJsonParseError err;
 	const QJsonDocument doc = QJsonDocument::fromJson(bytes, &err);
