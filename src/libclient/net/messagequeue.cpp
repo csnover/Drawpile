@@ -18,6 +18,7 @@
 */
 
 #include "libclient/net/messagequeue.h"
+#include "libshared/util/qtcompat.h"
 
 #include <QtEndian>
 #include <QTcpSocket>
@@ -194,7 +195,7 @@ void MessageQueue::sendDisconnect(GracefulDisconnect reason, const QString &mess
 	QByteArray data = message.toUtf8();
 	drawdance::Message msg = drawdance::Message::noinc(DP_msg_disconnect_new(0, uint8_t(reason), data.constData(), data.size()));
 
-	qInfo("Sending disconnect message (reason=%d), will disconnect after queue (%lld messages) is empty.", int(reason), static_cast<long long>(m_outbox.size()));
+	qInfo("Sending disconnect message (reason=%d), will disconnect after queue (%lld messages) is empty.", int(reason), compat::cast<long long>(m_outbox.size()));
 	send(msg);
 	m_gracefullyDisconnecting = true;
 	m_recvbytes = 0;

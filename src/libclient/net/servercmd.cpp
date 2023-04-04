@@ -18,6 +18,7 @@
 */
 
 #include "libclient/net/servercmd.h"
+#include "libshared/util/qtcompat.h"
 
 namespace net {
 
@@ -76,7 +77,7 @@ drawdance::Message ServerCommand::toMessage() const
 		qWarning(
 			"ServerCommand::toEnvelope(%s) produced a message that is too long! (%lld bytes)",
 			qPrintable(cmd),
-			static_cast<long long>(payload.length())
+			compat::cast<long long>(payload.length())
 		);
 		return drawdance::Message{};
 	}
