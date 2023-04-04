@@ -220,7 +220,7 @@ int MessageQueue::uploadQueueBytes() const
 {
 	int total = m_socket->bytesToWrite() + m_sendbuffer.length() - m_sentbytes;
 	for(const drawdance::Message &msg : m_outbox)
-		total += msg.length();
+		total += compat::castSize(msg.length());
 	return total;
 }
 
