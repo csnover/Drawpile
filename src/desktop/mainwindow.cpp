@@ -1485,9 +1485,9 @@ void MainWindow::hostSession(dialogs::HostDialog *dlg)
 /**
  * Show the join dialog
  */
-void MainWindow::join(const QUrl &url)
+void MainWindow::join(const QUrl &initialUrl)
 {
-	auto dlg = new dialogs::JoinDialog(url, this);
+	auto dlg = new dialogs::JoinDialog(initialUrl, this);
 
 	connect(dlg, &dialogs::JoinDialog::finished, this, [this, dlg](int i) {
 		if(i==QDialog::Accepted) {
@@ -2088,9 +2088,9 @@ void MainWindow::paste()
 
 void MainWindow::pasteCentered()
 {
-	const QMimeData *data = QApplication::clipboard()->mimeData();
-	if(data->hasImage()) {
-		pasteImage(data->imageData().value<QImage>(), nullptr, true);
+	const QMimeData *mimeData = QApplication::clipboard()->mimeData();
+	if(mimeData->hasImage()) {
+		pasteImage(mimeData->imageData().value<QImage>(), nullptr, true);
 	}
 }
 
