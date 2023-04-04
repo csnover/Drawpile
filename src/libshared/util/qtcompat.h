@@ -69,6 +69,11 @@ template <typename T>
 inline T cast(T value) {
 	return value;
 }
+
+template <typename T, typename U>
+inline auto cast_6(U value) {
+	return static_cast<T>(value);
+}
 #else
 using NativeEventResult = long *;
 using RetrieveDataMetaType = QVariant::Type;
@@ -102,6 +107,11 @@ inline auto stringSlice(const QString &str, int position) {
 template <typename T, typename U>
 inline auto cast(U value) {
 	return static_cast<T>(value);
+}
+
+template <typename T>
+inline T cast_6(T value) {
+	return value;
 }
 #endif
 

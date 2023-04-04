@@ -31,7 +31,7 @@
 #include "desktop/widgets/kis_num_parser.h"
 
 template <typename SpinBoxTypeTP, typename BaseSpinBoxTypeTP>
-class KisParseSpinBoxPrivate : public QObject
+class KisParseSpinBoxPrivate final : public QObject
 {
 public:
     using SpinBoxType = SpinBoxTypeTP;

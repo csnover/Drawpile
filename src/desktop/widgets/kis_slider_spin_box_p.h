@@ -36,7 +36,7 @@
 #include "desktop/utils/qtguicompat.h"
 
 template <typename SpinBoxTypeTP, typename BaseSpinBoxTypeTP>
-class KisSliderSpinBoxPrivate : public QObject
+class KisSliderSpinBoxPrivate final : public QObject
 {
     Q_DECLARE_TR_FUNCTIONS(KisSliderSpinBoxPrivate)
 public:

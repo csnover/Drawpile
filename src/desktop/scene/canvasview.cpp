@@ -21,6 +21,7 @@
 #include "desktop/scene/canvasscene.h"
 #include "libclient/canvas/canvasmodel.h"
 #include "libclient/drawdance/eventlog.h"
+#include "libshared/util/qtcompat.h"
 
 #include "desktop/widgets/notifbar.h"
 #include "desktop/utils/qtguicompat.h"
@@ -1203,7 +1204,7 @@ bool CanvasView::viewportEvent(QEvent *event)
 		const auto tabPos = compat::tabPosF(*tabev);
 		DP_EVENT_LOG(
 			"tablet_press x=%f y=%f pressure=%f xtilt=%d ytilt=%d rotation=%f buttons=0x%x modifiers=0x%x pendown=%d touching=%d",
-			tabPos.x(), tabPos.y(), tabev->pressure(), int(tabev->xTilt()), int(tabev->yTilt()),
+			tabPos.x(), tabPos.y(), tabev->pressure(), compat::cast_6<int>(tabev->xTilt()), compat::cast_6<int>(tabev->yTilt()),
 			tabev->rotation(), unsigned(tabev->buttons()), unsigned(tabev->modifiers()),
 			m_pendown, m_touching);
 
@@ -1233,7 +1234,7 @@ bool CanvasView::viewportEvent(QEvent *event)
 		const auto tabPos = compat::tabPosF(*tabev);
 		DP_EVENT_LOG(
 			"tablet_move x=%f y=%f pressure=%f xtilt=%d ytilt=%d rotation=%f buttons=0x%x modifiers=0x%x pendown=%d touching=%d",
-			tabPos.x(), tabPos.y(), tabev->pressure(), int(tabev->xTilt()), int(tabev->yTilt()),
+			tabPos.x(), tabPos.y(), tabev->pressure(), compat::cast_6<int>(tabev->xTilt()), compat::cast_6<int>(tabev->yTilt()),
 			tabev->rotation(), unsigned(tabev->buttons()), unsigned(tabev->modifiers()),
 			m_pendown, m_touching);
 

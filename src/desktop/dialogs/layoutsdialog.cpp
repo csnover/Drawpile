@@ -48,9 +48,9 @@ struct LayoutsDialog::Layout {
 	{
 	}
 
-	Layout(QString title, QByteArray state)
-		: title{title}
-		, state{state}
+	Layout(QString title_, QByteArray state_)
+		: title{title_}
+		, state{state_}
 		, originalTitle{}
 		, wasTransient{false}
 		, transient{false}
@@ -58,9 +58,9 @@ struct LayoutsDialog::Layout {
 	{
 	}
 
-	explicit Layout(QByteArray state)
+	explicit Layout(QByteArray state_)
 		: title{}
-		, state{state}
+		, state{state_}
 		, originalTitle{}
 		, wasTransient{true}
 		, transient{true}
