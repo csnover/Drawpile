@@ -199,6 +199,10 @@ jobs:
         with:
           path: .github/deps/other
           key: other-${{ runner.os }}-${{ matrix.libmicrohttpd }}-${{ matrix.libsodium }}-${{ matrix.qtkeychain }}-${{ matrix.qt }}-${{ matrix.libzip }}-${{ matrix.zlib }}
+      # Windows needs this to find all the DLLs during CTest
+      - name: Activate other dependencies
+        run: echo "${{ github.workspace }}/.github/deps/other/bin" >> $GITHUB_PATH
+        shell: bash
 
       # TODO: Restore once there is Rust again
       # - name: Save/restore Cargo database from cache
