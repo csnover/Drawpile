@@ -183,9 +183,15 @@ target_sources(dpclient PRIVATE
 )
 
 # TODO: Do what the warning says and stop passing a nonliteral to vasprintf
-set_property(SOURCE drawdance/global.cpp
-	APPEND PROPERTY COMPILE_OPTIONS "-Wno-format-nonliteral"
-)
+if(MSVC)
+	set_property(SOURCE drawdance/global.cpp
+		APPEND PROPERTY COMPILE_OPTIONS "/wd4774"
+	)
+else()
+	set_property(SOURCE drawdance/global.cpp
+		APPEND PROPERTY COMPILE_OPTIONS "-Wno-format-nonliteral"
+	)
+endif()
 
 # https://gitlab.kitware.com/cmake/cmake/-/issues/19813
 if(WIN32)
