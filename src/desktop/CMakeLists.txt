@@ -633,6 +633,7 @@ endif()
 include(AddResources)
 add_resources(drawpile
 	FILES
+		hotdogstand.colors
 		kritabright.colors
 		kritadark.colors
 		kritadarker.colors
