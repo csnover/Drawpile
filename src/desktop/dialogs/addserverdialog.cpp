@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "desktop/dialogs/addserverdialog.h"
+#include "desktop/main.h"
 #include "libshared/util/networkaccess.h"
 #include "libclient/utils/listservermodel.h"
 
@@ -11,13 +12,14 @@ namespace dialogs {
 
 AddServerDialog::AddServerDialog(QWidget *parent)
 	 : QMessageBox(
-		   QMessageBox::Icon::NoIcon,
-		   AddServerDialog::tr("Add Server"),
-		   QString(),
-		   QMessageBox::Cancel,
-		   parent),
-	   m_servers(nullptr)
+		QMessageBox::Icon::NoIcon,
+		AddServerDialog::tr("Add Server"),
+		QString(),
+		QMessageBox::Cancel,
+		parent)
+	, m_servers(nullptr)
 {
+	setWindowModality(Qt::WindowModal);
 	setAttribute(Qt::WA_DeleteOnClose);
 }
 
@@ -50,17 +52,17 @@ void AddServerDialog::showError(const QString &errorMessage)
 
 void AddServerDialog::showSuccess()
 {
-	setText(QStringLiteral("<b>%1</b><br><br>%2").arg(m_serverInfo.name.toHtmlEscaped(), m_serverInfo.description.toHtmlEscaped()));
+	setText(QStringLiteral("<b>%1</b>").arg(m_serverInfo.name.toHtmlEscaped()));
+	setInformativeText(m_serverInfo.description.toHtmlEscaped());
 	auto *btn = addButton(tr("Add"), AcceptRole);
 	connect(btn, &QPushButton::clicked, this, &AddServerDialog::onAddClicked);
 	show();
 
 	if(m_serverInfo.faviconUrl == "drawpile") {
-		const auto icon = QIcon(":/icons/drawpile.png").pixmap(128, 128);
+		const auto iconSize = style()->pixelMetric(QStyle::PM_MessageBoxIconSize, nullptr, this);
+		const auto icon = QIcon(":/icons/drawpile.png").pixmap(iconSize);
 		m_favicon = icon.toImage();
 		setIconPixmap(icon);
-
-
 	} else {
 		const QUrl faviconUrl(m_serverInfo.faviconUrl);
 		if(faviconUrl.isValid()) {
@@ -71,7 +73,7 @@ void AddServerDialog::showSuccess()
 			connect(filedownload, &networkaccess::FileDownload::finished, this, [filedownload, this](const QString &errorMessage) {
 				filedownload->deleteLater();
 				if(!errorMessage.isEmpty()) {
-					qWarning("Couldnt' fetch favicon: %s", qPrintable(errorMessage));
+					qWarning("Couldn't fetch favicon: %s", qPrintable(errorMessage));
 					return;
 				}
 
@@ -91,13 +93,10 @@ void AddServerDialog::showSuccess()
 void AddServerDialog::onAddClicked()
 {
 	sessionlisting::ListServerModel *listservers;
-	bool autosave;
 	if(m_servers) {
 		listservers = m_servers;
-		autosave = false;
 	} else {
-		listservers = new sessionlisting::ListServerModel(true, this);
-		autosave = true;
+		listservers = new sessionlisting::ListServerModel(dpApp().settings(), true, this);
 	}
 
 	const auto url = m_url.toString();
@@ -112,14 +111,14 @@ void AddServerDialog::onAddClicked()
 	);
 
 	if(!m_favicon.isNull()) {
+		const auto iconSize = style()->pixelMetric(QStyle::PM_MessageBoxIconSize, nullptr, this);
 		listservers->setFavicon(
 			url,
-			QIcon(":/icons/drawpile.png").pixmap(128, 128).toImage()
+			QIcon(":/icons/drawpile.png").pixmap(iconSize).toImage()
 			);
 	}
 
-	if(autosave)
-		listservers->saveServers();
+	listservers->submit();
 
 	emit serverAdded(m_serverInfo.name);
 }

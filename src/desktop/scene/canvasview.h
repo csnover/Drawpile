@@ -59,7 +59,10 @@ public:
 	void setTabletEnabled(bool enable) { m_enableTablet = enable; }
 
 	//! Enable/disable touch gestures
-	void setTouchGestures(bool scroll, bool draw, bool pinch, bool twist);
+	void setTouchScroll(bool scroll) { m_enableTouchScroll = scroll; }
+	void setTouchDraw(bool draw) { m_enableTouchDraw = draw; }
+	void setTouchPinch(bool pinch) { m_enableTouchPinch = pinch; }
+	void setTouchTwist(bool twist) { m_enableTouchTwist = twist; }
 
 	KisCubicCurve pressureCurve() const { return m_pressureCurve; }
 	void setPressureCurve(const KisCubicCurve &pressureCurve);
@@ -158,16 +161,8 @@ public slots:
 	void setToolCapabilities(
 		bool allowColorPick, bool allowToolAdjust, bool toolHandlesRightClick);
 
-	/**
-	 * @brief Set the cursor to use for brush tools
-	 * Styles:
-	 * 0. Dot
-	 * 1. Crosshair
-	 * 2. Arrow
-	 */
-	void setBrushCursorStyle(int style, qreal outlineWidth);
-
-	void updateSettings();
+	void setBrushCursorStyle(int style) { m_brushCursorStyle = style; }
+	void setBrushOutlineWidth(qreal outlineWidth);
 
 protected:
 	void enterEvent(compat::EnterEvent *event) override;

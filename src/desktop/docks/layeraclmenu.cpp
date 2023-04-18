@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "desktop/docks/layeraclmenu.h"
+#include "desktop/main.h"
 #include "libclient/canvas/userlist.h"
 #include "libclient/parentalcontrols/parentalcontrols.h"
 
@@ -41,7 +42,7 @@ LayerAclMenu::LayerAclMenu(QWidget *parent) :
 
 	connect(this, &LayerAclMenu::triggered, this, &LayerAclMenu::userClicked);
 
-	connect(qApp, SIGNAL(settingsChanged()), this, SLOT(refreshParentalControls()));
+	connect(&dpApp().settings(), &desktop::settings::Settings::contentFilterForceCensorChanged, this, &LayerAclMenu::refreshParentalControls);
 	refreshParentalControls();
 }
 

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "desktop/main.h"
 #include "desktop/scene/canvasview.h"
 #include "desktop/scene/canvasscene.h"
 #include "libclient/canvas/canvasmodel.h"
@@ -16,7 +17,6 @@
 #include <QPainter>
 #include <QMimeData>
 #include <QApplication>
-#include <QSettings>
 #include <QWindow>
 #include <QScreen>
 #include <QtMath>
@@ -72,7 +72,16 @@ CanvasView::CanvasView(QWidget *parent)
 		m_dotcursor = QCursor(dot, 0, 0);
 	}
 
-	updateSettings();
+	auto &settings = dpApp().settings();
+	settings.bindCanvasShortcuts(this, [=](desktop::settings::Settings::CanvasShortcutsType shortcuts) {
+		m_canvasShortcuts = CanvasShortcuts::load(shortcuts);
+	});
+
+	settings.bindCanvasScrollBars(this, [=](bool enabled) {
+		const auto policy = enabled ? Qt::ScrollBarAsNeeded : Qt::ScrollBarAlwaysOff;
+		setHorizontalScrollBarPolicy(policy);
+		setVerticalScrollBarPolicy(policy);
+	});
 }
 
 void CanvasView::showDisconnectedWarning(const QString &message)
@@ -80,20 +89,6 @@ void CanvasView::showDisconnectedWarning(const QString &message)
 	m_notificationBar->show(message, tr("Reconnect"), NotificationBar::RoleColor::Warning);
 }
 
-void CanvasView::updateSettings()
-{
-	QSettings cfg;
-	cfg.beginGroup("settings/canvasshortcuts2");
-	m_canvasShortcuts = CanvasShortcuts::load(cfg);
-	cfg.endGroup();
-
-	cfg.beginGroup("settings");
-	Qt::ScrollBarPolicy policy = cfg.value("canvasscrollbars", false).toBool()
-		? Qt::ScrollBarAsNeeded : Qt::ScrollBarAlwaysOff;
-	setHorizontalScrollBarPolicy(policy);
-	setVerticalScrollBarPolicy(policy);
-	cfg.endGroup();
-}
 void CanvasView::setCanvas(drawingboard::CanvasScene *scene)
 {
 	m_scene = scene;
@@ -245,9 +240,8 @@ void CanvasView::setLocked(bool lock)
 	resetCursor();
 }
 
-void CanvasView::setBrushCursorStyle(int style, qreal outlineWidth)
+void CanvasView::setBrushOutlineWidth(qreal outlineWidth)
 {
-	m_brushCursorStyle = style;
 	m_brushOutlineWidth = qIsNaN(outlineWidth) || outlineWidth < 1.0 ? 1.0 : outlineWidth;
 	resetCursor();
 }
@@ -971,14 +965,6 @@ void CanvasView::keyReleaseEvent(QKeyEvent *event) {
 static qreal squareDist(const QPointF &p)
 {
 	return p.x()*p.x() + p.y()*p.y();
-}
-
-void CanvasView::setTouchGestures(bool scroll, bool draw, bool pinch, bool twist)
-{
-	m_enableTouchScroll = scroll;
-	m_enableTouchDraw = draw;
-	m_enableTouchPinch = pinch;
-	m_enableTouchTwist = twist;
 }
 
 void CanvasView::setPressureCurve(const KisCubicCurve &pressureCurve)

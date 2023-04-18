@@ -1,0 +1,70 @@
+--- a/src/gui/text/coretext/qcoretextfontdatabase_p.h	2023-05-04 17:19:25.000000000 -0500
++++ b/src/gui/text/coretext/qcoretextfontdatabase_p.h	2023-05-04 17:19:15.000000000 -0500
+@@ -21,6 +21,10 @@
+ #include <qpa/qplatformtheme.h>
+ #include <private/qcore_mac_p.h>
+ 
++#if defined(Q_OS_MACOS)
++#include "QtCore/qtimer.h"
++#endif
++
+ Q_FORWARD_DECLARE_CF_TYPE(CTFontDescriptor);
+ Q_FORWARD_DECLARE_CF_TYPE(CTFont);
+ 
+@@ -29,7 +33,11 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-class Q_GUI_EXPORT QCoreTextFontDatabase : public QPlatformFontDatabase
++class Q_GUI_EXPORT QCoreTextFontDatabase :
++#if defined(Q_OS_MACOS)
++    public QObject,
++#endif
++    public QPlatformFontDatabase
+ {
+ public:
+     QCoreTextFontDatabase();
+@@ -63,7 +72,10 @@
+     bool m_hasPopulatedAliases;
+ 
+ #if defined(Q_OS_MACOS)
++protected:
++    void timerEvent(QTimerEvent *event) override;
+     QMacNotificationObserver m_fontSetObserver;
++    QBasicTimer m_fontSetTimer;
+ #endif
+ };
+ 
+--- a/src/gui/text/coretext/qcoretextfontdatabase.mm	2023-05-04 17:19:21.000000000 -0500
++++ b/src/gui/text/coretext/qcoretextfontdatabase.mm	2023-05-04 17:19:09.000000000 -0500
+@@ -77,9 +77,8 @@
+     : m_hasPopulatedAliases(false)
+ {
+ #if defined(Q_OS_MACOS)
+-    m_fontSetObserver = QMacNotificationObserver(nil, NSFontSetChangedNotification, [] {
+-        qCDebug(lcQpaFonts) << "Fonts have changed";
+-        QPlatformFontDatabase::repopulateFontDatabase();
++    m_fontSetObserver = QMacNotificationObserver(nil, NSFontSetChangedNotification, [this] {
++        m_fontSetTimer.start(25, this);
+     });
+ #endif
+ }
+@@ -89,6 +88,18 @@
+     qDeleteAll(m_themeFonts);
+ }
+ 
++#if defined(Q_OS_MACOS)
++void QCoreTextFontDatabase::timerEvent(QTimerEvent *event)
++{
++    if (event->timerId() == m_fontSetTimer.timerId()) {
++        m_fontSetTimer.stop();
++        qCDebug(lcQpaFonts) << "Fonts have changed";
++        QPlatformFontDatabase::repopulateFontDatabase();
++    }
++    QObject::timerEvent(event);
++}
++#endif
++
+ CTFontDescriptorRef descriptorForFamily(const QString &familyName)
+ {
+     return CTFontDescriptorCreateWithAttributes(CFDictionaryRef(@{

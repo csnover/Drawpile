@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+
+#include "desktop/main.h"
 #include "desktop/tabletinput.h"
-#include <QApplication>
-#include <QSettings>
 
 #ifdef Q_OS_WIN
 #	include "bundled/kis_tablet/kis_tablet_support_win.h"

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-FileCopyrightText: Calle Laakkonen
 
 #ifndef LISTSERVERDELEGATE_H
 #define LISTSERVERDELEGATE_H

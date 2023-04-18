@@ -44,17 +44,17 @@ QFileInfo getCertFile(CertLocation location, const QString &hostname)
 namespace net {
 
 LoginHandler::LoginHandler(Mode mode, const QUrl &url, QObject *parent)
-	: QObject(parent),
-	  m_mode(mode),
-	  m_address(url),
-	  m_state(EXPECT_HELLO),
-	  m_multisession(false),
-	  m_canPersist(false),
-	  m_canReport(false),
-	  m_needUserPassword(false),
-	  m_supportsCustomAvatars(false),
-	  m_supportsExtAuthAvatars(false),
-	  m_isGuest(true)
+	: QObject(parent)
+	, m_mode(mode)
+	, m_address(url)
+	, m_state(EXPECT_HELLO)
+	, m_multisession(false)
+	, m_canPersist(false)
+	, m_canReport(false)
+	, m_needUserPassword(false)
+	, m_supportsCustomAvatars(false)
+	, m_supportsExtAuthAvatars(false)
+	, m_isGuest(true)
 {
 	m_sessions = new LoginSessionModel(this);
 
@@ -458,10 +458,16 @@ void LoginHandler::expectSessionDescriptionJoin(const ServerReply &msg)
 			if(!m_autoJoinId.isEmpty() && (session.id == m_autoJoinId || session.alias == m_autoJoinId)) {
 				// A session ID was given as part of the URL
 
-				if(!session.incompatibleSeries.isEmpty() || (session.nsfm && pclevel >= parentalcontrols::Level::NoJoin))
-					m_autoJoinId = QString();
-				else
+				auto canJoin = session.incompatibleSeries.isEmpty();
+				if (canJoin && pclevel >= parentalcontrols::Level::NoJoin) {
+					canJoin = (parentalcontrols::useAdvisoryTag() ? !session.nsfm : true)
+						&& !parentalcontrols::isNsfmTitle(session.title);
+				}
+
+				if(canJoin)
 					joinSelectedSession(m_autoJoinId, session.needPassword);
+				else
+					m_autoJoinId = QString();
 			}
 		}
 	}
@@ -479,16 +485,21 @@ void LoginHandler::expectSessionDescriptionJoin(const ServerReply &msg)
 
 		if(session.id.isEmpty()) {
 			failLogin(tr("Session not yet started!"));
+			return;
+		} else if(parentalcontrols::level() >= parentalcontrols::Level::NoJoin) {
+			const auto blocked = (parentalcontrols::useAdvisoryTag() ? session.nsfm : false)
+				|| parentalcontrols::isNsfmTitle(session.title);
 
-		} else if(session.nsfm && parentalcontrols::level() >= parentalcontrols::Level::NoJoin) {
-			failLogin(tr("Blocked by parental controls"));
-
+			if (blocked) {
+				failLogin(tr("Blocked by content filter"));
+				return;
+			}
 		} else if(!session.incompatibleSeries.isEmpty()) {
-				failLogin(tr("Session for a different Drawpile version (%1) in progress!").arg(session.incompatibleSeries));
-
-		} else {
-			joinSelectedSession(session.id, session.needPassword);
+			failLogin(tr("Session for a different Drawpile version (%1) in progress!").arg(session.incompatibleSeries));
+			return;
 		}
+
+		joinSelectedSession(session.id, session.needPassword);
 	}
 }
 

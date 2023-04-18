@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "desktop/dialogs/sessionsettings.h"
+#include "desktop/main.h"
 #include "libclient/utils/listservermodel.h"
 #include "libclient/net/banlistmodel.h"
 #include "libclient/net/announcementlist.h"
@@ -143,7 +144,7 @@ void SessionSettingsDialog::showEvent(QShowEvent *event)
 
 void SessionSettingsDialog::reloadSettings()
 {
-	const auto listservers = sessionlisting::ListServerModel::listServers(false);
+	const auto listservers = sessionlisting::ListServerModel::listServers(dpApp().settings().listServers(), false);
 	auto *addAnnouncementMenu = m_ui->addAnnouncement->menu();
 	auto *addPrivateAnnouncementMenu = m_ui->addPrivateAnnouncement->menu();
 
@@ -402,7 +403,7 @@ void SessionSettingsDialog::sendSessionConf()
 	}
 }
 
-void SessionSettingsDialog::changeSesionConf(const QString &key, const QJsonValue &value, bool now)
+void SessionSettingsDialog::changeSessionConf(const QString &key, const QJsonValue &value, bool now)
 {
 	m_sessionconf[key] = value;
 	if(now) {
@@ -413,16 +414,16 @@ void SessionSettingsDialog::changeSesionConf(const QString &key, const QJsonValu
 	}
 }
 
-void SessionSettingsDialog::titleChanged(const QString &title) { changeSesionConf("title", title); }
-void SessionSettingsDialog::maxUsersChanged() { changeSesionConf("maxUserCount", m_ui->maxUsers->value()); }
-void SessionSettingsDialog::denyJoinsChanged(bool set) { changeSesionConf("closed", set); }
-void SessionSettingsDialog::authOnlyChanged(bool set) { changeSesionConf("authOnly", set); }
+void SessionSettingsDialog::titleChanged(const QString &title) { changeSessionConf("title", title); }
+void SessionSettingsDialog::maxUsersChanged() { changeSessionConf("maxUserCount", m_ui->maxUsers->value()); }
+void SessionSettingsDialog::denyJoinsChanged(bool set) { changeSessionConf("closed", set); }
+void SessionSettingsDialog::authOnlyChanged(bool set) { changeSessionConf("authOnly", set); }
 
-void SessionSettingsDialog::autoresetThresholdChanged() { changeSesionConf("resetThreshold", int(m_ui->autoresetThreshold->value()* 1024 * 1024)); }
-void SessionSettingsDialog::keepChatChanged(bool set) { changeSesionConf("preserveChat", set); }
-void SessionSettingsDialog::persistenceChanged(bool set) { changeSesionConf("persistent", set); }
-void SessionSettingsDialog::nsfmChanged(bool set) { changeSesionConf("nsfm", set); }
-void SessionSettingsDialog::deputiesChanged(int idx) { changeSesionConf("deputies", idx>0); }
+void SessionSettingsDialog::autoresetThresholdChanged() { changeSessionConf("resetThreshold", int(m_ui->autoresetThreshold->value()* 1024 * 1024)); }
+void SessionSettingsDialog::keepChatChanged(bool set) { changeSessionConf("preserveChat", set); }
+void SessionSettingsDialog::persistenceChanged(bool set) { changeSessionConf("persistent", set); }
+void SessionSettingsDialog::nsfmChanged(bool set) { changeSessionConf("nsfm", set); }
+void SessionSettingsDialog::deputiesChanged(int idx) { changeSessionConf("deputies", idx>0); }
 
 void SessionSettingsDialog::changePassword()
 {
@@ -442,7 +443,7 @@ void SessionSettingsDialog::changePassword()
 				&ok
 	);
 	if(ok)
-		changeSesionConf("password", newpass, true);
+		changeSessionConf("password", newpass, true);
 }
 
 void SessionSettingsDialog::changeOpword()
@@ -463,7 +464,7 @@ void SessionSettingsDialog::changeOpword()
 				&ok
 	);
 	if(ok)
-		changeSesionConf("opword", newpass, true);
+		changeSessionConf("opword", newpass, true);
 }
 
 }

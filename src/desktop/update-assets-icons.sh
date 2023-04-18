@@ -13,8 +13,14 @@ update_icons() {
 			drawpile_*)
 				continue
 				;;
-			folder.svg)
+			folder.svg | network-server-database.svg)
 				category=places
+				;;
+			network-modem.svg)
+				category=devices
+				;;
+			dialog-input-devices.svg)
+				category=actions
 				;;
 			dialog-*.svg | security-*.svg | update-none.svg)
 				category=status

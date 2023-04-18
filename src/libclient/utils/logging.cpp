@@ -6,7 +6,6 @@
 
 #include <QMessageLogContext>
 #include <QDateTime>
-#include <QSettings>
 
 #include <cstdio>
 
@@ -64,11 +63,6 @@ void logMessage(int level, const char *file, uint32_t line, const char *msg)
 
 void initLogging()
 {
-	if(!QSettings().value("settings/logfile", true).toBool()) {
-		qInfo("Logfile disabled");
-		return;
-	}
-
 	const QByteArray logpath = logFilePath();
 
 	qInfo("Opening log file: %s", logpath.constData());

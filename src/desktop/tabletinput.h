@@ -4,8 +4,8 @@
 
 #include <QString>
 
-class QApplication;
-class QSettings;
+class DrawpileApp;
+namespace desktop { namespace settings { class Settings; } }
 
 namespace tabletinput {
 

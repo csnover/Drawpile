@@ -5,6 +5,9 @@ add_library(dpclient)
 target_sources(dpclient PRIVATE
 	document.cpp
 	document.h
+	settings_table.h
+	settings.cpp
+	settings.h
 	brushes/brush.cpp
 	brushes/brush.h
 	brushes/brushpresetmodel.cpp
@@ -144,8 +147,11 @@ target_sources(dpclient PRIVATE
 	tools/zoom.h
 	utils/avatarlistmodel.cpp
 	utils/avatarlistmodel.h
+	utils/avatarlistmodeldelegate.h
 	utils/canvasshortcutsmodel.cpp
 	utils/canvasshortcutsmodel.h
+	utils/certificatestoremodel.cpp
+	utils/certificatestoremodel.h
 	utils/changeflags.h
 	utils/colorscheme.cpp
 	utils/colorscheme.h
@@ -171,7 +177,6 @@ target_sources(dpclient PRIVATE
 	utils/sessionfilterproxymodel.h
 	utils/sessionidvalidator.cpp
 	utils/sessionidvalidator.h
-	utils/settingdefault.h
 	utils/shortcutdetector.cpp
 	utils/shortcutdetector.h
 	utils/usernamevalidator.cpp

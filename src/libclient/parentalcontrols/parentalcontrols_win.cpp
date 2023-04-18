@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "libclient/parentalcontrols/parentalcontrols.h"
+#include "libclient/settings.h"
 
 #include <wpcapi.h>
 
@@ -13,8 +14,9 @@ static const IID IID_IWinParentalControls  = {0x28B4D88B,0xE072,0x49E6,{0x80,0x4
 
 static bool ACTIVE = false;
 
-void init()
+void init(libclient::settings::Settings &settings)
 {
+	g_settings = &settings;
 	qDebug("Initializing parental controls");
 
 	CoInitialize(nullptr);
@@ -30,10 +32,9 @@ void init()
 	IWPCSettings *wpcs;
 	hr = pc->GetUserSettings(nullptr, &wpcs);
 	if(hr == S_OK) {
-		DWORD settings;
-		wpcs->GetRestrictions(&settings);
-		// If web filtering is enabled, active PC mode
-		if((settings & 0x02)) {
+		DWORD restrictions;
+		wpcs->GetRestrictions(&restrictions);
+		if((restrictions & WPCFLAG_WEB_FILTERED)) {
 			ACTIVE = true;
 		}
 		wpcs->Release();
