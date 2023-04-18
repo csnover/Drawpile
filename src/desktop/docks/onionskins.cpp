@@ -169,7 +169,7 @@ OnionSkinsDock::OnionSkinsDock(const QString &title, QWidget *parent)
 	titlebar->addStretch();
 
 	connect(
-		static_cast<DrawpileApp *>(qApp), &DrawpileApp::settingsChanged, this,
+		&dpApp(), &DrawpileApp::settingsChanged, this,
 		&OnionSkinsDock::updateSettings);
 	updateSettings();
 }

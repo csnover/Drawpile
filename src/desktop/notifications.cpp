@@ -23,8 +23,8 @@ void playSoundNow(Event event, int volume)
 	}
 
 	// Lazily load the sound effect
-	DrawpileApp *app = static_cast<DrawpileApp *>(qApp);
-	if(!app->m_sounds.contains(event)) {
+	auto &app = dpApp();
+	if(!app.m_sounds.contains(event)) {
 		QString filename;
 		switch(event) {
 		case Event::CHAT: filename = QStringLiteral("sounds/chat.wav"); break;
@@ -49,12 +49,12 @@ void playSoundNow(Event event, int volume)
 
 		QSoundEffect *fx = new QSoundEffect(qApp);
 		fx->setSource(QUrl::fromLocalFile(fullpath));
-		app->m_sounds[event] = fx;
+		app.m_sounds[event] = fx;
 	}
 
 	// We have a sound effect... play it now
-	app->m_sounds[event]->setVolume(qMin(volume, 100) / 100.0);
-	app->m_sounds[event]->play();
+	app.m_sounds[event]->setVolume(qMin(volume, 100) / 100.0);
+	app.m_sounds[event]->play();
 }
 
 static bool isEnabled(Event event, QSettings &cfg)

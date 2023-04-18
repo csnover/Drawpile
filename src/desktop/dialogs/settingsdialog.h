@@ -13,6 +13,7 @@ class QListWidgetItem;
 class CanvasShortcutsModel;
 class CustomShortcutModel;
 class AvatarListModel;
+class Settings;
 
 namespace sessionlisting { class ListServerModel; }
 
@@ -74,6 +75,7 @@ private:
 	CanvasShortcutsModel *m_canvasShortcuts;
 	sessionlisting::ListServerModel *m_listservers;
 	AvatarListModel *m_avatars;
+	Settings &m_settings;
 };
 
 }

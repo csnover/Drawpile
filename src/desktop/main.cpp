@@ -3,6 +3,7 @@
 #include "desktop/main.h"
 #include "desktop/mainwindow.h"
 #include "desktop/tabletinput.h"
+#include "desktop/settingsmodel.h"
 
 #include "libclient/utils/logging.h"
 #include "libclient/utils/colorscheme.h"
@@ -109,22 +110,13 @@ bool DrawpileApp::event(QEvent *e) {
 	return QApplication::event(e);
 }
 
-void DrawpileApp::notifySettingsChanged()
+void DrawpileApp::setTheme(Settings::ThemeEnum theme)
 {
-	tabletinput::update(QSettings{});
-	emit settingsChanged();
-}
-
-void DrawpileApp::setTheme(int theme)
-{
-	if(theme < THEME_SYSTEM || theme >= THEME_COUNT) {
-		theme = THEME_DEFAULT;
-	}
-
+	using Theme = Settings::ThemeEnum;
 	switch(theme) {
-	case THEME_SYSTEM:
-	case THEME_SYSTEM_LIGHT:
-	case THEME_SYSTEM_DARK:
+	case Theme::System:
+	case Theme::SystemLight:
+	case Theme::SystemDark:
 #ifdef Q_OS_WIN
 		// Empty string will use the Vista style, which is so incredibly ugly
 		// that it looks outright broken. So we use the old Windows-95-esque
@@ -136,7 +128,7 @@ void DrawpileApp::setTheme(int theme)
 		setStyle(QStringLiteral(""));
 #endif
 		break;
-	case THEME_HOTDOG_STAND:
+	case Theme::HotdogStand:
 		setStyle(QStringLiteral("Windows"));
 		break;
 	default:
@@ -145,7 +137,7 @@ void DrawpileApp::setTheme(int theme)
 	}
 
 	switch(theme) {
-	case THEME_SYSTEM_DARK:
+	case Theme::SystemDark:
 #ifdef Q_OS_MACOS
 		if (macui::setNativeAppearance(macui::Appearance::Dark)) {
 			setPalette(style()->standardPalette());
@@ -153,10 +145,10 @@ void DrawpileApp::setTheme(int theme)
 		}
 #endif
 		[[fallthrough]];
-	case THEME_FUSION_DARK:
+	case Theme::FusionDark:
 		setPalette(loadPalette(QStringLiteral("nightmode.colors")));
 		break;
-	case THEME_SYSTEM_LIGHT:
+	case Theme::SystemLight:
 #ifdef Q_OS_MACOS
 	if (macui::setNativeAppearance(macui::Appearance::Light)) {
 		setPalette(style()->standardPalette());
@@ -164,16 +156,16 @@ void DrawpileApp::setTheme(int theme)
 	}
 #endif
 		[[fallthrough]];
-	case THEME_KRITA_BRIGHT:
+	case Theme::KritaBright:
 		setPalette(loadPalette(QStringLiteral("kritabright.colors")));
 		break;
-	case THEME_KRITA_DARK:
+	case Theme::KritaDark:
 		setPalette(loadPalette(QStringLiteral("kritadark.colors")));
 		break;
-	case THEME_KRITA_DARKER:
+	case Theme::KritaDarker:
 		setPalette(loadPalette(QStringLiteral("kritadarker.colors")));
 		break;
-	case THEME_HOTDOG_STAND:
+	case Theme::HotdogStand:
 		setPalette(loadPalette(QStringLiteral("hotdogstand.colors")));
 		break;
 	default:
@@ -233,21 +225,9 @@ void DrawpileApp::initTheme()
 	}
 	QIcon::setThemeSearchPaths(themePaths);
 
-	QSettings settings;
-
-	// Override widget theme
-	int theme = settings.value("settings/theme", DrawpileApp::THEME_SYSTEM).toInt();
-
-	// System themes tend to look ugly and broken. Reset the theme once to get
-	// a sensible default, the user can still revert to the ugly theme manually.
-	int themeVersion = settings.value("settings/themeversion", 0).toInt();
-	if(themeVersion < 1) {
-		theme = DrawpileApp::THEME_DEFAULT;
-		settings.setValue("settings/theme", theme);
-		settings.setValue("settings/themeversion", DrawpileApp::THEME_VERSION);
-	}
-
-	setTheme(theme);
+	m_settings.bind(Settings::Theme, this, &DrawpileApp::setTheme);
+	// If the theme is set to the default theme then the palette will not change
+	// and icon initialisation will be incomplete if it is not updated once here
 	updateThemeIcons();
 }
 
@@ -279,26 +259,11 @@ void DrawpileApp::openUrl(QUrl url)
 
 void DrawpileApp::openBlankDocument()
 {
-	// Open a new window with a blank image
-	QSettings cfg;
-
-	const QSize maxSize {65536, 65536};
-	QSize size = cfg.value("history/newsize").toSize();
-
-	if(size.width()<100 || size.height()<100) {
-		// No previous size, or really small size
-		size = QSize(800, 600);
-	} else {
-		// Make sure previous size is not ridiculously huge
-		size = size.boundedTo(maxSize);
-	}
-
-	QColor color = cfg.value("history/newcolor").value<QColor>();
-	if(!color.isValid())
-		color = Qt::white;
-
 	MainWindow *win = new MainWindow;
-	win->newDocument(size, color);
+	win->newDocument(
+		m_settings.get<QSize>(Settings::NewCanvasSize),
+		m_settings.get<QColor>(Settings::NewCanvasBackColor)
+	);
 }
 
 void DrawpileApp::deleteAllMainWindowsExcept(MainWindow *win)
@@ -339,7 +304,7 @@ static void initTranslations(DrawpileApp &app, const QLocale &locale)
 	if(translator->isEmpty())
 		delete translator;
 	else
-		qApp->installTranslator(translator);
+		app.installTranslator(translator);
 }
 
 #ifdef Q_OS_WIN
@@ -432,8 +397,6 @@ static QStringList initApp(DrawpileApp &app)
 	// Continue initialization (can use QSettings from now on)
 	utils::initLogging();
 
-	QSettings settings;
-
 	app.initTheme();
 
 #ifdef Q_OS_MACOS
@@ -453,7 +416,7 @@ static QStringList initApp(DrawpileApp &app)
 	});
 #endif
 
-	tabletinput::init(&app, settings);
+	tabletinput::init(app);
 
 	// Set override locale from settings, or use system locale if no override is set
 	QLocale locale = QLocale::c();

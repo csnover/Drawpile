@@ -4,14 +4,11 @@
 
 #include <QString>
 
-class QApplication;
-class QSettings;
+class DrawpileApp;
 
 namespace tabletinput {
 
-void init(QApplication *app, const QSettings &cfg);
-
-void update(const QSettings &cfg);
+void init(DrawpileApp &app);
 
 QString current();
 

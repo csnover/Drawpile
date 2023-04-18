@@ -413,15 +413,9 @@ MainWindow::MainWindow(bool restoreWindowPosition)
 		}
 	});
 
-	DrawpileApp *app = static_cast<DrawpileApp *>(qApp);
-	connect(app, &DrawpileApp::settingsChanged, this, &MainWindow::loadShortcuts);
-	connect(app, &DrawpileApp::settingsChanged, this, &MainWindow::updateSettings);
-	connect(app, &DrawpileApp::settingsChanged, m_doc, &Document::updateSettings);
-	connect(app, &DrawpileApp::settingsChanged, m_view, &widgets::CanvasView::updateSettings);
-	connect(app, &DrawpileApp::setDockTitleBarsHidden, this, &MainWindow::setDockTitleBarsHidden);
+	connect(&dpApp(), &DrawpileApp::setDockTitleBarsHidden, this, &MainWindow::setDockTitleBarsHidden);
 
 	updateSettings();
-	m_doc->updateSettings();
 
 	// Create actions and menus
 	setupActions();

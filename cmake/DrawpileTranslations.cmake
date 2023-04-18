@@ -7,6 +7,15 @@ define_property(TARGET PROPERTY DP_TRANSLATION_QM_FILES
 	FULL_DOCS ".qm files for this target"
 )
 
+#[[
+Returns the list of supported languages in a variable that can be interpolated
+into a C++ initializer list.
+#]]
+function(get_supported_langs_cxx out_var)
+	list(JOIN SUPPORTED_LANGS "\", \"" langs)
+	set(${out_var} "\"${langs}\"" PARENT_SCOPE)
+endfunction()
+
 # Using a variable name used anywhere else as a parameter causes CMake to
 # erase the parent one
 function(_add_translation _qm_files)

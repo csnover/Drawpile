@@ -31,7 +31,7 @@ protected:
 	{
 		QPainter painter{this};
 		painter.translate(sizeHint().width(), 0);
-		painter.rotate(90.0);
+		painter.rotate(-90.0);
 		painter.drawText(0, 0, height(), width(), alignment(), text());
 	}
 

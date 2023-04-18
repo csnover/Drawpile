@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "desktop/main.h"
+#include "desktop/settingsmodel.h"
 #include "desktop/dialogs/settingsdialog.h"
+#include "desktop/dialogs/settingsdialog/general.h"
+#include "desktop/dialogs/settingsdialog/input.h"
+#include "desktop/dialogs/settingsdialog/tools.h"
 #include "desktop/dialogs/canvasshortcutsdialog.h"
 #include "desktop/dialogs/certificateview.h"
 #include "desktop/dialogs/avatarimport.h"
@@ -69,7 +73,7 @@ static constexpr int INPUT_WINTAB_RELATIVE_PEN_MODE_HACK = 2;
 
 using color_widgets::ColorWheel;
 
-class KeySequenceEditFactory : public QItemEditorCreatorBase
+class KeySequenceEditFactory final : public QItemEditorCreatorBase
 {
 public:
 	QWidget *createWidget(QWidget *parent) const override
@@ -96,6 +100,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 	: QDialog(parent)
 	, m_ui(new Ui_SettingsDialog)
 	, m_itemEditorFactory(new QItemEditorFactory)
+	, m_settings(dpApp().settings())
 {
 	m_ui->setupUi(this);
 
@@ -119,9 +124,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 		}
 	}
 
-	connect(m_ui->themeChoice, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int theme) {
-		static_cast<DrawpileApp *>(qApp)->setTheme(theme);
-	});
+	m_settings.bind(Settings::Theme, m_ui->themeChoice, &QComboBox::setCurrentIndex, &QComboBox::currentIndexChanged);
 
 #if defined(HAVE_INPUT_SETTINGS)
 #	if !defined(HAVE_RELATIVE_PEN_MODE_HACK)
@@ -184,7 +187,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 	connect(m_ui->removeKnownHosts, SIGNAL(clicked()), this, SLOT(removeCertificates()));
 	connect(m_ui->importTrustedButton, SIGNAL(clicked()), this, SLOT(importTrustedCertificate()));
 
-	QStringList pemfilter; pemfilter << "*.pem";
+	QStringList pemfilter{{ "*.pem" }};
 	QDir knownHostsDir(utils::paths::writablePath("known-hosts"));
 
 	for(const QString &filename : knownHostsDir.entryList(pemfilter, QDir::Files)) {
@@ -250,14 +253,21 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
 	// Settings saving
 	connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::rememberSettings);
-	connect(m_ui->buttonBox, &QDialogButtonBox::rejected, [] {
-		static_cast<DrawpileApp *>(qApp)->setTheme(QSettings().value("settings/theme", DrawpileApp::THEME_DEFAULT).toInt());
+	connect(m_ui->buttonBox, &QDialogButtonBox::rejected, [=] {
+		m_settings.revert();
 	});
 	connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::saveCertTrustChanges);
 	connect(m_ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &SettingsDialog::resetSettings);
 
 	// Active first page
 	m_ui->pager->setCurrentRow(0);
+
+	m_ui->pager->addItem("new general");
+	m_ui->stackedWidget->addWidget(new settingsdialog::General(this));
+	m_ui->pager->addItem("new input");
+	m_ui->stackedWidget->addWidget(new settingsdialog::Input(this));
+	m_ui->pager->addItem("new tools");
+	m_ui->stackedWidget->addWidget(new settingsdialog::Tools(this));
 }
 
 SettingsDialog::~SettingsDialog()
@@ -287,10 +297,6 @@ void SettingsDialog::resetSettings()
 					cfg.remove(key);
 				}
 			}
-
-			// Restore theme version so the selected theme doesn't
-			// get clobbered with the default on next startup.
-			cfg.setValue("settings/themeversion", DrawpileApp::THEME_VERSION);
 		}
 
 		restoreSettings();
@@ -328,7 +334,6 @@ void SettingsDialog::restoreSettings()
 		}
 	}
 
-	m_ui->themeChoice->setCurrentIndex(cfg.value("theme", DrawpileApp::THEME_DEFAULT).toInt());
 	m_ui->logfile->setChecked(cfg.value("logfile", true).toBool());
 	m_ui->autosaveInterval->setValue(cfg.value("autosave", 5000).toInt() / 1000);
 
@@ -571,6 +576,7 @@ void SettingsDialog::rememberSettings()
 	m_customShortcuts->saveShortcuts();
 	m_listservers->saveServers();
 	m_avatars->commit();
+	m_settings.submit();
 
 	static_cast<DrawpileApp*>(qApp)->notifySettingsChanged();
 }

@@ -29,6 +29,8 @@ target_sources(drawpile PRIVATE
 	mainwindow.h
 	notifications.cpp
 	notifications.h
+	settingsmodel.cpp
+	settingsmodel.h
 	tabletinput.cpp
 	tabletinput.h
 	chat/chatbox.cpp
@@ -110,6 +112,13 @@ target_sources(drawpile PRIVATE
 	dialogs/sessionsettings.h
 	dialogs/settingsdialog.cpp
 	dialogs/settingsdialog.h
+	dialogs/settingsdialog/common.h
+	dialogs/settingsdialog/general.cpp
+	dialogs/settingsdialog/general.h
+	dialogs/settingsdialog/input.cpp
+	dialogs/settingsdialog/input.h
+	dialogs/settingsdialog/tools.cpp
+	dialogs/settingsdialog/tools.h
 	dialogs/tablettester.cpp
 	dialogs/tablettester.h
 	dialogs/userinfodialog.cpp

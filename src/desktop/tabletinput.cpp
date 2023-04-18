@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "desktop/main.h"
 #include "desktop/tabletinput.h"
 #include <QApplication>
 #include <QSettings>
@@ -18,74 +19,65 @@ namespace tabletinput {
 
 static const char *inputMode = "Qt tablet input";
 
-void init(QApplication *app, const QSettings &cfg)
+#ifdef Q_OS_WIN
+static void updateWindowsInk(bool enable)
 {
-#if defined(Q_OS_WIN) && defined(HAVE_KIS_TABLET)
-	bool useWindowsInk = false;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	using QWindowsApplication = QNativeInterface::Private::QWindowsApplication;
+	if (auto *wa = qApp->nativeInterface<QWindowsApplication>()) {
+		wa->setWinTabEnabled(!enable);
+		if(wa->isWinTabEnabled()) {
+			qDebug("Wintab enabled");
+			inputMode = "Qt6 Wintab input";
+		} else {
+			qDebug("Wintab disabled");
+			inputMode = "Qt6 Windows Ink input";
+		}
+	} else {
+		qWarning("Error retrieving Windows platform integration");
+	}
+#else
 	// Enable Windows Ink tablet event handler
 	// This was taken directly from Krita
-	if(cfg.value("settings/input/windowsink", true).toBool()) {
+	if(enable) {
 		KisTabletSupportWin8 *penFilter = new KisTabletSupportWin8();
 		if(penFilter->init()) {
 			app->installNativeEventFilter(penFilter);
-			useWindowsInk = true;
 			inputMode = "KisTablet Windows Ink input";
 			qDebug("Using Win8 Pointer Input for tablet support");
-
 		} else {
 			qWarning("No Win8 Pointer Input available");
 			delete penFilter;
 		}
 	} else {
-		qDebug("Win8 Pointer Input disabled");
-	}
-
-	if(!useWindowsInk) {
 		// Enable modified Wintab support
 		// This too was taken from Krita
 		qDebug("Enabling custom Wintab support");
 		KisTabletSupportWin::init();
-		if(cfg.value("settings/input/relativepenhack", false).toBool()) {
-			KisTabletSupportWin::enableRelativePenModeHack(true);
-			inputMode = "KisTablet Wintab input with relative pen mode hack";
-		} else {
-			KisTabletSupportWin::enableRelativePenModeHack(false);
-			inputMode = "KisTablet Wintab input";
-		}
+		qDebug("Win8 Pointer Input disabled");
 	}
-#elif defined(Q_OS_WIN) && QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-	Q_UNUSED(app);
-	update(cfg);
-#else
-	// Nothing to do on other platforms.
-	Q_UNUSED(app);
-	Q_UNUSED(cfg);
 #endif
 }
 
-void update(const QSettings &cfg)
+void updateRelativePenMode(bool enable)
 {
-#if defined(Q_OS_WIN) && QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-	// See by qtbase tests/manual/qtabletevent/regular_widgets/main.cpp
-	using QWindowsApplication = QNativeInterface::Private::QWindowsApplication;
-	QWindowsApplication *wa = dynamic_cast<QWindowsApplication *>(
-		QGuiApplicationPrivate::platformIntegration());
-	if(wa) {
-        bool windowsInk = cfg.value("settings/input/windowsink", true).toBool();
-		wa->setWinTabEnabled(!windowsInk);
-        if(wa->isWinTabEnabled()) {
-            qDebug("Wintab enabled");
-			inputMode = "Qt6 Wintab input";
-        } else {
-            qDebug("Wintab disabled");
-			inputMode = "Qt6 Windows Ink input";
-        }
+	KisTabletSupportWin::enableRelativePenModeHack(enable);
+	if(enable) {
+		inputMode = "KisTablet Wintab input with relative pen mode hack";
 	} else {
-		qWarning("Error retrieving Windows platform integration");
+		inputMode = "KisTablet Wintab input";
 	}
+}
+#endif
+
+void init(DrawpileApp &app)
+{
+#if defined(Q_OS_WIN) && defined(HAVE_KIS_TABLET)
+	app.settings().bind(Settings::TabletWindowsInk, &updateWindowsInk);
+	app.settings().bind(Settings::TabletRelativePenMode, &updateRelativePenMode);
 #else
-	// Nothing to do on other platforms, KIS_TABLET needs a restart.
-	Q_UNUSED(cfg);
+	// Nothing to do on other platforms.
+	Q_UNUSED(app);
 #endif
 }
 
