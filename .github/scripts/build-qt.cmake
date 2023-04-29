@@ -203,13 +203,17 @@ if(BASE)
 		ALL_PLATFORMS
 			${BASE_GENERATOR}
 				ALL
-					-release -opensource -confirm-license
+					-opensource -confirm-license
 					-nomake tests -nomake examples
 					-no-sql-mysql -no-sql-odbc -no-sql-psql -sql-sqlite
 					-qt-libjpeg -qt-libpng -qt-sqlite -qt-harfbuzz
 					${BASE_FLAGS}
 				DEBUG
-					-force-asserts -force-debug-info -separate-debug-info
+					-debug -separate-debug-info
+				RELWITHDEBINFO
+					-release -force-asserts -force-debug-info -separate-debug-info
+				RELEASE
+					-release
 		PATCHES
 			ALL
 				patches/qtbug-111538.diff
