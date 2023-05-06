@@ -2799,7 +2799,9 @@ void MainWindow::setupActions()
 	addToolBar(Qt::TopToolBarArea, filetools);
 
 	connect(m_recentMenu, &QMenu::triggered, this, [this](QAction *action) {
-		this->open(QUrl::fromLocalFile(action->property("filepath").toString()));
+		if (action->property("filepath").isValid()) {
+			this->open(QUrl::fromLocalFile(action->property("filepath").toString()));
+		}
 	});
 
 	//

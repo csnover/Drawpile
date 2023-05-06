@@ -3,6 +3,8 @@
 #ifndef RECENTFILES_H
 #define RECENTFILES_H
 
+#include <QCoreApplication>
+
 class QMenu;
 class QString;
 
@@ -11,6 +13,8 @@ class QString;
  * saved files.
  */
 class RecentFiles {
+	Q_DECLARE_TR_FUNCTIONS(RecentFiles)
+
 	public:
 		//! Add a new entry to the list of recent files
 		static void addFile(const QString& file);

@@ -50,6 +50,12 @@ void RecentFiles::initMenu(QMenu *menu)
 		a->setProperty("filepath", absoluteFilePath);
 		++index;
 	}
+
+	menu->addSeparator();
+	menu->addAction(tr("Clear Recently Opened"), [=] {
+		dpApp().settings().setRecentFiles(QStringList());
+		RecentFiles::initMenu(menu);
+	});
 }
 
 
