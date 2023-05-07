@@ -60,6 +60,66 @@ namespace newCanvasBackColor {
 	}
 }
 
+namespace tabletDriver {
+	QVariant get(const SettingMeta &meta, const QSettings &settings)
+	{
+		using tabletinput::Mode;
+
+		auto mode = meta.defaultValue.value<Mode>();
+		if (findKey(settings, meta.baseKey, meta.version)) {
+			mode = any::get(meta, settings).value<Mode>();
+		} else if (const auto inkKey = findKey(settings, "settings/input/windowsink", SettingMeta::Version::V0)) {
+			const auto useInk = settings.value(inkKey->key).toBool();
+			const auto modeKey = findKey(settings, "settings/input/relativepenhack", SettingMeta::Version::V0);
+			const auto relativeMode = modeKey
+				? settings.value(modeKey->key).toBool()
+				: false;
+
+			mode = Mode::KisTabletWintab;
+			if (relativeMode) {
+				mode = Mode::KisTabletWintabRelativePenHack;
+			} else if (useInk) {
+				mode = Mode::KisTabletWinink;
+			}
+		}
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+		if (mode == Mode::Qt5) {
+			mode = Mode::Qt6Winink;
+		}
+#else
+		if (mode == Mode::Qt6Winink || mode == Mode::Qt6Wintab) {
+			mode = Mode::Qt5;
+		}
+#endif
+
+		return QVariant::fromValue(mode);
+	}
+
+	void set(const SettingMeta &meta, QSettings &settings, QVariant value)
+	{
+		any::set(meta, settings, value);
+
+		if (const auto oldKey = findKey(settings, "settings/input/windowsink", SettingMeta::Version::V0)) {
+			const auto mode = value.value<tabletinput::Mode>();
+			auto useInk = false;
+			auto relativeMode = false;
+			switch (mode) {
+			case tabletinput::Mode::KisTabletWintabRelativePenHack:
+				relativeMode = true;
+				break;
+			case tabletinput::Mode::Qt6Winink:
+			case tabletinput::Mode::KisTabletWinink:
+				useInk = true;
+				break;
+			default: {}
+			}
+			settings.setValue(oldKey->key, useInk);
+			settings.setValue("settings/input/relativepenhack", relativeMode);
+		}
+	}
+}
+
 namespace themePalette {
 	QVariant get(const SettingMeta &meta, const QSettings &settings)
 	{

@@ -393,7 +393,7 @@ static QStringList initApp(DrawpileApp &app)
 	});
 #endif
 
-	tabletinput::update(&app, settings);
+	tabletinput::init(app);
 
 	// Set override locale from settings, or use system locale if no override is set
 	QLocale locale = QLocale::c();

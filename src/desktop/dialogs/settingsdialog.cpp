@@ -14,7 +14,6 @@
 #include <QAction>
 #include <QBoxLayout>
 #include <QButtonGroup>
-#include <QDebug>
 #ifndef Q_OS_MACOS
 #include <QStackedWidget>
 #endif

@@ -2,6 +2,7 @@
 #ifndef DESKTOP_SETTINGS_H
 #define DESKTOP_SETTINGS_H
 
+#include "desktop/tabletinput.h"
 #include "libclient/export/videoexporter.h"
 #include "libclient/settings.h"
 #include "libclient/tools/tool.h"

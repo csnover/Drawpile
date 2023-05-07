@@ -2,14 +2,13 @@
 #ifndef TABLETINPUT_H
 #define TABLETINPUT_H
 
+#include <QMetaType>
 #include <QString>
 
 class DrawpileApp;
-namespace desktop { namespace settings { class Settings; } }
 
 namespace tabletinput {
-
-#if defined(Q_OS_WIN)
+Q_NAMESPACE
 
 enum class Mode : int {
 	Uninitialized, // Must be the first value, used for a range check.
@@ -24,11 +23,9 @@ enum class Mode : int {
 	Last = Qt5, // Must be equal to the last value, used for a range check.
 };
 
-Mode extractMode(const QSettings &cfg);
+Q_ENUM_NS(Mode)
 
-#endif
-
-void update(QApplication *app, const QSettings &cfg);
+void init(DrawpileApp &app);
 
 QString current();
 
