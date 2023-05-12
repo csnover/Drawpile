@@ -64,6 +64,7 @@ void VersionCheckDialog::doVersionCheckIfNeeded()
 void VersionCheckDialog::queryNewVersions()
 {
 	m_newversion = new NewVersionCheck(this);
+	m_newversion->setShowBetas(dpApp().settings().versionCheckBeta());
 	connect(m_newversion, &NewVersionCheck::versionChecked, this, &VersionCheckDialog::versionChecked);
 	m_newversion->queryVersions(dpApp().settings());
 }

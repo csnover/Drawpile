@@ -22,6 +22,9 @@ private:
 	void initSnapshots(desktop::settings::Settings &settings, utils::SanerFormLayout *form);
 	void initTheme(desktop::settings::Settings &settings, utils::SanerFormLayout *form);
 	void initUndo(desktop::settings::Settings &settings, utils::SanerFormLayout *form);
+#ifdef ENABLE_VERSION_CHECK
+	void initVersionCheck(desktop::settings::Settings &settings, utils::SanerFormLayout *form);
+#endif
 };
 
 } // namespace settingsdialog

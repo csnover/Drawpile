@@ -24,6 +24,10 @@ General::General(desktop::settings::Settings &settings, QWidget *parent)
 	initTheme(settings, form);
 	initLanguage(settings, form);
 	form->addSeparator();
+#ifdef ENABLE_VERSION_CHECK
+	initVersionCheck(settings, form);
+	form->addSeparator();
+#endif
 	initMiscUi(settings, form);
 	form->addSeparator();
 	initUndo(settings, form);
@@ -142,6 +146,20 @@ void General::initUndo(desktop::settings::Settings &settings, utils::SanerFormLa
 	undoLimitLayout->setControlTypes(QSizePolicy::CheckBox);
 	form->addRow(tr("Session history:"), undoLimitLayout);
 }
+
+#ifdef ENABLE_VERSION_CHECK
+void General::initVersionCheck(desktop::settings::Settings &settings, utils::SanerFormLayout *form)
+{
+	auto *versionCheck = new QCheckBox(tr("Check for new versions"), this);
+	settings.bindVersionCheckEnabled(versionCheck);
+	form->addRow(tr("Automatic updates:"), versionCheck);
+
+	auto *versionCheckBeta = new QCheckBox(tr("Include beta versions"), this);
+	settings.bindVersionCheckEnabled(versionCheckBeta, &QCheckBox::setEnabled);
+	settings.bindVersionCheckBeta(versionCheckBeta);
+	form->addRow(nullptr, utils::indent(versionCheckBeta));
+}
+#endif
 
 } // namespace settingsdialog
 } // namespace dialogs

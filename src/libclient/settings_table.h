@@ -15,6 +15,7 @@ SETTING(listServers               , ListServers               , "listservers"   
 SETTING(serverAutoReset           , ServerAutoReset           , "settings/server/autoreset"             , true)
 SETTING(serverTimeout             , ServerTimeout             , "settings/server/timeout"               , 60)
 SETTING(smoothing                 , Smoothing                 , "settings/input/smooth"                 , defaultSmoothing)
+SETTING(versionCheckBeta          , VersionCheckBeta          , "versioncheck/beta"                     , false)
 SETTING(versionCheckEnabled       , VersionCheckEnabled       , "versioncheck/enabled"                  , false)
 SETTING(versionCheckLastCheck     , VersionCheckLastCheck     , "versioncheck/lastcheck"                , QString())
 SETTING(versionCheckLastSuccess   , VersionCheckLastSuccess   , "versioncheck/lastsuccess"              , false)

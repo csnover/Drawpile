@@ -34,28 +34,7 @@ Network::Network(desktop::settings::Settings &settings, QWidget *parent)
 	form->addSeparator();
 	initSounds(settings, form);
 	form->addSeparator();
-
-	auto *allowInsecure = new QCheckBox(tr("Allow insecure local storage"), this);
-	settings.bindInsecurePasswordStorage(allowInsecure);
-	form->addRow(tr("Password security:"), allowInsecure);
-
-	auto *autoReset = form->addRadioGroup(tr("Connection quality:"), true, {
-		{ tr("Good"), 1 },
-		{ tr("Poor"), 0 }
-	});
-	settings.bindServerAutoReset(autoReset);
-	auto *autoResetNote = new QWidget;
-	auto *autoResetNoteLayout = utils::note(tr("If all operators in a session set connection quality to Poor, auto-reset will not work and the server will stop processing updates until the session is manually reset."), QSizePolicy::Label);
-	autoResetNoteLayout->insertWidget(0, makeIconLabel(QStyle::SP_MessageBoxWarning, QStyle::PM_SmallIconSize, this), 0, Qt::AlignTop);
-	autoResetNote->setLayout(autoResetNoteLayout);
-	form->addRow(nullptr, autoResetNote);
-	settings.bindServerAutoReset(autoResetNote, &QWidget::setHidden);
-
-	auto *timeout = new QSpinBox(this);
-	timeout->setAlignment(Qt::AlignLeft);
-	timeout->setRange(15, 600);
-	settings.bindServerTimeout(timeout);
-	form->addRow(tr("Network timeout:"), utils::encapsulate(tr("%1 seconds"), timeout));
+	initMisc(settings, form);
 }
 
 void Network::initAvatars(utils::SanerFormLayout *form)
@@ -85,6 +64,31 @@ void Network::initAvatars(utils::SanerFormLayout *form)
 	form->addSpanningRow(listActions(avatars, tr("Add avatar…"), [=] {
 		AvatarImport::importAvatar(avatarsModel, this);
 	}, tr("Delete selected avatars…"), makeDefaultDeleter(this, avatars, tr("Delete avatars"), QT_TR_NOOP("Really delete %n avatars?"))));
+}
+
+void Network::initMisc(desktop::settings::Settings &settings, utils::SanerFormLayout *form)
+{
+	auto *allowInsecure = new QCheckBox(tr("Allow insecure local storage"), this);
+	settings.bindInsecurePasswordStorage(allowInsecure);
+	form->addRow(tr("Password security:"), allowInsecure);
+
+	auto *autoReset = form->addRadioGroup(tr("Connection quality:"), true, {
+		{ tr("Good"), 1 },
+		{ tr("Poor"), 0 }
+	});
+	settings.bindServerAutoReset(autoReset);
+	auto *autoResetNote = new QWidget;
+	auto *autoResetNoteLayout = utils::note(tr("If all operators in a session set connection quality to Poor, auto-reset will not work and the server will stop processing updates until the session is manually reset."), QSizePolicy::Label);
+	autoResetNoteLayout->insertWidget(0, makeIconLabel(QStyle::SP_MessageBoxWarning, QStyle::PM_SmallIconSize, this), 0, Qt::AlignTop);
+	autoResetNote->setLayout(autoResetNoteLayout);
+	form->addRow(nullptr, autoResetNote);
+	settings.bindServerAutoReset(autoResetNote, &QWidget::setHidden);
+
+	auto *timeout = new QSpinBox(this);
+	timeout->setAlignment(Qt::AlignLeft);
+	timeout->setRange(15, 600);
+	settings.bindServerTimeout(timeout);
+	form->addRow(tr("Network timeout:"), utils::encapsulate(tr("%1 seconds"), timeout));
 }
 
 void Network::initSounds(desktop::settings::Settings &settings, utils::SanerFormLayout *form)
