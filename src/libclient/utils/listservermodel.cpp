@@ -34,7 +34,10 @@ QVariant ListServerModel::data(const QModelIndex &index, int role) const
 		const ListServer &srv = m_servers.at(index.row());
 		switch(role) {
 		case Qt::DisplayRole: return srv.name;
-		case Qt::DecorationRole: return srv.icon;
+		case Qt::DecorationRole:
+			return srv.icon.isNull()
+				? QIcon::fromTheme("network-workgroup")
+				: srv.icon;
 		case Qt::ToolTipRole: return QString("%1\n\n%2\n\nURL: %3\nRead-only: %4, public: %5, private: %6").arg(
 			srv.name,
 			srv.description,
