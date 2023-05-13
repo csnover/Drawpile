@@ -55,6 +55,11 @@ CanvasView::CanvasView(QWidget *parent)
 	m_notificationBar = new NotificationBar(this);
 	connect(m_notificationBar, &NotificationBar::actionButtonClicked, this, &CanvasView::reconnectRequested);
 
+	m_activationTimer.setSingleShot(true);
+	connect(&m_activationTimer, &QTimer::timeout, this, [=] {
+		m_inputState = InputState::Normal;
+	});
+
 	m_trianglerightcursor = QCursor(QPixmap(":/cursors/triangle-right.png"), 14, 14);
 	m_triangleleftcursor = QCursor(QPixmap(":/cursors/triangle-left.png"), 14, 14);
 	m_colorpickcursor = QCursor(QPixmap(":/cursors/colorpicker.png"), 2, 29);
@@ -569,6 +574,17 @@ void CanvasView::penPressEvent(long long timeMsec, const QPointF &pos, qreal pre
 		break;
 	}
 
+	switch(m_inputState) {
+	case InputState::Waiting:
+		m_activationTimer.stop();
+		m_inputState = InputState::Blocked;
+		[[fallthrough]];
+	case InputState::Blocked:
+		return;
+	case InputState::Normal:
+		break;
+	}
+
 	if(m_dragmode == ViewDragMode::Prepared) {
 		m_dragLastPoint = pos.toPoint();
 		m_dragmode = ViewDragMode::Started;
@@ -666,7 +682,7 @@ void CanvasView::mouseMoveEvent(QMouseEvent *event)
 		return;
 	}
 
-	if(m_pendown && event->buttons() == Qt::NoButton) {
+	if((m_inputState == InputState::Blocked || m_pendown) && event->buttons() == Qt::NoButton) {
 		// In case we missed a mouse release
 		mouseReleaseEvent(event);
 		return;
@@ -686,6 +702,10 @@ void CanvasView::mouseMoveEvent(QMouseEvent *event)
 
 void CanvasView::penReleaseEvent(long long timeMsec, const QPointF &pos, Qt::MouseButton button, Qt::KeyboardModifiers modifiers)
 {
+	if (m_inputState == InputState::Blocked) {
+		m_inputState = InputState::Normal;
+	}
+
 	canvas::Point point = mapToScene(timeMsec, pos, 0.0, 0.0, 0.0, 0.0);
 	m_prevpoint = point;
 	CanvasShortcuts::Match mouseMatch = m_canvasShortcuts.matchMouseButton(
@@ -1168,8 +1188,12 @@ void CanvasView::flushTouchDrawBuffer()
  */
 bool CanvasView::viewportEvent(QEvent *event)
 {
-	QEvent::Type type = event->type();
-	if(type == QEvent::TouchBegin || type == QEvent::TouchUpdate || type == QEvent::TouchEnd || type == QEvent::TouchCancel) {
+	const auto type = event->type();
+	if(type == QEvent::WindowActivate) {
+		m_inputState = InputState::Waiting;
+		// 20ms is arbitrary
+		m_activationTimer.start(20);
+	} else if(type == QEvent::TouchBegin || type == QEvent::TouchUpdate || type == QEvent::TouchEnd || type == QEvent::TouchCancel) {
 		touchEvent(static_cast<QTouchEvent*>(event));
 	}
 	else if(type == QEvent::TabletPress && m_enableTablet) {
